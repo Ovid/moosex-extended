@@ -48,7 +48,17 @@ This module is **EXPERIMENTAL**! All features subject to change.
 This class attempts to create a "safer" version of Moose that default to
 read-only attributes and is easier to read and write.
 
-It's sort of the equivalent to:
+This:
+
+```perl
+package My::Class {
+    use MooseX::Extreme;
+
+    ... your code here
+}
+```
+
+Is sort of the equivalent to:
 
 ```perl
 package My::Class {
@@ -98,7 +108,7 @@ _optionally_ be passed to the constructor, just use `required => 0`.
 param title => ( isa => Str, required => 0 );
 ```
 
-Note that `param`, like `field`, defaults to read-only, `is => 'ro`.
+Note that `param`, like `field`, defaults to read-only, `is => 'ro'`.
 You can override this:
 
 ```perl
@@ -134,7 +144,7 @@ has created => (
 );
 ```
 
-Note that `field`, like `param`, defaults to read-only, `is => 'ro`.
+Note that `field`, like `param`, defaults to read-only, `is => 'ro'`.
 You can override this:
 
 ```perl
@@ -142,7 +152,11 @@ field some_data => ( is => 'rw', isa => NonEmptyStr );
 ```
 
 Otherwise, it behaves like `has`. You can pass in any arguments that `has`
-accepts. However, if you pass in `init_arg`, that will be ignored.
+accepts.
+
+**WARNING**: if you pass in `init_arg`, that will be ignored. A `field` is
+just for instance data the class uses. It's not to be passed to the
+constructor. If you want that, just use `param`.
 
 # TODO
 

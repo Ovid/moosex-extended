@@ -57,7 +57,7 @@ I<optionally> be passed to the constructor, just use C<< required => 0 >>.
 
     param title => ( isa => Str, required => 0 );
 
-Note that C<param>, like C<field>, defaults to read-only, C<< is => 'ro >>.
+Note that C<param>, like C<field>, defaults to read-only, C<< is => 'ro' >>.
 You can override this:
 
     param name => ( is => 'rw', isa => NonEmptyStr );
@@ -101,13 +101,17 @@ The above C<field> definition is equivalent to:
         default  => sub { time },
     );
 
-Note that C<field>, like C<param>, defaults to read-only, C<< is => 'ro >>.
+Note that C<field>, like C<param>, defaults to read-only, C<< is => 'ro' >>.
 You can override this:
 
     field some_data => ( is => 'rw', isa => NonEmptyStr );
 
 Otherwise, it behaves like C<has>. You can pass in any arguments that C<has>
-accepts. However, if you pass in C<init_arg>, that will be ignored.
+accepts.
+
+B<WARNING>: if you pass in C<init_arg>, that will be ignored. A C<field> is
+just for instance data the class uses. It's not to be passed to the
+constructor. If you want that, just use C<param>.
 
 =cut
 
@@ -168,7 +172,15 @@ This module is B<EXPERIMENTAL>! All features subject to change.
 This class attempts to create a "safer" version of Moose that default to
 read-only attributes and is easier to read and write.
 
-It's sort of the equivalent to:
+This:
+
+    package My::Class {
+        use MooseX::Extreme;
+
+        ... your code here
+    }
+
+Is sort of the equivalent to:
 
     package My::Class {
         use v5.22.0;
