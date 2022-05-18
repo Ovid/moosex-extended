@@ -1,5 +1,7 @@
 package MooseX::Extreme;
 
+# ABSTRACT: Moose on Steroids
+
 use 5.22.0;
 use Moose                     ();
 use MooseX::StrictConstructor ();
@@ -9,6 +11,8 @@ use feature              ();
 use namespace::autoclean ();
 use Import::Into;
 use Carp qw/carp croak confess/;
+
+our $VERSION = '0.01';
 
 Moose::Exporter->setup_import_methods(
     with_meta => [ 'field', 'param' ],
