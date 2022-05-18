@@ -10,9 +10,9 @@ package My::Names {
       qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
     use List::Util 'sum';
 
-    param _name => ( isa => NonEmptyStr, init_arg => 'name' );
-    param title => ( isa => Str,         required => 0 );
-    field created => ( isa => PositiveInt, default => sub { time } );
+    param _name   => ( isa => NonEmptyStr, init_arg => 'name' );
+    param title   => ( isa => Str,         required => 0 );
+    field created => ( isa => PositiveInt, default  => sub { time } );
 
     sub name ($self) {
         my $title = $self->title;
@@ -34,8 +34,7 @@ package My::Names {
 
 TODO: {
     local $TODO = 'B::Hooks::EndOfScope is needed for this, I think';
-    ok +My::Names->meta->is_immutable,
-      'We should be able to define an immutable class';
+    ok +My::Names->meta->is_immutable, 'We should be able to define an immutable class';
 }
 my $person = My::Names->new( name => 'Ovid', );
 is $person->name, 'Ovid', 'name should be correct';
@@ -48,8 +47,8 @@ throws_ok { My::Names->new( name => 'Ovid', created => 1 ) }
   'Attributes not defined as `param` are illegal in the constructor';
 
 my $doctor = My::Names->new( name => 'Smith', title => 'Dr.' );
-is $doctor->name, 'Dr. Smith', 'Titles should show up correctly';
-cmp_ok $doctor->created, '>=', $person->created,
+is $doctor->name,        'Dr. Smith', 'Titles should show up correctly';
+cmp_ok $doctor->created, '>=',        $person->created,
   '... and their created date should be correct';
 
 done_testing;
