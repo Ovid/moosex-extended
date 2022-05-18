@@ -1,4 +1,4 @@
-package MooseX::Fields::Types;
+package MooseX::Extreme::Types;
 
 # ABSTRACT: Keep our type tools orgnanized
 
@@ -29,9 +29,9 @@ __END__
 
 =head1 SYNOPSIS
 
-    package MooseX::Fields::Types;
+    package MooseX::Extreme::Types;
 
-    use MooseX::Fields::Types qw(
+    use MooseX::Extreme::Types qw(
       ArrayRef
       Dict
       Enum

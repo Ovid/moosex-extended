@@ -1,4 +1,4 @@
-package MooseX::Fields;
+package MooseX::Extreme;
 
 use 5.22.0;
 use Moose                     ();
