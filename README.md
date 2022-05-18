@@ -30,9 +30,8 @@ package My::Names {
     }
 
     sub add ( $self, $args ) {
-        state $check = compile( ArrayRef [Num] );
+        state $check = compile( ArrayRef [Num, 1] ); # at least one number
         ($args) = $check->($args);
-        carp("no numbers supplied to add()") unless $args->@*;
         return sum( $args->@* );
     }
 
