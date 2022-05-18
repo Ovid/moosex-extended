@@ -30,7 +30,7 @@ package My::Names {
     sub warnit ($self) {
         carp("this is a warning");
     }
-};
+}
 
 TODO: {
     local $TODO = 'B::Hooks::EndOfScope is needed for this, I think';
