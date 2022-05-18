@@ -71,6 +71,8 @@ It also exports two functions which are similar to Moose `has`: `param` and `fie
 A `param` is a required parameter (defaults may be used). A `field` is not
 allowed to be passed to the constructor.
 
+Note that the `has` function is still available, even if it's not needed.
+
 ## `param`
 
 ```perl

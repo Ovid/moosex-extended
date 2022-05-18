@@ -189,6 +189,8 @@ It also exports two functions which are similar to Moose C<has>: C<param> and C<
 A C<param> is a required parameter (defaults may be used). A C<field> is not
 allowed to be passed to the constructor.
 
+Note that the C<has> function is still available, even if it's not needed.
+
 =head1 TODO
 
     # :(
