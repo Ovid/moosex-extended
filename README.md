@@ -71,10 +71,6 @@ It also exports two functions which are similar to Moose `has`: `param` and `fie
 A `param` is a required parameter (defaults may be used). A `field` is not
 allowed to be passed to the constructor.
 
-## `init_meta`
-
-Internal method setting up exports. Do not call directly.
-
 ## `param`
 
 ```perl

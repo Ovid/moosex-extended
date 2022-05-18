@@ -20,11 +20,8 @@ Moose::Exporter->setup_import_methods(
     also      => ['Moose'],
 );
 
-=head2 C<init_meta>
-
-Internal method setting up exports. Do not call directly.
-
-=cut
+# Internal method setting up exports. No public
+# documentation by design
 
 sub init_meta {
     my ( $class, @args ) = @_;
