@@ -219,6 +219,10 @@ Note that the C<has> function is still available, even if it's not needed.
 Some of this may just be wishful thinking. Some of this would be interesting if
 others would like to collaborate.
 
+=head2 TESTS
+
+Tests! Many more tests! Volunteers welcome :)
+
 =head2 Roles
 
 We need C<MooseX::Extreme::Roles> for completeness. They would also offer the

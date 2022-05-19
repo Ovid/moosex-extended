@@ -174,6 +174,10 @@ constructor. If you want that, just use `param`.
 Some of this may just be wishful thinking. Some of this would be interesting if
 others would like to collaborate.
 
+## TESTS
+
+Tests! Many more tests! Volunteers welcome :)
+
 ## Roles
 
 We need `MooseX::Extreme::Roles` for completeness. They would also offer the
