@@ -3,12 +3,13 @@ package MooseX::Extreme;
 # ABSTRACT: Moose on Steroids
 
 use 5.22.0;
+use Moose::Exporter;
 use Moose                     ();
 use MooseX::StrictConstructor ();
-use Moose::Exporter;
-use mro                  ();
-use feature              ();
-use namespace::autoclean ();
+use MooseX::HasDefaults::RO   ();
+use mro                       ();
+use feature                   ();
+use namespace::autoclean      ();
 use Import::Into;
 use Ref::Util 'is_plain_arrayref';
 use Carp qw/carp croak confess/;
@@ -17,7 +18,7 @@ our $VERSION = '0.01';
 
 Moose::Exporter->setup_import_methods(
     with_meta => [ 'field', 'param' ],
-    as_is     => [ \&carp, \&croak ],
+    as_is     => [ \&carp,  \&croak ],
     also      => ['Moose'],
 );
 
@@ -30,12 +31,13 @@ sub init_meta {
     my $for_class = $params{for_class};
     Moose->init_meta(@args);
     MooseX::StrictConstructor->import( { into => $for_class } );
+    MooseX::HasDefaults::RO->import( { into => $for_class } );
     warnings->unimport('experimental::signatures');
     feature->import(qw/signatures :5.22/);
     namespace::autoclean->import::into($for_class);
 
     # If we never use multiple inheritance, this should not be needed.
-    mro::set_mro( scalar caller(), 'c3' );
+    mro::set_mro( $for_class, 'c3' );
 }
 
 =head2 C<param>
@@ -75,7 +77,6 @@ accepts.
 sub param {
     my ( $meta, $name, %opts ) = @_;
 
-    $opts{is}       //= 'ro';
     $opts{required} //= 1;
 
     # "has [@attributes]" versus "has $attribute"
@@ -118,8 +119,6 @@ constructor. If you want that, just use C<param>.
 
 sub field {
     my ( $meta, $name, %opts ) = @_;
-
-    $opts{is} //= 'ro';
 
     # "has [@attributes]" versus "has $attribute"
     foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {

@@ -2,6 +2,8 @@ Revision history for MooseX-Extrme
 
 {{$NEXT}}
 
+          - Clean up and test mro setting
+          - use MooseX::HasDefaults::RO to allow the RO default
           - Start building out a TODO wishlist in the POD
           - Add [CPANFile] Dist::Zilla plugin (thanks, Happy Barney)
           - First pass at experimental Moose version

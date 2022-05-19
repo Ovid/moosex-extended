@@ -31,11 +31,14 @@ package My::Names {
     }
 }
 
-TODO: {
-    local $TODO = 'B::Hooks::EndOfScope is needed for this, I think';
-    ok +My::Names->meta->is_immutable,
-      'We should be able to define an immutable class';
-}
+subtest 'miscellaneous features' => sub {
+  TODO: {
+        local $TODO = 'B::Hooks::EndOfScope is needed for this, I think';
+        ok +My::Names->meta->is_immutable,
+          'We should be able to define an immutable class';
+    }
+    is mro::get_mro('My::Names'), 'c3', "Our class's mro should be c3";
+};
 
 subtest 'no title' => sub {
     my $person = My::Names->new( name => 'Ovid', );
@@ -59,7 +62,11 @@ subtest 'exceptions' => sub {
 
     throws_ok { $person->title('Mr.') }
     'Moose::Exception::CannotAssignValueToReadOnlyAccessor',
-      'Attributes are read-only by default';
+      'param() is read-only by default';
+
+    throws_ok { $person->created(11111) }
+    'Moose::Exception::CannotAssignValueToReadOnlyAccessor',
+      'field() is read-only by default';
 
     throws_ok { $person->add( [] ) }
     'Error::TypeTiny::Assertion',
