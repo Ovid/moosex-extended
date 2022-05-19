@@ -235,6 +235,11 @@ they ran at compile-time instead of runtime, making them look a touch more
 like native functions. My various attempts at solving this have failed, but I
 confess I didn't try too hard.
 
+# SEE ALSO
+
+- [MooseX::Modern](https://metacpan.org/pod/MooseX::Modern)
+- [Corinna](https://github.com/Ovid/Cor)
+
 # AUTHOR
 
 Curtis "Ovid" Poe <curtis.poe@gmail.com>

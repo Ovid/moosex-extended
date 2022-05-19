@@ -273,3 +273,13 @@ In fact, there are a variety of Moose functions which would work better if
 they ran at compile-time instead of runtime, making them look a touch more
 like native functions. My various attempts at solving this have failed, but I
 confess I didn't try too hard.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<MooseX::Modern|https://metacpan.org/pod/MooseX::Modern>
+
+=item * L<Corinna|https://github.com/Ovid/Cor>
+
+=back
