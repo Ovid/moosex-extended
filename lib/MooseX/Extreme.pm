@@ -122,7 +122,7 @@ sub field {
     $opts{is} //= 'ro';
 
     # "has [@attributes]" versus "has $attribute"
-    foreach my $attr ( 'ARRAY' eq ref $name ? @$name : $name ) {
+    foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
         my %options = %opts;    # copy each time to avoid overwriting
         $options{init_arg} = undef;
         $meta->add_attribute( $attr, %options );
