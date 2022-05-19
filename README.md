@@ -174,7 +174,7 @@ constructor. If you want that, just use `param`.
 Some of this may just be wishful thinking. Some of this would be interesting if
 others would like to collaborate.
 
-## TESTS
+## Tests
 
 Tests! Many more tests! Volunteers welcome :)
 

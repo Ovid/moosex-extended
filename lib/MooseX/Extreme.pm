@@ -219,7 +219,7 @@ Note that the C<has> function is still available, even if it's not needed.
 Some of this may just be wishful thinking. Some of this would be interesting if
 others would like to collaborate.
 
-=head2 TESTS
+=head2 Tests
 
 Tests! Many more tests! Volunteers welcome :)
 
