@@ -2,5 +2,6 @@ Revision history for MooseX-Extrme
 
 {{$NEXT}}
 
+          - Start building out a TODO wishlist in the POD
           - Add [CPANFile] Dist::Zilla plugin (thanks, Happy Barney)
           - First pass at experimental Moose version

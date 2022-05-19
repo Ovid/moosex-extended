@@ -10,6 +10,7 @@ use mro                  ();
 use feature              ();
 use namespace::autoclean ();
 use Import::Into;
+use Ref::Util 'is_plain_arrayref';
 use Carp qw/carp croak confess/;
 
 our $VERSION = '0.01';
@@ -78,7 +79,7 @@ sub param {
     $opts{required} //= 1;
 
     # "has [@attributes]" versus "has $attribute"
-    foreach my $attr ( 'ARRAY' eq ref $name ? @$name : $name ) {
+    foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
         my %options = %opts;    # copy each time to avoid overwriting
         $options{init_arg} //= $attr;
         $meta->add_attribute( $attr, %options );
@@ -169,8 +170,12 @@ __END__
 
 This module is B<EXPERIMENTAL>! All features subject to change.
 
-This class attempts to create a "safer" version of Moose that default to
+This class attempts to create a safer version of Moose that defaults to
 read-only attributes and is easier to read and write.
+
+It tries to bring some of the lessons learned from L<the Corinna project|https://github.com/Ovid/Cor>,
+while acknowledging that you can't always get what you want (such as
+true encapsulation and true methods).
 
 This:
 
@@ -195,16 +200,41 @@ Is sort of the equivalent to:
         ... your code here
     }
 
-It also exports two functions which are similar to Moose C<has>: C<param> and C<field>.
+It also exports two functions which are similar to Moose C<has>: C<param> and
+C<field>.
 
 A C<param> is a required parameter (defaults may be used). A C<field> is not
 allowed to be passed to the constructor.
 
 Note that the C<has> function is still available, even if it's not needed.
 
+=head1 RELATED MODULED
+
+=head2 C<MooseX::Extreme::Types>
+
+* L<MooseX::Extreme::Types> is included in the distribution.
+
 =head1 TODO
 
-    # :(
+Some of this may just be wishful thinking. Some of this would be interesting if
+others would like to collaborate.
+
+=head2 Roles
+
+We need C<MooseX::Extreme::Roles> for completeness. They would also offer the
+C<param> and C<field> functions.
+
+It might be interesting to automatically include something like
+C<MooseX::Role::Strict>, but with warnings instead of failures.
+
+=head2 Configurable Types
+
+We provide C<MooseX::Extreme::Types> for convenience. It would be even more
+convenient if we offered an easier for people to build something like
+C<MooseX::Extreme::Types::Mine> so they can customize it.
+
+=head2 Immutability
+
     __PACKAGE__->meta->make_immutable; # we want this to be optional
 
 Try to figure out how to automatically make the class immutable.
@@ -214,3 +244,28 @@ fires I<before> C<param> and C<field> are run.
 
 I thought seriously about making the class mutable in each of those functions
 and immutable after, but hey, we don't need that performance hit.
+ 
+=head2 Configurability
+
+Not everyone wants everything. In particular, using `MooseX::Extreme` with
+`DBIx::Class` will be fatal because the latter allows unknown arguments to
+constructors.  Or someone might want their "own" extreme Moose, requiring
+C<v5.36.0> or not using the C3 mro. What's the best way to allow this?
+
+=head2 C<BEGIN::Lift>
+
+This idea maybe belongs in C<MooseX::Extremely::Extreme>, but ...
+
+Quite often you see things like this:
+
+    BEGIN { extends 'Some::Parent' }
+
+Or this:
+
+    sub serial_number; # required by a role, must be compile-time
+    has serial_number => ( ... );
+
+In fact, there are a variety of Moose functions which would work better if
+they ran at compile-time instead of runtime, making them look a touch more
+like native functions. My various attempts at solving this have failed, but I
+confess I didn't try too hard.

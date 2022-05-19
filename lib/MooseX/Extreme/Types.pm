@@ -7,6 +7,9 @@ use warnings;
 use Type::Library -base;
 use Type::Utils -all;
 use Type::Params; # this gets us compile and compile_named
+use Types::Standard qw(
+  slurpy
+);
 
 our $VERSION = '0.01';
 our @EXPORT_OK;
@@ -20,6 +23,7 @@ BEGIN {
     push @EXPORT_OK => (
         'compile',          # from Type::Params
         'compile_named',    # from Type::Params
+        'slurpy',
     );
 }
 
@@ -43,8 +47,15 @@ __END__
 
 =head1 DESCRIPTION
 
-This is an internal package for L<AATW::Scan>. It's probably overkill,
-but if we want to be more strict later, this gives us the basics.
+A basic set of useful types for C<MooseX::Extreme>. Using these is preferred
+to using using strings due to runtime versus compile-time failures. For
+example:
+
+    # fails at runtime, if ->name is set
+    param name => ( isa => 'StR' );
+
+    # fails at compile-time
+    param name => ( isa => StR );
 
 =head1 TYPE LIBRARIES
 
@@ -59,21 +70,6 @@ We automatically include the types from the following:
 =item * L<Types::Common::String>
 
 =back
-
-=head1 CUSTOM TYPES
-
-=head2 C<PackageName>
-
-Matches valid package names.
-
-=head2 C<MethodName>
-
-Matches valid method names.
-
-=head2 C<Directory>
-
-Valid directory name. Generally must be C<\w+> separated by C</>. A single
-leading dot is permitted.
 
 =head1 EXTRAS
 
