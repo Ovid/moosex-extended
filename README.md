@@ -99,6 +99,31 @@ That prevents further changes to the class and provides some optimizations to
 make the code run much faster. However, it's somewhat annoying to type. We do
 this for you, via `B::Hooks::AtRuntime`. You no longer need to do this yourself.
 
+# OBJECT CONSTRUCTION
+
+The normal `new`, `BUILD`, and `BUILDARGS` functions work as expected.
+However, we apply [<MooseX::StrictConstructor](https://metacpan.org/pod/%3CMooseX%3A%3AStrictConstructor) to avoid this problem:
+
+```perl
+my $soldier = Soldier->new(
+    name   => $name,
+    rank   => $rank,
+    seriel => $serial, # should be serial
+);
+```
+
+By default, misspelled arguments to the [Moose](https://metacpan.org/pod/Moose) constructor are silently discarded,
+leading to hard-to-diagnose bugs. With [MooseX::Extreme](https://metacpan.org/pod/MooseX%3A%3AExtreme), they're a fatal error.
+
+If you need ot pass arbitrary "sideband" data, explicitly declare it as such:
+
+```perl
+param sideband => ( isa => HashRef, default => sub { {} } );
+```
+
+Naturally, because we bundle `MooseX::Extreme::Types`, you can do much
+finer-grained data validation on that, if needed.
+
 # FUNCTIONS
 
 The following two functions are exported into your namespace.
@@ -194,6 +219,7 @@ Every `param` is not lazy by default, but you can add `lazy => 1` if you need to
 ## `MooseX::Extreme::Types`
 
 \* [MooseX::Extreme::Types](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ATypes) is included in the distribution.
+\* [MooseX::Extreme::Role](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ARole) is included in the distribution.
 
 # TODO
 
@@ -203,14 +229,6 @@ others would like to collaborate.
 ## Tests
 
 Tests! Many more tests! Volunteers welcome :)
-
-## Roles
-
-We need `MooseX::Extreme::Roles` for completeness. They would also offer the
-`param` and `field` functions.
-
-It might be interesting to automatically include something like
-`MooseX::Role::Strict`, but with warnings instead of failures.
 
 ## Configurable Types
 
@@ -246,6 +264,18 @@ In fact, there are a variety of Moose functions which would work better if
 they ran at compile-time instead of runtime, making them look a touch more
 like native functions. My various attempts at solving this have failed, but I
 confess I didn't try too hard.
+
+# NOTES
+
+There are a few things you might be interested to knwo about this module when evaluating it.
+
+Most of this is written with bog-standard [Moose](https://metacpan.org/pod/Moose), so there's nothing terribly weird inside. Howvever,
+there are a couple of modules which stand out.
+
+We do not need `__PACKAGE__->meta->make_immutable` because we use [B::Hooks::AtRuntime](https://metacpan.org/pod/B%3A%3AHooks%3A%3AAtRuntime)'s
+`after_runtime` function to set it.
+
+We do not need a true value at the end of a module because we use [true](https://metacpan.org/pod/true).
 
 # SEE ALSO
 
