@@ -329,8 +329,13 @@ C<_build__auth_token> (note the two underscores between "build" and "auth_token"
 
 =head2 C<MooseX::Extreme::Types>
 
-* L<MooseX::Extreme::Types> is included in the distribution.
-* L<MooseX::Extreme::Role> is included in the distribution.
+=over 4
+
+=item * L<MooseX::Extreme::Types> is included in the distribution.
+
+=item * L<MooseX::Extreme::Role> is included in the distribution.
+
+=back
 
 =head1 TODO
 

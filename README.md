@@ -332,8 +332,8 @@ Obviously, a "private" attribute, such as `_auth_token` would get a build named
 
 ## `MooseX::Extreme::Types`
 
-\* [MooseX::Extreme::Types](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ATypes) is included in the distribution.
-\* [MooseX::Extreme::Role](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ARole) is included in the distribution.
+- [MooseX::Extreme::Types](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ATypes) is included in the distribution.
+- [MooseX::Extreme::Role](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ARole) is included in the distribution.
 
 # TODO
 
