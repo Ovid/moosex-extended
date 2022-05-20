@@ -162,6 +162,7 @@ has created => (
     isa      => PositiveInt,
     init_arg => undef,        # not allowed in the constructor
     default  => sub { time },
+    lazy     => 1,
 );
 ```
 
@@ -175,9 +176,18 @@ field some_data => ( is => 'rw', isa => NonEmptyStr );
 Otherwise, it behaves like `has`. You can pass in any arguments that `has`
 accepts.
 
-**WARNING**: if you pass in `init_arg`, that will be ignored. A `field` is
-just for instance data the class uses. It's not to be passed to the
-constructor. If you want that, just use `param`.
+**WARNING**: if you pass `field` an `init_arg` with a defined value, The code
+will `croak`. A `field` is just for instance data the class uses. It's not
+to be passed to the constructor. If you want that, just use `param`.
+
+Later, we'll add proper exceptions.
+
+### Lazy Fields
+
+Every `field` is lazy by default. This is because there's no guarantee the code will call
+them, but this makes it very easy for a `field` to rely on a `param` value being present.
+
+Every `param` is not lazy by default, but you can add `lazy => 1` if you need to.
 
 # RELATED MODULES
 
