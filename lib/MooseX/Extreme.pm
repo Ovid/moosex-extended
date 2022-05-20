@@ -5,7 +5,15 @@ package MooseX::Extreme;
 use 5.22.0;
 use Moose::Exporter;
 use Moose                     ();
-use MooseX::Extreme::Helpers qw(init_meta field param);
+use MooseX::StrictConstructor ();
+use mro                       ();
+use namespace::autoclean      ();
+use MooseX::Extreme::Helpers qw(field param);
+use B::Hooks::AtRuntime 'after_runtime';
+use Import::Into;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+use true;
 
 our $VERSION = '0.01';
 
@@ -16,6 +24,21 @@ Moose::Exporter->setup_import_methods(
 
 # Internal method setting up exports. No public
 # documentation by design
+
+sub init_meta ( $class, %params ) {
+    my $for_class = $params{for_class};
+    Moose->init_meta(%params);
+    MooseX::StrictConstructor->import( { into => $for_class } );
+    Carp->import::into($for_class);
+    warnings->unimport('experimental::signatures');
+    feature->import(qw/signatures :5.22/);
+    namespace::autoclean->import::into($for_class);
+    after_runtime { $for_class->meta->make_immutable };
+    true->import;    # no need for `1` at the end of the module
+
+    # If we never use multiple inheritance, this should not be needed.
+    mro::set_mro( $for_class, 'c3' );
+}
 
 1;
 
