@@ -1,11 +1,15 @@
 package MooseX::Extreme::Helpers;
+
+# ABSTRACT: Internal module for MooseX::Extreme
+
 use v5.22.0;
 use warnings;
 use parent 'Exporter';
 use feature 'signatures';
 no warnings 'experimental::signatures';
-use Carp 'croak';
+
 use Ref::Util 'is_plain_arrayref';
+use Carp 'croak';
 
 our $VERSION = '0.01';
 
@@ -41,3 +45,10 @@ sub field ( $meta, $name, %opts ) {
 }
 
 1;
+
+__END__
+
+=head1 DESCRIPTION
+
+This is not for public consumption. Provides the C<field> and C<param>
+functions to L<MooseX::Extreme> and L<MooseX::Extreme::Role>.

@@ -3,6 +3,9 @@ package MooseX::Extreme;
 # ABSTRACT: Moose on Steroids
 
 use 5.22.0;
+use warnings;
+use feature 'signatures';
+
 use Moose::Exporter;
 use Moose                     ();
 use MooseX::StrictConstructor ();
@@ -11,7 +14,7 @@ use namespace::autoclean      ();
 use MooseX::Extreme::Helpers qw(field param);
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
-use feature 'signatures';
+
 no warnings 'experimental::signatures';
 use true;
 
@@ -129,6 +132,27 @@ That prevents further changes to the class and provides some optimizations to
 make the code run much faster. However, it's somewhat annoying to type. We do
 this for you, via C<B::Hooks::AtRuntime>. You no longer need to do this yourself.
 
+=head1 OBJECT CONSTRUCTION
+
+The normal C<new>, C<BUILD>, and C<BUILDARGS> functions work as expected.
+However, we apply L<<MooseX::StrictConstructor> to avoid this problem:
+
+    my $soldier = Soldier->new(
+        name   => $name,
+        rank   => $rank,
+        seriel => $serial, # should be serial
+    );
+
+By default, misspelled arguments to the L<Moose> constructor are silently discarded,
+leading to hard-to-diagnose bugs. With L<MooseX::Extreme>, they're a fatal error.
+
+If you need ot pass arbitrary "sideband" data, explicitly declare it as such:
+
+    param sideband => ( isa => HashRef, default => sub { {} } );
+
+Naturally, because we bundle C<MooseX::Extreme::Types>, you can do much
+finer-grained data validation on that, if needed.
+
 =head1 FUNCTIONS
 
 The following two functions are exported into your namespace.
@@ -210,6 +234,7 @@ Every C<param> is not lazy by default, but you can add C<< lazy => 1 >> if you n
 =head2 C<MooseX::Extreme::Types>
 
 * L<MooseX::Extreme::Types> is included in the distribution.
+* L<MooseX::Extreme::Role> is included in the distribution.
 
 =head1 TODO
 
@@ -219,14 +244,6 @@ others would like to collaborate.
 =head2 Tests
 
 Tests! Many more tests! Volunteers welcome :)
-
-=head2 Roles
-
-We need C<MooseX::Extreme::Roles> for completeness. They would also offer the
-C<param> and C<field> functions.
-
-It might be interesting to automatically include something like
-C<MooseX::Role::Strict>, but with warnings instead of failures.
 
 =head2 Configurable Types
 
@@ -258,6 +275,18 @@ In fact, there are a variety of Moose functions which would work better if
 they ran at compile-time instead of runtime, making them look a touch more
 like native functions. My various attempts at solving this have failed, but I
 confess I didn't try too hard.
+
+=head1 NOTES
+
+There are a few things you might be interested to knwo about this module when evaluating it.
+
+Most of this is written with bog-standard L<Moose>, so there's nothing terribly weird inside. Howvever,
+there are a couple of modules which stand out.
+
+We do not need C<< __PACKAGE__->meta->make_immutable >> because we use L<B::Hooks::AtRuntime>'s
+C<after_runtime> function to set it.
+
+We do not need a true value at the end of a module because we use L<true>.
 
 =head1 SEE ALSO
 
