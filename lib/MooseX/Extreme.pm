@@ -327,13 +327,15 @@ C<_build__auth_token> (note the two underscores between "build" and "auth_token"
 
 =head1 RELATED MODULES
 
-=head2 C<MooseX::Extreme::Types>
-
 =over 4
 
 =item * L<MooseX::Extreme::Types> is included in the distribution.
 
+This provides codre types for you.
+
 =item * L<MooseX::Extreme::Role> is included in the distribution.
+
+C<MooseX::Extreme>, but for roles.
 
 =back
 
