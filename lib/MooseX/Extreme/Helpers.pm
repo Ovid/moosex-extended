@@ -2,7 +2,6 @@ package MooseX::Extreme::Helpers {
     use v5.22.0;
     use parent 'Exporter';
     use MooseX::StrictConstructor ();
-    use MooseX::HasDefaults::RO   ();
     use mro                       ();
     use namespace::autoclean      ();
     use Import::Into;
@@ -18,12 +17,10 @@ package MooseX::Extreme::Helpers {
     our @EXPORT_OK = qw(field param init_meta);
 
     sub init_meta {
-        my ( $class, @args ) = @_;
-        my %params    = @args;
+        my ( $class, %params ) = @_;
         my $for_class = $params{for_class};
-        Moose->init_meta(@args);
+        Moose->init_meta(%params);
         MooseX::StrictConstructor->import( { into => $for_class } );
-        MooseX::HasDefaults::RO->import( { into => $for_class } );
         Carp->import::into($for_class);
         warnings->unimport('experimental::signatures');
         feature->import(qw/signatures :5.22/);
@@ -36,6 +33,7 @@ package MooseX::Extreme::Helpers {
     }
 
     sub param ( $meta, $name, %opts ) {
+        $opts{is}       //= 'ro';
         $opts{required} //= 1;
 
         # "has [@attributes]" versus "has $attribute"
@@ -47,6 +45,7 @@ package MooseX::Extreme::Helpers {
     }
 
     sub field ( $meta, $name, %opts ) {
+        $opts{is} //= 'ro';
 
         # "has [@attributes]" versus "has $attribute"
         foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
