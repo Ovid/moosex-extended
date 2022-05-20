@@ -87,6 +87,22 @@ allowed to be passed to the constructor.
 
 Note that the `has` function is still available, even if it's not needed.
 
+# Immutability
+
+Typically Moose classes should end with this:
+
+```
+__PACKAGE__->meta->make_immutable;
+```
+
+That prevents further changes to the class and provides some optimizations to
+make the code run much faster. However, it's somewhat annoying to type. We do
+this for you, via `B::Hooks::AtRuntime`. You no longer need to do this yourself.
+
+# FUNCTIONS
+
+The following two functions are exported into your namespace.
+
 ## `param`
 
 ```perl
@@ -163,7 +179,7 @@ accepts.
 just for instance data the class uses. It's not to be passed to the
 constructor. If you want that, just use `param`.
 
-# RELATED MODULED
+# RELATED MODULES
 
 ## `MooseX::Extreme::Types`
 
@@ -191,20 +207,6 @@ It might be interesting to automatically include something like
 We provide `MooseX::Extreme::Types` for convenience. It would be even more
 convenient if we offered an easier for people to build something like
 `MooseX::Extreme::Types::Mine` so they can customize it.
-
-## Immutability
-
-```
-__PACKAGE__->meta->make_immutable; # we want this to be optional
-```
-
-Try to figure out how to automatically make the class immutable.
-`B::Hooks::EndOfScope` did not work because `param` and `field` fire at
-runtime, not compile-time, and making the class immutable at the end of scope
-fires _before_ `param` and `field` are run.
-
-I thought seriously about making the class mutable in each of those functions
-and immutable after, but hey, we don't need that performance hit.
 
 ## Configurability
 
