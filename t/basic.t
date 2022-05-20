@@ -11,7 +11,7 @@ package My::Names {
     use List::Util 'sum';
 
     param _name => ( isa => NonEmptyStr, init_arg => 'name' );
-    param title => ( isa => Str,         required => 0 );
+    param title => ( isa => Str, required => 0, predicate => 1 );
     field created => ( isa => PositiveInt, default => sub { time } );
 
     sub name ($self) {
@@ -44,6 +44,7 @@ subtest 'no title' => sub {
     cmp_ok $person->created, '>', 0, '... and a sane default for created';
     ok !$person->can('sum'), 'subroutines have been removed from the namespace';
     is $person->add( [qw/1 3 5 6/] ), 15, 'Our add() method should work';
+    ok !$person->has_title, 'Our predicate shortcut should work';
 };
 
 subtest 'has title' => sub {
@@ -52,6 +53,7 @@ subtest 'has title' => sub {
     is $doctor->name, 'Dr. Smith', 'Titles should show up correctly';
     cmp_ok $doctor->created, '>=', $person->created,
       '... and their created date should be correct';
+    ok $doctor->has_title, 'Our predicate shortcut should work';
 };
 
 subtest 'exceptions' => sub {

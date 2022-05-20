@@ -227,7 +227,100 @@ them, but this makes it very easy for a C<field> to rely on a C<param> value bei
 
 Every C<param> is not lazy by default, but you can add C<< lazy => 1 >> if you need to.
 
-=cut
+=head1 ATTRIBUTE SHORTCUTS
+
+When using C<field> or C<param>, we have some attribute shortcuts:
+
+    param name => (
+        isa       => NonEmptyStr,
+        predicate => 1,   # has_name
+        clearer   => 1,   # clear_name
+        builder   => 1,   # _build_name
+    );
+
+    sub _build_name ($self) {
+        ...
+    }
+
+These can also be used when you pass an array reference to the function:
+
+    package Point {
+        use MooseX::Extreme;
+        use MooseX::Extreme::Types qw(Int);
+
+        param [ 'x', 'y' ] => (
+            isa     => Int,
+            clearer => 1,     # clear_x and clear_y available
+            default => 0,
+        ) :;
+    }
+
+=head2 C<predicate>
+
+If an attribute has C<predicate> is set to C<1> (the number one), a method
+named C<has_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        predicate => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is        => 'ro',
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        predicate => 'has_title',
+    );
+
+=head2 C<clearer>
+
+If an attribute has C<clearer> is set to C<1> (the number one), a method
+named C<clear_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        clearer => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'ro',
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        clearer => 'clear_title',
+    );
+
+=head2 C<builder>
+
+If an attribute has C<builder> is set to C<1> (the number one), a method
+named C<_build_$attribute_name>.
+
+This:
+
+    param title => (
+        isa     =>  NonEmptyStr,
+        builder => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'ro',
+        isa     => NonEmptyStr,
+        builder => '_build_title',
+    );
+
+Obviously, a "private" attribute, such as C<_auth_token> would get a build named
+C<_build__auth_token> (note the two underscores between "build" and "auth_token").
 
 =head1 RELATED MODULES
 
