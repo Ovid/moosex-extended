@@ -149,7 +149,7 @@ However, we apply L<<MooseX::StrictConstructor> to avoid this problem:
 By default, misspelled arguments to the L<Moose> constructor are silently discarded,
 leading to hard-to-diagnose bugs. With L<MooseX::Extreme>, they're a fatal error.
 
-If you need ot pass arbitrary "sideband" data, explicitly declare it as such:
+If you need to pass arbitrary "sideband" data, explicitly declare it as such:
 
     param sideband => ( isa => HashRef, default => sub { {} } );
 
@@ -165,7 +165,7 @@ The following two functions are exported into your namespace.
     param name => ( isa => NonEmptyStr );
 
 A similar function to Moose's C<has>. A C<param> is required. You may pass it
-to the contructor, or use a C<default> or C<builder> to supply this value.
+to the constructor, or use a C<default> or C<builder> to supply this value.
 
 The above C<param> definition is equivalent to:
 
@@ -331,7 +331,7 @@ C<_build__auth_token> (note the two underscores between "build" and "auth_token"
 
 =item * L<MooseX::Extreme::Types> is included in the distribution.
 
-This provides codre types for you.
+This provides core types for you.
 
 =item * L<MooseX::Extreme::Role> is included in the distribution.
 
@@ -381,13 +381,14 @@ confess I didn't try too hard.
 
 =head1 NOTES
 
-There are a few things you might be interested to knwo about this module when evaluating it.
+There are a few things you might be interested to know about this module when
+evaluating it.
 
-Most of this is written with bog-standard L<Moose>, so there's nothing terribly weird inside. Howvever,
-there are a couple of modules which stand out.
+Most of this is written with bog-standard L<Moose>, so there's nothing
+terribly weird inside. However, there are a couple of modules which stand out.
 
-We do not need C<< __PACKAGE__->meta->make_immutable >> because we use L<B::Hooks::AtRuntime>'s
-C<after_runtime> function to set it.
+We do not need C<< __PACKAGE__->meta->make_immutable >> because we use
+L<B::Hooks::AtRuntime>'s C<after_runtime> function to set it.
 
 We do not need a true value at the end of a module because we use L<true>.
 
