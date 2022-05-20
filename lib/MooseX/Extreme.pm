@@ -112,7 +112,10 @@ Is sort of the equivalent to:
         use mro 'c3';
 
         ... your code here
+
+        __PACKAGE__->meta->make_immutable;
     }
+    1;
 
 It also exports two functions which are similar to Moose C<has>: C<param> and
 C<field>.
