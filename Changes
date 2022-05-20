@@ -2,6 +2,8 @@ Revision history for MooseX-Extrme
 
 {{$NEXT}}
 
+          - make_immutable is now the default (thanks, haarg)
+          - no need to add a true value to the end of your module (thanks, haarg)
           - Clean up and test mro setting (thanks, haarg!)
           - use MooseX::HasDefaults::RO to allow the RO default
           - Start building out a TODO wishlist in the POD
