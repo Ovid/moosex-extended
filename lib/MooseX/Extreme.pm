@@ -356,8 +356,8 @@ C<MooseX::Extreme::Types::Mine> so they can customize it.
  
 =head2 Configurability
 
-Not everyone wants everything. In particular, using `MooseX::Extreme` with
-`DBIx::Class` will be fatal because the latter allows unknown arguments to
+Not everyone wants everything. In particular, using C<MooseX::Extreme> with
+L<DBIx::Class> will be fatal because the latter allows unknown arguments to
 constructors.  Or someone might want their "own" extreme Moose, requiring
 C<v5.36.0> or not using the C3 mro. What's the best way to allow this?
 

@@ -355,8 +355,8 @@ convenient if we offered an easier for people to build something like
 
 ## Configurability
 
-Not everyone wants everything. In particular, using \`MooseX::Extreme\` with
-\`DBIx::Class\` will be fatal because the latter allows unknown arguments to
+Not everyone wants everything. In particular, using `MooseX::Extreme` with
+[DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass) will be fatal because the latter allows unknown arguments to
 constructors.  Or someone might want their "own" extreme Moose, requiring
 `v5.36.0` or not using the C3 mro. What's the best way to allow this?
 
