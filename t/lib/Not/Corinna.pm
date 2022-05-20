@@ -5,6 +5,10 @@ package Not::Corinna {
       qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
     use List::Util 'sum';
 
+    with qw(
+        Not::Corinna::Role::Created
+    );
+
     # these default to 'ro' (but you can override that) and are required
     param _name => ( isa => NonEmptyStr, init_arg => 'name' );
     param title => ( isa => Str,         required => 0 );
@@ -20,7 +24,6 @@ package Not::Corinna {
             return $title ? "$title $name" : $name;
         },
     );
-    field created => ( isa => PositiveInt, default => sub { time } );
 
     sub add ( $self, $args ) {
         state $check = compile( ArrayRef [ Num, 1 ] );

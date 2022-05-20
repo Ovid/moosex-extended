@@ -2,6 +2,7 @@ Revision history for MooseX-Extrme
 
 {{$NEXT}}
 
+          - Role support added
           - make_immutable is now the default (thanks, haarg)
           - no need to add a true value to the end of your module (thanks, haarg)
           - Clean up and test mro setting (thanks, haarg!)
