@@ -87,6 +87,22 @@ allowed to be passed to the constructor.
 
 Note that the `has` function is still available, even if it's not needed.
 
+# Immutability
+
+Typically Moose classes should end with this:
+
+```
+__PACKAGE__->meta->make_immutable;
+```
+
+That prevents further changes to the class and provides some optimizations to
+make the code run much faster. However, it's somewhat annoying to type. We do
+this for you, via `B::Hooks::AtRuntime`. You no longer need to do this yourself.
+
+# FUNCTIONS
+
+The following two functions are exported into your namespace.
+
 ## `param`
 
 ```perl
@@ -146,6 +162,7 @@ has created => (
     isa      => PositiveInt,
     init_arg => undef,        # not allowed in the constructor
     default  => sub { time },
+    lazy     => 1,
 );
 ```
 
@@ -159,11 +176,20 @@ field some_data => ( is => 'rw', isa => NonEmptyStr );
 Otherwise, it behaves like `has`. You can pass in any arguments that `has`
 accepts.
 
-**WARNING**: if you pass in `init_arg`, that will be ignored. A `field` is
-just for instance data the class uses. It's not to be passed to the
-constructor. If you want that, just use `param`.
+**WARNING**: if you pass `field` an `init_arg` with a defined value, The code
+will `croak`. A `field` is just for instance data the class uses. It's not
+to be passed to the constructor. If you want that, just use `param`.
 
-# RELATED MODULED
+Later, we'll add proper exceptions.
+
+### Lazy Fields
+
+Every `field` is lazy by default. This is because there's no guarantee the code will call
+them, but this makes it very easy for a `field` to rely on a `param` value being present.
+
+Every `param` is not lazy by default, but you can add `lazy => 1` if you need to.
+
+# RELATED MODULES
 
 ## `MooseX::Extreme::Types`
 
@@ -191,20 +217,6 @@ It might be interesting to automatically include something like
 We provide `MooseX::Extreme::Types` for convenience. It would be even more
 convenient if we offered an easier for people to build something like
 `MooseX::Extreme::Types::Mine` so they can customize it.
-
-## Immutability
-
-```
-__PACKAGE__->meta->make_immutable; # we want this to be optional
-```
-
-Try to figure out how to automatically make the class immutable.
-`B::Hooks::EndOfScope` did not work because `param` and `field` fire at
-runtime, not compile-time, and making the class immutable at the end of scope
-fires _before_ `param` and `field` are run.
-
-I thought seriously about making the class mutable in each of those functions
-and immutable after, but hey, we don't need that performance hit.
 
 ## Configurability
 

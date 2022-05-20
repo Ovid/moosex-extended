@@ -5,128 +5,17 @@ package MooseX::Extreme;
 use 5.22.0;
 use Moose::Exporter;
 use Moose                     ();
-use MooseX::StrictConstructor ();
-use MooseX::HasDefaults::RO   ();
-use mro                       ();
-use feature                   ();
-use namespace::autoclean      ();
-use Import::Into;
-use Ref::Util 'is_plain_arrayref';
-use Carp qw/carp croak confess/;
+use MooseX::Extreme::Helpers qw(init_meta field param);
 
 our $VERSION = '0.01';
 
 Moose::Exporter->setup_import_methods(
     with_meta => [ 'field', 'param' ],
-    as_is     => [ \&carp,  \&croak ],
     also      => ['Moose'],
 );
 
 # Internal method setting up exports. No public
 # documentation by design
-
-sub init_meta {
-    my ( $class, @args ) = @_;
-    my %params    = @args;
-    my $for_class = $params{for_class};
-    Moose->init_meta(@args);
-    MooseX::StrictConstructor->import( { into => $for_class } );
-    MooseX::HasDefaults::RO->import( { into => $for_class } );
-    warnings->unimport('experimental::signatures');
-    feature->import(qw/signatures :5.22/);
-    namespace::autoclean->import::into($for_class);
-
-    # If we never use multiple inheritance, this should not be needed.
-    mro::set_mro( $for_class, 'c3' );
-}
-
-=head2 C<param>
-
-    param name => ( isa => NonEmptyStr );
-
-A similar function to Moose's C<has>. A C<param> is required. You may pass it
-to the contructor, or use a C<default> or C<builder> to supply this value.
-
-The above C<param> definition is equivalent to:
-
-    has name => (
-        is       => 'ro',
-        isa      => NonEmptyStr,
-        required => 1,
-    );
-
-If you want a parameter that has no C<default> or C<builder> and can
-I<optionally> be passed to the constructor, just use C<< required => 0 >>.
-
-    param title => ( isa => Str, required => 0 );
-
-Note that C<param>, like C<field>, defaults to read-only, C<< is => 'ro' >>.
-You can override this:
-
-    param name => ( is => 'rw', isa => NonEmptyStr );
-
-Otherwise, it behaves like C<has>. You can pass in any arguments that C<has>
-accepts.
-
-    # we'll make it private, but allow it to be passed to the constructor
-    # as `name`
-    param _name   => ( isa => NonEmptyStr, init_arg => 'name' );
-
-=cut
-
-sub param {
-    my ( $meta, $name, %opts ) = @_;
-
-    $opts{required} //= 1;
-
-    # "has [@attributes]" versus "has $attribute"
-    foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
-        my %options = %opts;    # copy each time to avoid overwriting
-        $options{init_arg} //= $attr;
-        $meta->add_attribute( $attr, %options );
-    }
-}
-
-=head2 C<field>
-
-    field created => ( isa => PositiveInt, default => sub { time } );
-
-A similar function to Moose's C<has>. A C<field> is never allowed to be passed
-to the constructor, but you can still use C<default> or C<builder>, as normal.
-
-The above C<field> definition is equivalent to:
-
-    has created => (
-        is       => 'ro',
-        isa      => PositiveInt,
-        init_arg => undef,        # not allowed in the constructor
-        default  => sub { time },
-    );
-
-Note that C<field>, like C<param>, defaults to read-only, C<< is => 'ro' >>.
-You can override this:
-
-    field some_data => ( is => 'rw', isa => NonEmptyStr );
-
-Otherwise, it behaves like C<has>. You can pass in any arguments that C<has>
-accepts.
-
-B<WARNING>: if you pass in C<init_arg>, that will be ignored. A C<field> is
-just for instance data the class uses. It's not to be passed to the
-constructor. If you want that, just use C<param>.
-
-=cut
-
-sub field {
-    my ( $meta, $name, %opts ) = @_;
-
-    # "has [@attributes]" versus "has $attribute"
-    foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
-        my %options = %opts;    # copy each time to avoid overwriting
-        $options{init_arg} = undef;
-        $meta->add_attribute( $attr, %options );
-    }
-}
 
 1;
 
@@ -207,7 +96,93 @@ allowed to be passed to the constructor.
 
 Note that the C<has> function is still available, even if it's not needed.
 
-=head1 RELATED MODULED
+=head1 Immutability
+
+Typically Moose classes should end with this:
+
+    __PACKAGE__->meta->make_immutable;
+
+That prevents further changes to the class and provides some optimizations to
+make the code run much faster. However, it's somewhat annoying to type. We do
+this for you, via C<B::Hooks::AtRuntime>. You no longer need to do this yourself.
+
+=head1 FUNCTIONS
+
+The following two functions are exported into your namespace.
+
+=head2 C<param>
+
+    param name => ( isa => NonEmptyStr );
+
+A similar function to Moose's C<has>. A C<param> is required. You may pass it
+to the contructor, or use a C<default> or C<builder> to supply this value.
+
+The above C<param> definition is equivalent to:
+
+    has name => (
+        is       => 'ro',
+        isa      => NonEmptyStr,
+        required => 1,
+    );
+
+If you want a parameter that has no C<default> or C<builder> and can
+I<optionally> be passed to the constructor, just use C<< required => 0 >>.
+
+    param title => ( isa => Str, required => 0 );
+
+Note that C<param>, like C<field>, defaults to read-only, C<< is => 'ro' >>.
+You can override this:
+
+    param name => ( is => 'rw', isa => NonEmptyStr );
+
+Otherwise, it behaves like C<has>. You can pass in any arguments that C<has>
+accepts.
+
+    # we'll make it private, but allow it to be passed to the constructor
+    # as `name`
+    param _name   => ( isa => NonEmptyStr, init_arg => 'name' );
+
+=head2 C<field>
+
+    field created => ( isa => PositiveInt, default => sub { time } );
+
+A similar function to Moose's C<has>. A C<field> is never allowed to be passed
+to the constructor, but you can still use C<default> or C<builder>, as normal.
+
+The above C<field> definition is equivalent to:
+
+    has created => (
+        is       => 'ro',
+        isa      => PositiveInt,
+        init_arg => undef,        # not allowed in the constructor
+        default  => sub { time },
+        lazy     => 1,
+    );
+
+Note that C<field>, like C<param>, defaults to read-only, C<< is => 'ro' >>.
+You can override this:
+
+    field some_data => ( is => 'rw', isa => NonEmptyStr );
+
+Otherwise, it behaves like C<has>. You can pass in any arguments that C<has>
+accepts.
+
+B<WARNING>: if you pass C<field> an C<init_arg> with a defined value, The code
+will C<croak>. A C<field> is just for instance data the class uses. It's not
+to be passed to the constructor. If you want that, just use C<param>.
+
+Later, we'll add proper exceptions.
+
+=head3 Lazy Fields
+
+Every C<field> is lazy by default. This is because there's no guarantee the code will call
+them, but this makes it very easy for a C<field> to rely on a C<param> value being present.
+
+Every C<param> is not lazy by default, but you can add C<< lazy => 1 >> if you need to.
+
+=cut
+
+=head1 RELATED MODULES
 
 =head2 C<MooseX::Extreme::Types>
 
@@ -235,18 +210,6 @@ C<MooseX::Role::Strict>, but with warnings instead of failures.
 We provide C<MooseX::Extreme::Types> for convenience. It would be even more
 convenient if we offered an easier for people to build something like
 C<MooseX::Extreme::Types::Mine> so they can customize it.
-
-=head2 Immutability
-
-    __PACKAGE__->meta->make_immutable; # we want this to be optional
-
-Try to figure out how to automatically make the class immutable.
-C<B::Hooks::EndOfScope> did not work because C<param> and C<field> fire at
-runtime, not compile-time, and making the class immutable at the end of scope
-fires I<before> C<param> and C<field> are run.
-
-I thought seriously about making the class mutable in each of those functions
-and immutable after, but hey, we don't need that performance hit.
  
 =head2 Configurability
 

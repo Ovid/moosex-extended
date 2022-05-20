@@ -32,11 +32,8 @@ package My::Names {
 }
 
 subtest 'miscellaneous features' => sub {
-  TODO: {
-        local $TODO = 'B::Hooks::EndOfScope is needed for this, I think';
-        ok +My::Names->meta->is_immutable,
-          'We should be able to define an immutable class';
-    }
+    ok +My::Names->meta->is_immutable,
+      'We should be able to define an immutable class';
     is mro::get_mro('My::Names'), 'c3', "Our class's mro should be c3";
 };
 
