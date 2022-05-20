@@ -76,7 +76,10 @@ package My::Class {
     use mro 'c3';
 
     ... your code here
+
+    __PACKAGE__->meta->make_immutable;
 }
+1;
 ```
 
 It also exports two functions which are similar to Moose `has`: `param` and
@@ -213,6 +216,117 @@ Every `field` is lazy by default. This is because there's no guarantee the code 
 them, but this makes it very easy for a `field` to rely on a `param` value being present.
 
 Every `param` is not lazy by default, but you can add `lazy => 1` if you need to.
+
+# ATTRIBUTE SHORTCUTS
+
+When using `field` or `param`, we have some attribute shortcuts:
+
+```perl
+param name => (
+    isa       => NonEmptyStr,
+    predicate => 1,   # has_name
+    clearer   => 1,   # clear_name
+    builder   => 1,   # _build_name
+);
+
+sub _build_name ($self) {
+    ...
+}
+```
+
+These can also be used when you pass an array reference to the function:
+
+```perl
+package Point {
+    use MooseX::Extreme;
+    use MooseX::Extreme::Types qw(Int);
+
+    param [ 'x', 'y' ] => (
+        isa     => Int,
+        clearer => 1,     # clear_x and clear_y available
+        default => 0,
+    ) :;
+}
+```
+
+## `predicate`
+
+If an attribute has `predicate` is set to `1` (the number one), a method
+named `has_$attribute_name` is created.
+
+This:
+
+```perl
+param title => (
+    isa       => Undef | NonEmptyStr,
+    default   => undef,
+    predicate => 1,
+);
+```
+
+Is the same as this:
+
+```perl
+has title => (
+    is        => 'ro',
+    isa       => Undef | NonEmptyStr,
+    default   => undef,
+    predicate => 'has_title',
+);
+```
+
+## `clearer`
+
+If an attribute has `clearer` is set to `1` (the number one), a method
+named `clear_$attribute_name` is created.
+
+This:
+
+```perl
+param title => (
+    isa     => Undef | NonEmptyStr,
+    default => undef,
+    clearer => 1,
+);
+```
+
+Is the same as this:
+
+```perl
+has title => (
+    is      => 'ro',
+    isa     => Undef | NonEmptyStr,
+    default => undef,
+    clearer => 'clear_title',
+);
+```
+
+## `builder`
+
+If an attribute has `builder` is set to `1` (the number one), a method
+named `_build_$attribute_name`.
+
+This:
+
+```perl
+param title => (
+    isa     =>  NonEmptyStr,
+    builder => 1,
+);
+```
+
+Is the same as this:
+
+```perl
+has title => (
+    is      => 'ro',
+    isa     => NonEmptyStr,
+    builder => '_build_title',
+);
+```
+
+Obviously, a "private" attribute, such as `_auth_token` would get a build named
+`_build__auth_token` (note the two underscores between "build" and "auth\_token").
 
 # RELATED MODULES
 
