@@ -50,12 +50,17 @@ sub _apply_shortcuts ( $meta, $name, %opt_for ) {
         predicate => sub ($value) {"has_$value"},
         clearer   => sub ($value) {"clear_$value"},
         builder   => sub ($value) {"_build_$value"},
+        writer    => sub ($value) {"set_$value"},
     };
     foreach my $option ( keys $shortcut_for->%* ) {
         if ( exists $opt_for{$option} && 1 == $opt_for{$option} ) {
             $opt_for{$option} = $shortcut_for->{$option}->($name);
         }
     }
+    if ( exists $opt_for{writer} && defined $opt_for{writer} ) {
+        $opt_for{is} = 'rw';
+    }
+
     return %opt_for;
 }
 

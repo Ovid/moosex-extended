@@ -236,6 +236,7 @@ When using C<field> or C<param>, we have some attribute shortcuts:
 
     param name => (
         isa       => NonEmptyStr,
+        writer    => 1,   # set_name
         predicate => 1,   # has_name
         clearer   => 1,   # clear_name
         builder   => 1,   # _build_name
@@ -257,6 +258,28 @@ These can also be used when you pass an array reference to the function:
             default => 0,
         ) :;
     }
+
+=head2 C<writer>
+
+If an attribute has C<writer> is set to C<1> (the number one), a method
+named C<set_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        writer => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'rw',                  # we change this from 'ro'
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        writer  => 'set_title',
+    );
 
 =head2 C<predicate>
 

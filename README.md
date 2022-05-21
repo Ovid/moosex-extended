@@ -224,6 +224,7 @@ When using `field` or `param`, we have some attribute shortcuts:
 ```perl
 param name => (
     isa       => NonEmptyStr,
+    writer    => 1,   # set_name
     predicate => 1,   # has_name
     clearer   => 1,   # clear_name
     builder   => 1,   # _build_name
@@ -247,6 +248,32 @@ package Point {
         default => 0,
     ) :;
 }
+```
+
+## `writer`
+
+If an attribute has `writer` is set to `1` (the number one), a method
+named `set_$attribute_name` is created.
+
+This:
+
+```perl
+param title => (
+    isa       => Undef | NonEmptyStr,
+    default   => undef,
+    writer => 1,
+);
+```
+
+Is the same as this:
+
+```perl
+has title => (
+    is      => 'rw',                  # we change this from 'ro'
+    isa     => Undef | NonEmptyStr,
+    default => undef,
+    writer  => 'set_title',
+);
 ```
 
 ## `predicate`
