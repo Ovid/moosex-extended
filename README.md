@@ -92,6 +92,8 @@ Note that the `has` function is still available, even if it's not needed.
 
 # Immutability
 
+## Making Your Class Immutable
+
 Typically Moose classes should end with this:
 
 ```
@@ -101,6 +103,34 @@ __PACKAGE__->meta->make_immutable;
 That prevents further changes to the class and provides some optimizations to
 make the code run much faster. However, it's somewhat annoying to type. We do
 this for you, via `B::Hooks::AtRuntime`. You no longer need to do this yourself.
+
+## Immutable Objects
+
+By default, attributes defined via `param` and `field` are read-only.
+However, if they contain a reference, you can fetch the reference, mutate it,
+and now everyone with a copy of that reference has mutated state.
+`MooseX::Extreme` offers **EXPERIMENTAL** support for cloning, but differently
+from how we see it typically done. You can just pass the `clone => 1`
+argument to your attribute and it will be clone with [Storable](https://metacpan.org/pod/Storable)'s `dclone`
+function every time you read or write that attribute, it will be cloned if
+it's a reference, ensuring that your object is effectively immutable.
+
+```perl
+package My::Class {
+    use v5.22.0;
+    use MooseX::Extreme;
+    use MooseX::Extreme::Types qw(NonEmptyStr HashRef);
+
+    param name => ( isa => NonEmptyStr );    # no need to clone
+    param payload => (
+        isa   => HashRef,                    # need to clone
+        clone => 1,
+    );
+}
+```
+
+**Warning**: setting the value via the constructor for the first time doesn't clone
+the data. All other gets and sets will.
 
 # OBJECT CONSTRUCTION
 
@@ -224,6 +254,7 @@ When using `field` or `param`, we have some attribute shortcuts:
 ```perl
 param name => (
     isa       => NonEmptyStr,
+    writer    => 1,   # set_name
     predicate => 1,   # has_name
     clearer   => 1,   # clear_name
     builder   => 1,   # _build_name
@@ -247,6 +278,41 @@ package Point {
         default => 0,
     ) :;
 }
+```
+
+Note that these are _shortcuts_ and they make attributes easier to write and more consistent.
+However, you can still use full names:
+
+```perl
+field authz_delegate => (
+    builder => '_build_my_darned_authz_delegate',
+);
+```
+
+## `writer`
+
+If an attribute has `writer` is set to `1` (the number one), a method
+named `set_$attribute_name` is created.
+
+This:
+
+```perl
+param title => (
+    isa       => Undef | NonEmptyStr,
+    default   => undef,
+    writer => 1,
+);
+```
+
+Is the same as this:
+
+```perl
+has title => (
+    is      => 'rw',                  # we change this from 'ro'
+    isa     => Undef | NonEmptyStr,
+    default => undef,
+    writer  => 'set_title',
+);
 ```
 
 ## `predicate`

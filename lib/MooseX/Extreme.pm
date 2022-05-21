@@ -11,7 +11,7 @@ use Moose                     ();
 use MooseX::StrictConstructor ();
 use mro                       ();
 use namespace::autoclean      ();
-use MooseX::Extreme::Helpers qw(field param);
+use MooseX::Extreme::Core qw(field param);
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
@@ -36,7 +36,14 @@ sub init_meta ( $class, %params ) {
     warnings->unimport('experimental::signatures');
     feature->import(qw/signatures :5.22/);
     namespace::autoclean->import::into($for_class);
-    after_runtime { $for_class->meta->make_immutable };
+
+    # see perldoc -v '$^P'
+    if ($^P) {
+        say STDERR "We are running under the debugger. $for_class is not immutable";
+    }
+    else {
+        after_runtime { $for_class->meta->make_immutable };
+    }
     true->import;    # no need for `1` at the end of the module
 
     # If we never use multiple inheritance, this should not be needed.
@@ -127,6 +134,8 @@ Note that the C<has> function is still available, even if it's not needed.
 
 =head1 Immutability
 
+=head2 Making Your Class Immutable
+
 Typically Moose classes should end with this:
 
     __PACKAGE__->meta->make_immutable;
@@ -134,6 +143,32 @@ Typically Moose classes should end with this:
 That prevents further changes to the class and provides some optimizations to
 make the code run much faster. However, it's somewhat annoying to type. We do
 this for you, via C<B::Hooks::AtRuntime>. You no longer need to do this yourself.
+
+=head2 Immutable Objects
+
+By default, attributes defined via C<param> and C<field> are read-only.
+However, if they contain a reference, you can fetch the reference, mutate it,
+and now everyone with a copy of that reference has mutated state.
+C<MooseX::Extreme> offers B<EXPERIMENTAL> support for cloning, but differently
+from how we see it typically done. You can just pass the C<< clone => 1 >>
+argument to your attribute and it will be clone with L<Storable>'s C<dclone>
+function every time you read or write that attribute, it will be cloned if
+it's a reference, ensuring that your object is effectively immutable.
+
+    package My::Class {
+        use v5.22.0;
+        use MooseX::Extreme;
+        use MooseX::Extreme::Types qw(NonEmptyStr HashRef);
+
+        param name => ( isa => NonEmptyStr );    # no need to clone
+        param payload => (
+            isa   => HashRef,                    # need to clone
+            clone => 1,
+        );
+    }
+
+B<Warning>: setting the value via the constructor for the first time doesn't clone
+the data. All other gets and sets will.
 
 =head1 OBJECT CONSTRUCTION
 
@@ -236,6 +271,7 @@ When using C<field> or C<param>, we have some attribute shortcuts:
 
     param name => (
         isa       => NonEmptyStr,
+        writer    => 1,   # set_name
         predicate => 1,   # has_name
         clearer   => 1,   # clear_name
         builder   => 1,   # _build_name
@@ -257,6 +293,35 @@ These can also be used when you pass an array reference to the function:
             default => 0,
         ) :;
     }
+
+Note that these are I<shortcuts> and they make attributes easier to write and more consistent.
+However, you can still use full names:
+
+    field authz_delegate => (
+        builder => '_build_my_darned_authz_delegate',
+    );
+
+=head2 C<writer>
+
+If an attribute has C<writer> is set to C<1> (the number one), a method
+named C<set_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        writer => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'rw',                  # we change this from 'ro'
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        writer  => 'set_title',
+    );
 
 =head2 C<predicate>
 

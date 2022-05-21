@@ -1,8 +1,11 @@
-Revision history for MooseX-Extrme
+Revision history for MooseX-Extreme
 
 {{$NEXT}}
 
-          - Add shortcuts for clearer, builder, predicate
+          - Trial support for `clone => 1`
+          - Roles will now warn if a class overrides a role method without
+            excluding it (in Moose, the class silently ignores the role method)
+          - Add shortcuts for writer, clearer, builder, predicate
           - Role support added
           - make_immutable is now the default (thanks, haarg)
           - no need to add a true value to the end of your module (thanks, haarg)

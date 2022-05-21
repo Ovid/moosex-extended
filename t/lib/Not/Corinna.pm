@@ -1,12 +1,11 @@
 package Not::Corinna {
     use v5.22.0;
     use MooseX::Extreme;
-    use MooseX::Extreme::Types
-      qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
+    use MooseX::Extreme::Types qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
     use List::Util 'sum';
 
     with qw(
-        Not::Corinna::Role::Created
+      Not::Corinna::Role::Created
     );
 
     # these default to 'ro' (but you can override that) and are required
@@ -28,12 +27,11 @@ package Not::Corinna {
     sub add ( $self, $args ) {
         state $check = compile( ArrayRef [ Num, 1 ] );
         ($args) = $check->($args);
-        return sum( $args->@* )
-          ;    # note that Not::Corinna->can('sum') will return false!
+        return sum( $args->@* );    # note that Not::Corinna->can('sum') will return false!
     }
 
     sub warnit ($self) {
-        carp("this is a warning");  # carp and croak are automatically available
+        carp("this is a warning");    # carp and croak are automatically available
     }
 
     # There is no need for __PACKAGE__->meta->make_immutable or to end in a true

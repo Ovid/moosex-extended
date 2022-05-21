@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Type::Library -base;
 use Type::Utils -all;
-use Type::Params; # this gets us compile and compile_named
+use Type::Params;    # this gets us compile and compile_named
 use Types::Standard qw(
   slurpy
 );

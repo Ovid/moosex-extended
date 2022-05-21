@@ -6,13 +6,12 @@ use Test::Most;
 package My::Names {
     use v5.22.0;
     use MooseX::Extreme;
-    use MooseX::Extreme::Types
-      qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
+    use MooseX::Extreme::Types qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
     use List::Util 'sum';
 
     param _name => ( isa => NonEmptyStr, init_arg => 'name' );
     param title => ( isa => Str, required => 0, predicate => 1 );
-    field created => ( isa => PositiveInt, default => sub { time } );
+    field created => ( isa => PositiveInt, default => sub {time} );
 
     sub name ($self) {
         my $title = $self->title;
