@@ -259,6 +259,13 @@ These can also be used when you pass an array reference to the function:
         ) :;
     }
 
+Note that these are I<shortcuts> and they make attributes easier to write and more consistent.
+However, you can still use full names:
+
+    field authz_delegate => (
+        builder => '_build_my_darned_authz_delegate',
+    );
+
 =head2 C<writer>
 
 If an attribute has C<writer> is set to C<1> (the number one), a method

@@ -250,6 +250,15 @@ package Point {
 }
 ```
 
+Note that these are _shortcuts_ and they make attributes easier to write and more consistent.
+However, you can still use full names:
+
+```perl
+field authz_delegate => (
+    builder => '_build_my_darned_authz_delegate',
+);
+```
+
 ## `writer`
 
 If an attribute has `writer` is set to `1` (the number one), a method
