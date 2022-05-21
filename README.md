@@ -129,13 +129,14 @@ package My::Class {
 }
 ```
 
-**Warning**: setting the value via the constructor for the first time doesn't clone
-the data. All other gets and sets will.
+**Warning**: setting the value via the constructor for the first time doesn't
+clone the data. All other gets and sets will clone it. We need to figure out a
+clean, performant solution for this.
 
 # OBJECT CONSTRUCTION
 
 The normal `new`, `BUILD`, and `BUILDARGS` functions work as expected.
-However, we apply [<MooseX::StrictConstructor](https://metacpan.org/pod/%3CMooseX%3A%3AStrictConstructor) to avoid this problem:
+However, we apply [MooseX::StrictConstructor](https://metacpan.org/pod/MooseX%3A%3AStrictConstructor) to avoid this problem:
 
 ```perl
 my $soldier = Soldier->new(

@@ -167,13 +167,14 @@ it's a reference, ensuring that your object is effectively immutable.
         );
     }
 
-B<Warning>: setting the value via the constructor for the first time doesn't clone
-the data. All other gets and sets will.
+B<Warning>: setting the value via the constructor for the first time doesn't
+clone the data. All other gets and sets will clone it. We need to figure out a
+clean, performant solution for this.
 
 =head1 OBJECT CONSTRUCTION
 
 The normal C<new>, C<BUILD>, and C<BUILDARGS> functions work as expected.
-However, we apply L<<MooseX::StrictConstructor> to avoid this problem:
+However, we apply L<MooseX::StrictConstructor> to avoid this problem:
 
     my $soldier = Soldier->new(
         name   => $name,
