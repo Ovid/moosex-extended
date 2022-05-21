@@ -36,7 +36,14 @@ sub init_meta ( $class, %params ) {
     warnings->unimport('experimental::signatures');
     feature->import(qw/signatures :5.22/);
     namespace::autoclean->import::into($for_class);
-    after_runtime { $for_class->meta->make_immutable };
+
+    # see perldoc -v '$^P'
+    if ($^P) {
+        say STDERR "We are running under the debugger. $for_class is not immutable";
+    }
+    else {
+        after_runtime { $for_class->meta->make_immutable };
+    }
     true->import;    # no need for `1` at the end of the module
 
     # If we never use multiple inheritance, this should not be needed.
