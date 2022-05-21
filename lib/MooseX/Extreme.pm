@@ -35,13 +35,18 @@ sub init_meta ( $class, %params ) {
     Carp->import::into($for_class);
     warnings->unimport('experimental::signatures');
     feature->import(qw/signatures :5.22/);
-    namespace::autoclean->import::into($for_class);
 
     # see perldoc -v '$^P'
     if ($^P) {
         say STDERR "We are running under the debugger. $for_class is not immutable";
     }
     else {
+        # we also remove namespace::autoclean because when those symbols get
+        # removed from the symbol table, you can't access them under the
+        # debugger! Very frustrating
+        namespace::autoclean->import::into($for_class);
+
+        # after_runtime is loaded too late under the debugger
         after_runtime { $for_class->meta->make_immutable };
     }
     true->import;    # no need for `1` at the end of the module
@@ -273,6 +278,7 @@ When using C<field> or C<param>, we have some attribute shortcuts:
     param name => (
         isa       => NonEmptyStr,
         writer    => 1,   # set_name
+        reader    => 1,   # get_name
         predicate => 1,   # has_name
         clearer   => 1,   # clear_name
         builder   => 1,   # _build_name
@@ -322,6 +328,35 @@ Is the same as this:
         isa     => Undef | NonEmptyStr,
         default => undef,
         writer  => 'set_title',
+    );
+
+=head2 C<reader>
+
+By default, the reader (accessor) for the attribute is the same as the name.
+You can always change this:
+
+    has payload => ( is => 'ro', reader => 'the_payload' );
+
+However, if you want to change the reader name
+
+If an attribute has C<reader> is set to C<1> (the number one), a method
+named C<get_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        reader => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'rw',                  # we change this from 'ro'
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        reader  => 'get_title',
     );
 
 =head2 C<predicate>
