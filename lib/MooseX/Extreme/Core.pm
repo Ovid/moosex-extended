@@ -23,7 +23,8 @@ sub param ( $meta, $name, %opt_for ) {
     foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
         my %options = %opt_for;    # copy each time to avoid overwriting
         $options{init_arg} //= $attr;
-        %options = _apply_shortcuts( $meta, $name, %options );
+        %options = _finalize_options( $meta, $name, %options );
+        debug("Setting param '$attr'", \%options);
         $meta->add_attribute( $attr, %options );
     }
 }
@@ -40,12 +41,13 @@ sub field ( $meta, $name, %opt_for ) {
         $options{init_arg} = undef;
         $options{lazy} //= 1;
 
-        %options = _apply_shortcuts( $meta, $name, %options );
+        %options = _finalize_options( $meta, $name, %options );
+        debug("Setting field '$attr'", \%options);
         $meta->add_attribute( $attr, %options );
     }
 }
 
-sub _apply_shortcuts ( $meta, $name, %opt_for ) {
+sub _finalize_options ( $meta, $name, %opt_for ) {
     state $shortcut_for = {
         predicate => sub ($value) {"has_$value"},
         clearer   => sub ($value) {"clear_$value"},
@@ -62,6 +64,14 @@ sub _apply_shortcuts ( $meta, $name, %opt_for ) {
     }
 
     return %opt_for;
+}
+
+sub debug ( $message, $data ) {
+    return unless $MooseX::Extreme::Debug;
+    require Data::Printer;
+    $data = Data::Printer::np($data);
+    $message = "$message: $data";
+    Data::Printer::p(\$message);
 }
 
 1;
