@@ -35,9 +35,7 @@ sub field ( $meta, $name, %opt_for ) {
     foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
         my %options = %opt_for;    # copy each time to avoid overwriting
         if ( defined( my $init_arg = $options{init_arg} ) ) {
-            croak(
-                "The 'field.init_arg' must be absent or undef, not '$init_arg'"
-            );
+            croak("The 'field.init_arg' must be absent or undef, not '$init_arg'");
         }
         $options{init_arg} = undef;
         $options{lazy} //= 1;
@@ -49,9 +47,9 @@ sub field ( $meta, $name, %opt_for ) {
 
 sub _apply_shortcuts ( $meta, $name, %opt_for ) {
     state $shortcut_for = {
-        predicate => sub ($value) { "has_$value" },
-        clearer   => sub ($value) { "clear_$value" },
-        builder   => sub ($value) { "_build_$value" },
+        predicate => sub ($value) {"has_$value"},
+        clearer   => sub ($value) {"clear_$value"},
+        builder   => sub ($value) {"_build_$value"},
     };
     foreach my $option ( keys $shortcut_for->%* ) {
         if ( exists $opt_for{$option} && 1 == $opt_for{$option} ) {
