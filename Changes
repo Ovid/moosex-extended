@@ -1,7 +1,9 @@
-Revision history for MooseX-Extrme
+Revision history for MooseX-Extreme
 
 {{$NEXT}}
 
+          - Roles will now warn if a class overrides a role method without
+            excluding it (in Moose, the class silently ignores the role method)
           - Add shortcuts for clearer, builder, predicate
           - Role support added
           - make_immutable is now the default (thanks, haarg)
