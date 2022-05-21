@@ -134,6 +134,8 @@ Note that the C<has> function is still available, even if it's not needed.
 
 =head1 Immutability
 
+=head2 Making Your Class Immutable
+
 Typically Moose classes should end with this:
 
     __PACKAGE__->meta->make_immutable;
@@ -141,6 +143,32 @@ Typically Moose classes should end with this:
 That prevents further changes to the class and provides some optimizations to
 make the code run much faster. However, it's somewhat annoying to type. We do
 this for you, via C<B::Hooks::AtRuntime>. You no longer need to do this yourself.
+
+=head2 Immutable Objects
+
+By default, attributes defined via C<param> and C<field> are read-only.
+However, if they contain a reference, you can fetch the reference, mutate it,
+and now everyone with a copy of that reference has mutated state.
+C<MooseX::Extreme> offers B<EXPERIMENTAL> support for cloning, but differently
+from how we see it typically done. You can just pass the C<< clone => 1 >>
+argument to your attribute and it will be clone with L<Storable>'s C<dclone>
+function every time you read or write that attribute, it will be cloned if
+it's a reference, ensuring that your object is effectively immutable.
+
+    package My::Class {
+        use v5.22.0;
+        use MooseX::Extreme;
+        use MooseX::Extreme::Types qw(NonEmptyStr HashRef);
+
+        param name => ( isa => NonEmptyStr );    # no need to clone
+        param payload => (
+            isa   => HashRef,                    # need to clone
+            clone => 1,
+        );
+    }
+
+B<Warning>: setting the value via the constructor for the first time doesn't clone
+the data. All other gets and sets will.
 
 =head1 OBJECT CONSTRUCTION
 

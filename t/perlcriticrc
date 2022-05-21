@@ -29,6 +29,7 @@ allow_import_of = utf8
 # perlcritic thinks signatures are prototypes
 [-Subroutines::ProhibitSubroutinePrototypes] 
 [-Modules::ProhibitMultiplePackages]
+[-Subroutines::RequireArgUnpacking]
 
 # MooseX::Extreme provides these, so skip 'em
 [-Moose::RequireMakeImmutable]
