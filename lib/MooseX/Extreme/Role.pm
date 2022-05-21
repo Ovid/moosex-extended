@@ -53,7 +53,7 @@ Similar to L<MooseX::Extreme>, this provides C<field> and C<param> to the role.
 
 Note that there is no need to add a C<1> at the end of the role.
 
-=HEAD1 IDENTICAL METHOD NAMES IN CLASSES AND ROLES
+=head1 IDENTICAL METHOD NAMES IN CLASSES AND ROLES
 
 In L<Moose> if a class defines a method of the name as the method of a role
 it's consuming, the role's method is I<silently> discarded. With
