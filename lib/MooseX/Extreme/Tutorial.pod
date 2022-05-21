@@ -1,3 +1,25 @@
+=head1 CONVERTING FROM MOOSE
+
+For most sane codebases, converting from L<Moose> to L<MooseX::Extreme> is as
+simple as C<< s/Moose/MooseX::Extreme/ >>. We I<try> to be
+backwards-compatible, but some issues are glaring enough that they can't be
+fixed. Run your tests, folks.
+
+From there, convert your various C<has> attributes to C<field> or C<param>
+(and run your tests), and you can also delete the annoying C<<
+__PACKAGE__->meta->make_immutable >> at the end of every package (run your
+tests, folks).
+
+From there, if you're not using signatures, convert your methods to
+using signatures. You'll almost definitely get test failures there as many
+functions handle arguments poorly.
+
+For roles, just C<< s/Moose::Role/MooseX::Role::Extreme/ >> and repeat the
+process (and run your tests, folks).
+
+Along the way, you can probably delete your references to
+L<namespace::autoclean> and friends because we provide that for you.
+
 =head1 RATIONALE
 
 You can skip this section if you like.
