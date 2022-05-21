@@ -1,0 +1,188 @@
+=head1 RATIONALE
+
+You can skip this section if you like.
+
+L<MooseX::Extreme> is built on years of experience hacking on L<Moose> and
+being the lead designer of the L<Corinna|https://github.com/Ovid/Cor> project
+to bring modern OO to the Perl language. I love Moose, but over the years,
+it's become clear that there are some problematic design choices. Plus,
+Corinna is not yet in core as I write this (though the Perl Steering Committee
+has accepted it), so for now, let's see how far we can push the envelope.
+
+=head1 BOILERPLATE
+
+This:
+
+    package My::Class {
+        use MooseX::Extreme;
+
+        ... your code here
+    }
+
+Is sort of the equivalent to:
+
+    package My::Class {
+        use v5.22.0;
+        use Moose;
+        use MooseX::StrictConstructor;
+        use feature 'signatures';
+        no warnings 'experimental::signatures';
+        use namespace::autoclean;
+        use Carp;
+        use mro 'c3';
+
+        ... your code here
+
+        __PACKAGE__->meta->make_immutable;
+    }
+
+    1;
+
+We get tired of typing a lot of boilerplate, so C<MooseX::Extreme> does away
+with it.
+
+=head1 CONSTRUCTOR
+
+The constructor behavior for Moose could use some love.
+
+=head1 What's allowed in the constructor?
+
+I've regularly face the following problem:
+
+    package Some::Class;
+
+    use Moose;
+
+    has name     => (...);
+    has uuid     => (...);
+    has id       => (...);
+    has backlog  => (...);
+    has auth     => (...);
+    has username => (...);
+    has password => (...);
+    has cache    => (...);
+    has this     => (...);
+    has that     => (...);
+
+Which of those should be passed to the constructor and which should not? Just
+because you I<can> pass something to the constructor doesn't mean you
+I<should>. Unfortunately, Moose defaults to "opt-out" rather than "opt-in" for
+constructor arguments. This makes it really easy to build objects, but means
+that you can pass things to the constructo and it won't always work the way
+you want it to.
+
+There's an arcane C<< init_arg => undef >> pair to pass to each to say "this
+cannot be set via the constructor," but many developers are either unaware of
+this is simply forget about it. C<MooseX::Extreme> solves with by separating
+C<has> into C<param> (allowed in the constructor, but you can also use
+C<default> or C<builder>) and C<field>, which if forbidden in the constructor.
+We can rewrite the above as this:
+
+    package Some::Class;
+
+    use Moose;
+
+    param name     => (...);
+    param backlog  => (...);
+    param auth     => (...);
+    param username => (...);
+    param password => (...);
+
+    field cache    => (...);
+    field this     => (...);
+    field that     => (...);
+    field uuid     => (...);
+    field id       => (...);
+
+And now you can instantly see what is and is not I<intended> to be allowed in
+the constructor.
+
+Note that in our experience, C<field> attributes often depend on C<param>
+attributes, so they're lazy by default (a nice performance win if you don't
+call them), but you can still pass C<< lazy => 0 >> to override this.
+
+=head2 Unknown arguments to the constructor
+
+Here's another fun bug:
+
+    my $object = Some::Class->new(
+        name   => $name,
+        seriel => $serial,
+    );
+
+    # later in your code
+
+    if ( $gbject->serial ) {
+        # unreachable code
+    }
+
+This is because Moose, by default, ignores any unknown arguments to the
+constructor and in the above example, we misspelled "serial" as "seriel".
+
+C<MooseX::Extreme> applies C<MooseX::StrictConstructor> to your class so you
+never have to face this problem again.
+
+B<WARNING>: Be careful when using this in existing class hierarchies. While
+C<MooseX::Extreme> is compatible with Moose (Moose classes can always use
+C<MooseX::Extreme> classes and roles), the reverse isn't always true. We've
+found, for example, that trying to use C<MooseX::StrictConstructor> with
+L<DBIx::Class> does not work.
+
+=head2 Method Resolution Order (mro)
+
+If you don't use multiple inheritance, you won't need to worry about this.
+However, by now, it's generally agreed that the C3 method resolution order
+(breadth-first, for Perl) is superior to the depth-first default. You can read
+about L<the diamond inheritance
+problem|https://en.wikipedia.org/wiki/Multiple_inheritance> if you'd like to
+learn more.
+
+Rather than remembering to include C<use mro 'c3'> in your code,
+L<MooseX::Extreme> does it for you.
+
+If you have existing code that breaks under this, you should investigate
+carefully. You probably have a bug in your code.
+
+=head1 Immutable Objects
+
+The subject of immutable objects has been done to death. If I set the value of
+an attribute but another section of the code has already fetched that value,
+you might have two sections of the code operating under completely different
+assumptions of what they're allowed to do. So by default, all attributes are
+"read-only":
+
+    param name  => ( isa => NonEmptyStr );
+    field cache => ( isa => HashRef );
+
+You can change this if you need to:
+
+    param name  => ( is => 'rw', isa => NonEmptyStr );
+    field cache => ( is => 'rw', isa => HashRef );
+
+However, what's going on with that C<cache> attribute? It returns a reference.
+If your code mutates that reference, every bit of code holding a reference to
+that object I<silently has its state changed>. So we fixed that, too:
+
+    field cache => ( isa => HashRef, clone => 1 );
+
+Now, every time you get or set that data, it's cloned, ensuring that you can
+do this:
+
+    # assumes that the original ->cache has a SeKreT key.
+    my $hash1 = $object->cache;
+    delete $hash1->{SeKreT};
+    my $hash2 = $object->cache;
+    my $SeKreT = $hash2->{SeKreT}; # you get the original value
+
+Internally, we use L<Storable>'s C<dclone> method for this. Be aware that many
+things cannot be safely cloned (e.g., database handles).
+
+The C<< clone => 1 >> feature is safest when you don't have objects that
+you're trying to clone. As a result, this feature is B<EXPERIMENTAL>.
+
+=head1 ATTRIBUTES
+
+
+
+
+
