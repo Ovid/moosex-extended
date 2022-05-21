@@ -4,7 +4,7 @@ package MooseX::Extreme::Role;
 
 use strict;
 use warnings;
-use MooseX::Extreme::Helpers qw(field param);
+use MooseX::Extreme::Core qw(field param);
 use Moose::Role ();
 use Moose::Meta::Role;
 use namespace::autoclean ();

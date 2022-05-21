@@ -11,7 +11,7 @@ use Moose                     ();
 use MooseX::StrictConstructor ();
 use mro                       ();
 use namespace::autoclean      ();
-use MooseX::Extreme::Helpers qw(field param);
+use MooseX::Extreme::Core qw(field param);
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 

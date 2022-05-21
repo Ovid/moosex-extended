@@ -1,4 +1,4 @@
-package MooseX::Extreme::Helpers;
+package MooseX::Extreme::Core;
 
 # ABSTRACT: Internal module for MooseX::Extreme
 
