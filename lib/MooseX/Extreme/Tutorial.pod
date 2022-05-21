@@ -4,9 +4,9 @@ You can skip this section if you like.
 
 L<MooseX::Extreme> is built on years of experience hacking on L<Moose> and
 being the lead designer of the L<Corinna|https://github.com/Ovid/Cor> project
-to bring modern OO to the Perl language. I love Moose, but over the years,
+to bring modern OO to the Perl language. We love Moose, but over the years,
 it's become clear that there are some problematic design choices. Plus,
-Corinna is not yet in core as I write this (though the Perl Steering Committee
+Corinna is not yet in core as We write this (though the Perl Steering Committee
 has accepted it), so for now, let's see how far we can push the envelope.
 
 =head1 BOILERPLATE
@@ -47,7 +47,7 @@ The constructor behavior for Moose could use some love.
 
 =head1 What's allowed in the constructor?
 
-I've regularly face the following problem:
+We've regularly face the following problem:
 
     package Some::Class;
 
@@ -68,7 +68,7 @@ Which of those should be passed to the constructor and which should not? Just
 because you I<can> pass something to the constructor doesn't mean you
 I<should>. Unfortunately, Moose defaults to "opt-out" rather than "opt-in" for
 constructor arguments. This makes it really easy to build objects, but means
-that you can pass things to the constructo and it won't always work the way
+that you can pass things to the constructor and it won't always work the way
 you want it to.
 
 There's an arcane C<< init_arg => undef >> pair to pass to each to say "this
@@ -143,9 +143,31 @@ L<MooseX::Extreme> does it for you.
 If you have existing code that breaks under this, you should investigate
 carefully. You probably have a bug in your code.
 
-=head1 Immutable Objects
+=head2 Making Your Class Immutable
 
-The subject of immutable objects has been done to death. If I set the value of
+It's recommended that you end your Moose classes with this:
+
+    __PACKAGE__->meta->make_immutable;
+
+That causes a lot of things to happen under the hood. It makes your class much
+harder to debug as you're in a twisty maze of C<eval>ed methods, but it makes
+your class run much faster. The performance gain is often significant and you
+almost always want to use this, but it's easy to forget, so we add it for you.
+
+To do this, we use the C<after_runtime> function from C<B::Hooks::AtRuntime>.
+However, that doesn't work under the debugger. So if you're running under the
+debugger, we disable this. Please keep that in mind. As a convenience, when
+running under the debugger, we issue a series of warnings for every class that
+is impacted. For a large codebase, that could be a considerable number of
+classes if they use C<MooseX::Extreme>:
+
+    We are running under the debugger. My::Name is not immutable
+    We are running under the debugger. My::Product is not immutable
+    We are running under the debugger. My::Order is not immutable
+
+=head1 IMMUTABLE OBJECTS
+
+The subject of immutable objects has been done to death. If We set the value of
 an attribute but another section of the code has already fetched that value,
 you might have two sections of the code operating under completely different
 assumptions of what they're allowed to do. So by default, all attributes are
@@ -182,7 +204,165 @@ you're trying to clone. As a result, this feature is B<EXPERIMENTAL>.
 
 =head1 ATTRIBUTES
 
+By now, you know that C<< is => 'ro' >> is the default for all C<param> and
+C<field> attributes. You can still use C<has>, but you will still need to use
+C<< is => ... >> with that:
 
+    has name => ( is => 'ro, ... );
 
+However, I hate typing out something like C<< predicate => 'is_assigned' >>.
+Or should it be C<< predicate => 'has_assigned' >>? For a variety of
+attributes, we've made this simpler.
 
+When using C<field> or C<param>, we have some attribute shortcuts:
 
+    param name => (
+        isa       => NonEmptyStr,
+        writer    => 1,   # set_name
+        reader    => 1,   # get_name
+        predicate => 1,   # has_name
+        clearer   => 1,   # clear_name
+        builder   => 1,   # _build_name
+    );
+
+    sub _build_name ($self) {
+        ...
+    }
+
+These can also be used when you pass an array reference to the function:
+
+    package Point {
+        use MooseX::Extreme;
+        use MooseX::Extreme::Types qw(Int);
+
+        param [ 'x', 'y' ] => (
+            isa     => Int,
+            clearer => 1,     # clear_x and clear_y available
+            default => 0,
+        ) :;
+    }
+
+Note that these are I<shortcuts> and they make attributes easier to write and more consistent.
+However, you can still use full names:
+
+    field authz_delegate => (
+        builder => '_build_my_darned_authz_delegate',
+    );
+
+=head2 C<writer>
+
+If an attribute has C<writer> is set to C<1> (the number one), a method
+named C<set_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        writer => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'rw',                  # we change this from 'ro'
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        writer  => 'set_title',
+    );
+
+=head2 C<reader>
+
+By default, the reader (accessor) for the attribute is the same as the name.
+You can always change this:
+
+    has payload => ( is => 'ro', reader => 'the_payload' );
+
+However, if you want to change the reader name
+
+If an attribute has C<reader> is set to C<1> (the number one), a method
+named C<get_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        reader => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'rw',                  # we change this from 'ro'
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        reader  => 'get_title',
+    );
+
+=head2 C<predicate>
+
+If an attribute has C<predicate> is set to C<1> (the number one), a method
+named C<has_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        predicate => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is        => 'ro',
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        predicate => 'has_title',
+    );
+
+=head2 C<clearer>
+
+If an attribute has C<clearer> is set to C<1> (the number one), a method
+named C<clear_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        clearer => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'ro',
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        clearer => 'clear_title',
+    );
+
+=head2 C<builder>
+
+If an attribute has C<builder> is set to C<1> (the number one), a method
+named C<_build_$attribute_name>.
+
+This:
+
+    param title => (
+        isa     =>  NonEmptyStr,
+        builder => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'ro',
+        isa     => NonEmptyStr,
+        builder => '_build_title',
+    );
+
+Obviously, a "private" attribute, such as C<_auth_token> would get a build named
+C<_build__auth_token> (note the two underscores between "build" and "auth_token").
