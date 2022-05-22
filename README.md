@@ -66,7 +66,7 @@ Is sort of the equivalent to:
 
 ```perl
 package My::Class {
-    use v5.22.0;
+    use v5.20.0;
     use Moose;
     use MooseX::StrictConstructor;
     use feature qw( signatures postderef );
@@ -117,7 +117,7 @@ it's a reference, ensuring that your object is effectively immutable.
 
 ```perl
 package My::Class {
-    use v5.22.0;
+    use v5.20.0;
     use MooseX::Extreme;
     use MooseX::Extreme::Types qw(NonEmptyStr HashRef);
 
