@@ -5,6 +5,7 @@ package MooseX::Extreme::Core;
 use v5.20.0;
 use warnings;
 use parent 'Exporter';
+use Moose::Util 'throw_exception';
 use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 
@@ -49,6 +50,18 @@ sub field ( $meta, $name, %opt_for ) {
 
 sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
     debug("Finalizing options for $name");
+
+    my $valid_method_name = qr/\A[a-z_]\w*\z/ai;
+
+    if ( $name !~ $valid_method_name ) {
+        throw_exception(
+            'InvalidAttributeDefinition',
+            attribute_name => $name,
+            class_name     => $meta->name,
+            messsage       => "Illegal attribute name, '$name'",
+        );
+    }
+
     state $shortcut_for = {
         predicate => sub ($value) {"has_$value"},
         clearer   => sub ($value) {"clear_$value"},
@@ -57,12 +70,23 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
         reader    => sub ($value) {"get_$value"},
     };
 
-    foreach my $option ( keys $shortcut_for->%* ) {
+    OPTION: foreach my $option ( keys $shortcut_for->%* ) {
+        next unless exists $opt_for{$option};
         no warnings 'numeric';    ## no critic (TestingAndDebugging::ProhibitNoWarning)
-        if ( exists $opt_for{$option} && 1 == $opt_for{$option} ) {
-            $opt_for{$option} = $shortcut_for->{$option}->($name);
+        if ( 1 == length( $opt_for{$option} ) && 1 == $opt_for{$option} ) {
+            my $option_name = $shortcut_for->{$option}->($name);
+            $opt_for{$option} = $option_name;
+        }
+        if ( $opt_for{$option} !~ $valid_method_name ) {
+            throw_exception(
+                'InvalidAttributeDefinition',
+                attribute_name => $name,
+                class_name     => $meta->name,
+                messsage       => "Attribute '$name' has an invalid option name, $option => '$opt_for{$option}'",
+            );
         }
     }
+
     if ( exists $opt_for{writer} && defined $opt_for{writer} ) {
         $opt_for{is} = 'rw';
     }
@@ -124,12 +148,15 @@ sub _add_cloning_method ( $meta, $name, %opt_for ) {
 sub debug ( $message, $data = undef ) {
     $MooseX::Extreme::Debug = $MooseX::Extreme::Debug;    # suppress "once" warnings
     return unless $MooseX::Extreme::Debug;
-    require Data::Printer;
     if ( 2 == @_ ) {                                      # yup, still want multidispatch
-        $data    = Data::Printer::np($data);
+        require Data::Dumper;
+        local $Data::Dumper::Indent   = 1;
+        local $Data::Dumper::Sortkeys = 1;
+        local $Data::Dumper::Terse    = 1;
+        $data    = Data::Dumper::Dumper($data);
         $message = "$message: $data";
     }
-    Data::Printer::p( \$message );
+    say STDERR $message;
 }
 
 1;
