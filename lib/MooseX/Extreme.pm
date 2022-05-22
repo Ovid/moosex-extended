@@ -33,7 +33,7 @@ sub init_meta ( $class, %params ) {
     Moose->init_meta(%params);
     MooseX::StrictConstructor->import( { into => $for_class } );
     Carp->import::into($for_class);
-    feature->import(qw/signatures :5.20/);
+    feature->import(qw/signatures postderef :5.20/);
     warnings->unimport(qw/experimental::postderef experimental::signatures/);
 
     # see perldoc -v '$^P'
@@ -117,8 +117,8 @@ Is sort of the equivalent to:
         use v5.22.0;
         use Moose;
         use MooseX::StrictConstructor;
-        use feature 'signatures';
-        no warnings 'experimental::signatures';
+        use feature qw( signatures postderef );
+        no warnings qw( experimental::signatures experimental::postderef );
         use namespace::autoclean;
         use Carp;
         use mro 'c3';
