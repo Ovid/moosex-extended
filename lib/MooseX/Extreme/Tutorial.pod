@@ -1,3 +1,5 @@
+# PODNAME: MooseX::Extreme Tutorial
+
 =head1 CONVERTING FROM MOOSE
 
 For most sane codebases, converting from L<Moose> to L<MooseX::Extreme> is as

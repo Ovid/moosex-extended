@@ -256,6 +256,7 @@ When using `field` or `param`, we have some attribute shortcuts:
 param name => (
     isa       => NonEmptyStr,
     writer    => 1,   # set_name
+    reader    => 1,   # get_name
     predicate => 1,   # has_name
     clearer   => 1,   # clear_name
     builder   => 1,   # _build_name
@@ -313,6 +314,41 @@ has title => (
     isa     => Undef | NonEmptyStr,
     default => undef,
     writer  => 'set_title',
+);
+```
+
+## `reader`
+
+By default, the reader (accessor) for the attribute is the same as the name.
+You can always change this:
+
+```perl
+has payload => ( is => 'ro', reader => 'the_payload' );
+```
+
+However, if you want to change the reader name
+
+If an attribute has `reader` is set to `1` (the number one), a method
+named `get_$attribute_name` is created.
+
+This:
+
+```perl
+param title => (
+    isa       => Undef | NonEmptyStr,
+    default   => undef,
+    reader => 1,
+);
+```
+
+Is the same as this:
+
+```perl
+has title => (
+    is      => 'rw',                  # we change this from 'ro'
+    isa     => Undef | NonEmptyStr,
+    default => undef,
+    reader  => 'get_title',
 );
 ```
 
