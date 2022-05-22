@@ -2,7 +2,7 @@ package MooseX::Extreme::Core;
 
 # ABSTRACT: Internal module for MooseX::Extreme
 
-use v5.22.0;
+use v5.20.0;
 use warnings;
 use parent 'Exporter';
 use feature qw(signatures postderef);

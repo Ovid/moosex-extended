@@ -8,7 +8,6 @@ use Scalar::Util 'refaddr';
 my $CLONE_CALLED = 0;
 
 package My::Class {
-    use v5.22.0;
     use MooseX::Extreme;
     use MooseX::Extreme::Types qw(NonEmptyStr HashRef);
 

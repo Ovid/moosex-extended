@@ -26,8 +26,8 @@ sub init_meta {
 
     my $for_class = $params{for_class};
     Carp->import::into($for_class);
-    warnings->unimport('experimental::signatures');
-    feature->import(qw/signatures :5.22/);
+    warnings->unimport(qw(experimental::signatures experimental::postderef));
+    feature->import(qw/signatures postderef :5.20/);
     namespace::autoclean->import::into($for_class);
     true->import;              # no need for `1` at the end of the module
     MooseX::Role::WarnOnConflict->import::into($for_class);
