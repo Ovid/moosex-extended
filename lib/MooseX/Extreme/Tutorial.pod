@@ -1,4 +1,5 @@
 # PODNAME: MooseX::Extreme Tutorial
+# ABSTRACT: Work-in-progress tutorial for MooseX::Extreme
 
 =head1 CONVERTING FROM MOOSE
 

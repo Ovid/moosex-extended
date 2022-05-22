@@ -5,8 +5,8 @@ package MooseX::Extreme::Core;
 use v5.22.0;
 use warnings;
 use parent 'Exporter';
-use feature 'signatures';
-no warnings 'experimental::signatures';
+use feature qw(signatures postderef);
+no warnings qw(experimental::signatures experimental::postderef);
 
 use Storable 'dclone';
 use Ref::Util 'is_plain_arrayref';

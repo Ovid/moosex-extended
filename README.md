@@ -69,8 +69,8 @@ package My::Class {
     use v5.22.0;
     use Moose;
     use MooseX::StrictConstructor;
-    use feature 'signatures';
-    no warnings 'experimental::signatures';
+    use feature qw( signatures postderef );
+    no warnings qw( experimental::signatures experimental::postderef );
     use namespace::autoclean;
     use Carp;
     use mro 'c3';
