@@ -9,7 +9,7 @@ equivalent_modules = Test::Most MooseX::Extreme MooseX::Extreme::Role
 equivalent_modules = Test::Most MooseX::Extreme MooseX::Extreme::Role 
 
 [TestingAndDebugging::ProhibitNoWarnings]
-allow = experimental::signatures
+allow = experimental::signatures experimental::postderef
 
 [InputOutput::RequireBriefOpen]
 lines = 20

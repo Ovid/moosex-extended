@@ -4,7 +4,7 @@ package MooseX::Extreme;
 
 use 5.22.0;
 use warnings;
-use feature 'signatures';
+use feature qw(signatures);
 
 use Moose::Exporter;
 use Moose                     ();
@@ -15,7 +15,7 @@ use MooseX::Extreme::Core qw(field param);
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
-no warnings 'experimental::signatures';
+no warnings qw(experimental::signatures experimental::postderef);
 use true;
 
 our $VERSION = '0.01';
@@ -33,8 +33,8 @@ sub init_meta ( $class, %params ) {
     Moose->init_meta(%params);
     MooseX::StrictConstructor->import( { into => $for_class } );
     Carp->import::into($for_class);
-    warnings->unimport('experimental::signatures');
-    feature->import(qw/signatures :5.22/);
+    feature->import(qw/signatures :5.20/);
+    warnings->unimport(qw/experimental::postderef experimental::signatures/);
 
     # see perldoc -v '$^P'
     if ($^P) {
