@@ -2,6 +2,9 @@ Revision history for MooseX-Extreme
 
 {{$NEXT}}
 
+          - Support v5.20.0
+          - Add github actions
+          - Add postderef support
           - Trial support for `clone => 1`
           - Roles will now warn if a class overrides a role method without
             excluding it (in Moose, the class silently ignores the role method)
