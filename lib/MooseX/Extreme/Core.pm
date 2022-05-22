@@ -27,9 +27,7 @@ sub param ( $meta, $name, %opt_for ) {
             $attr =~ s/^\+//;      # in case they're overriding a parent class attribute
             $options{init_arg} //= $attr;
         }
-        %options = _finalize_options( $meta, $attr, %options );
-        debug( "Setting param '$attr'", \%options );
-        $meta->add_attribute( $attr, %options );
+        _add_attribute( 'param', $meta, $attr, %options );
     }
 }
 
@@ -45,13 +43,11 @@ sub field ( $meta, $name, %opt_for ) {
         $options{init_arg} = undef;
         $options{lazy} //= 1;
 
-        %options = _finalize_options( $meta, $attr, %options );
-        debug( "Setting field '$attr'", \%options );
-        $meta->add_attribute( $attr, %options );
+        _add_attribute( 'field', $meta, $attr, %options );
     }
 }
 
-sub _finalize_options ( $meta, $name, %opt_for ) {
+sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
     debug("Finalizing options for $name");
     state $shortcut_for = {
         predicate => sub ($value) {"has_$value"},
@@ -75,7 +71,8 @@ sub _finalize_options ( $meta, $name, %opt_for ) {
         %opt_for = _add_cloning_method( $meta, $name, %opt_for );
     }
 
-    return %opt_for;
+    debug( "Setting $attr_type, '$name'", \%opt_for );
+    $meta->add_attribute( $name, %opt_for );
 }
 
 sub _add_cloning_method ( $meta, $name, %opt_for ) {
