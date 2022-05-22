@@ -2,6 +2,8 @@ Revision history for MooseX-Extreme
 
 {{$NEXT}}
 
+          - Start adding exceptions
+          - Throw exceptions if attribute names or shortcut names are invalid
           - Support v5.20.0
           - Add github actions
           - Add postderef support
