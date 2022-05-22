@@ -1,5 +1,4 @@
 package Not::Corinna {
-    use v5.22.0;
     use MooseX::Extreme;
     use MooseX::Extreme::Types qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
     use List::Util 'sum';

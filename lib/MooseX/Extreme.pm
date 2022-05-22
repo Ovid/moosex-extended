@@ -2,7 +2,7 @@ package MooseX::Extreme;
 
 # ABSTRACT: Moose on Steroids
 
-use 5.22.0;
+use 5.20.0;
 use warnings;
 use feature qw(signatures);
 
@@ -114,7 +114,7 @@ This:
 Is sort of the equivalent to:
 
     package My::Class {
-        use v5.22.0;
+        use v5.20.0;
         use Moose;
         use MooseX::StrictConstructor;
         use feature qw( signatures postderef );
@@ -161,7 +161,7 @@ function every time you read or write that attribute, it will be cloned if
 it's a reference, ensuring that your object is effectively immutable.
 
     package My::Class {
-        use v5.22.0;
+        use v5.20.0;
         use MooseX::Extreme;
         use MooseX::Extreme::Types qw(NonEmptyStr HashRef);
 
