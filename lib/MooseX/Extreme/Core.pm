@@ -23,8 +23,11 @@ sub param ( $meta, $name, %opt_for ) {
     # "has [@attributes]" versus "has $attribute"
     foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
         my %options = %opt_for;    # copy each time to avoid overwriting
-        $options{init_arg} //= $attr;
-        %options = _finalize_options( $meta, $name, %options );
+        unless ( $options{init_arg} ) {
+            $attr =~ s/^\+//;      # in case they're overriding a parent class attribute
+            $options{init_arg} //= $attr;
+        }
+        %options = _finalize_options( $meta, $attr, %options );
         debug( "Setting param '$attr'", \%options );
         $meta->add_attribute( $attr, %options );
     }
@@ -42,7 +45,7 @@ sub field ( $meta, $name, %opt_for ) {
         $options{init_arg} = undef;
         $options{lazy} //= 1;
 
-        %options = _finalize_options( $meta, $name, %options );
+        %options = _finalize_options( $meta, $attr, %options );
         debug( "Setting field '$attr'", \%options );
         $meta->add_attribute( $attr, %options );
     }
