@@ -175,7 +175,7 @@ my $soldier = Soldier->new(
 ```
 
 By default, misspelled arguments to the [Moose](https://metacpan.org/pod/Moose) constructor are silently discarded,
-leading to hard-to-diagnose bugs. With [MooseX::SafeDefaults](https://metacpan.org/pod/MooseX%3A%3AExtreme), they're a fatal error.
+leading to hard-to-diagnose bugs. With [MooseX::SafeDefaults](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults), they're a fatal error.
 
 If you need to pass arbitrary "sideband" data, explicitly declare it as such:
 
@@ -484,11 +484,11 @@ This also applies to various attributes which allow method names, such as
 
 # RELATED MODULES
 
-- [MooseX::SafeDefaults::Types](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ATypes) is included in the distribution.
+- [MooseX::SafeDefaults::Types](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3ATypes) is included in the distribution.
 
     This provides core types for you.
 
-- [MooseX::SafeDefaults::Role](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ARole) is included in the distribution.
+- [MooseX::SafeDefaults::Role](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3ARole) is included in the distribution.
 
     `MooseX::SafeDefaults`, but for roles.
 
@@ -516,7 +516,7 @@ constructors.  Or someone might want their "own" extreme Moose, requiring
 
 ## `BEGIN::Lift`
 
-This idea maybe belongs in `MooseX::Extremely::Extreme`, but ...
+This idea maybe belongs in `MooseX::SafeDefaults::OverKill`, but ...
 
 Quite often you see things like this:
 

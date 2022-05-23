@@ -17,7 +17,7 @@ From there, if you're not using signatures, convert your methods to
 using signatures. You'll almost definitely get test failures there as many
 functions handle arguments poorly.
 
-For roles, just C<< s/Moose::Role/MooseX::Role::Extreme/ >> and repeat the
+For roles, just C<< s/Moose::Role/MooseX::SafeDefaults::Roles/ >> and repeat the
 process (and run your tests, folks).
 
 Along the way, you can probably delete your references to

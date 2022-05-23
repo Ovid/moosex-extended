@@ -513,7 +513,7 @@ C<v5.36.0> or not using the C3 mro. What's the best way to allow this?
 
 =head2 C<BEGIN::Lift>
 
-This idea maybe belongs in C<MooseX::Extremely::Extreme>, but ...
+This idea maybe belongs in C<MooseX::SafeDefaults::OverKill>, but ...
 
 Quite often you see things like this:
 
