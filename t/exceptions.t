@@ -2,10 +2,10 @@
 
 use lib 'lib';
 use Test::Most;
-use MooseX::Extreme::Core qw(param field);
+use MooseX::SafeDefaults::Core qw(param field);
 
 package Mock::Meta {
-    use MooseX::Extreme;
+    use MooseX::SafeDefaults;
     sub name {'My::Class'}
 }
 

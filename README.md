@@ -1,6 +1,6 @@
 # NAME
 
-MooseX::Extreme - Moose on Steroids
+MooseX::SafeDefaults - Moose on Steroids
 
 # VERSION
 
@@ -10,8 +10,8 @@ version 0.01
 
 ```perl
 package My::Names {
-    use MooseX::Extreme;
-    use MooseX::Extreme::Types
+    use MooseX::SafeDefaults;
+    use MooseX::SafeDefaults::Types
       qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
     use List::Util 'sum';
 
@@ -56,7 +56,7 @@ This:
 
 ```perl
 package My::Class {
-    use MooseX::Extreme;
+    use MooseX::SafeDefaults;
 
     ... your code here
 }
@@ -109,7 +109,7 @@ this for you, via `B::Hooks::AtRuntime`. You no longer need to do this yourself.
 By default, attributes defined via `param` and `field` are read-only.
 However, if they contain a reference, you can fetch the reference, mutate it,
 and now everyone with a copy of that reference has mutated state.
-`MooseX::Extreme` offers **EXPERIMENTAL** support for cloning, but differently
+`MooseX::SafeDefaults` offers **EXPERIMENTAL** support for cloning, but differently
 from how we see it typically done. You can just pass the `clone => 1`
 argument to your attribute and it will be clone with [Storable](https://metacpan.org/pod/Storable)'s `dclone`
 function every time you read or write that attribute, it will be cloned if
@@ -122,8 +122,8 @@ from our test suite.
 
 ```perl
 package My::Class {
-    use MooseX::Extreme;
-    use MooseX::Extreme::Types qw(NonEmptyStr HashRef InstanceOf);
+    use MooseX::SafeDefaults;
+    use MooseX::SafeDefaults::Types qw(NonEmptyStr HashRef InstanceOf);
 
     param name => ( isa => NonEmptyStr );
 
@@ -175,7 +175,7 @@ my $soldier = Soldier->new(
 ```
 
 By default, misspelled arguments to the [Moose](https://metacpan.org/pod/Moose) constructor are silently discarded,
-leading to hard-to-diagnose bugs. With [MooseX::Extreme](https://metacpan.org/pod/MooseX%3A%3AExtreme), they're a fatal error.
+leading to hard-to-diagnose bugs. With [MooseX::SafeDefaults](https://metacpan.org/pod/MooseX%3A%3AExtreme), they're a fatal error.
 
 If you need to pass arbitrary "sideband" data, explicitly declare it as such:
 
@@ -183,7 +183,7 @@ If you need to pass arbitrary "sideband" data, explicitly declare it as such:
 param sideband => ( isa => HashRef, default => sub { {} } );
 ```
 
-Naturally, because we bundle `MooseX::Extreme::Types`, you can do much
+Naturally, because we bundle `MooseX::SafeDefaults::Types`, you can do much
 finer-grained data validation on that, if needed.
 
 # FUNCTIONS
@@ -299,8 +299,8 @@ These can also be used when you pass an array reference to the function:
 
 ```perl
 package Point {
-    use MooseX::Extreme;
-    use MooseX::Extreme::Types qw(Int);
+    use MooseX::SafeDefaults;
+    use MooseX::SafeDefaults::Types qw(Int);
 
     param [ 'x', 'y' ] => (
         isa     => Int,
@@ -476,7 +476,7 @@ my $object = Some::Class->new( name => 'WhoAmI' );
 say $object->name;
 ```
 
-`MooseX::Extreme` will throw a `Moose::Exception::InvalidAttributeDefinition` exception
+`MooseX::SafeDefaults` will throw a `Moose::Exception::InvalidAttributeDefinition` exception
 if it encounters an illegal method name for an attribute.
 
 This also applies to various attributes which allow method names, such as
@@ -484,13 +484,13 @@ This also applies to various attributes which allow method names, such as
 
 # RELATED MODULES
 
-- [MooseX::Extreme::Types](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ATypes) is included in the distribution.
+- [MooseX::SafeDefaults::Types](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ATypes) is included in the distribution.
 
     This provides core types for you.
 
-- [MooseX::Extreme::Role](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ARole) is included in the distribution.
+- [MooseX::SafeDefaults::Role](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ARole) is included in the distribution.
 
-    `MooseX::Extreme`, but for roles.
+    `MooseX::SafeDefaults`, but for roles.
 
 # TODO
 
@@ -503,13 +503,13 @@ Tests! Many more tests! Volunteers welcome :)
 
 ## Configurable Types
 
-We provide `MooseX::Extreme::Types` for convenience. It would be even more
+We provide `MooseX::SafeDefaults::Types` for convenience. It would be even more
 convenient if we offered an easier for people to build something like
-`MooseX::Extreme::Types::Mine` so they can customize it.
+`MooseX::SafeDefaults::Types::Mine` so they can customize it.
 
 ## Configurability
 
-Not everyone wants everything. In particular, using `MooseX::Extreme` with
+Not everyone wants everything. In particular, using `MooseX::SafeDefaults` with
 [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass) will be fatal because the latter allows unknown arguments to
 constructors.  Or someone might want their "own" extreme Moose, requiring
 `v5.36.0` or not using the C3 mro. What's the best way to allow this?

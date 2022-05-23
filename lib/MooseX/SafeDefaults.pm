@@ -1,4 +1,4 @@
-package MooseX::Extreme;
+package MooseX::SafeDefaults;
 
 # ABSTRACT: Moose on Steroids
 
@@ -11,7 +11,7 @@ use Moose                     ();
 use MooseX::StrictConstructor ();
 use mro                       ();
 use namespace::autoclean      ();
-use MooseX::Extreme::Core qw(field param);
+use MooseX::SafeDefaults::Core qw(field param);
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
@@ -62,8 +62,8 @@ __END__
 =head1 SYNOPSIS
 
     package My::Names {
-        use MooseX::Extreme;
-        use MooseX::Extreme::Types
+        use MooseX::SafeDefaults;
+        use MooseX::SafeDefaults::Types
           qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
         use List::Util 'sum';
 
@@ -106,7 +106,7 @@ true encapsulation and true methods).
 This:
 
     package My::Class {
-        use MooseX::Extreme;
+        use MooseX::SafeDefaults;
 
         ... your code here
     }
@@ -154,7 +154,7 @@ this for you, via C<B::Hooks::AtRuntime>. You no longer need to do this yourself
 By default, attributes defined via C<param> and C<field> are read-only.
 However, if they contain a reference, you can fetch the reference, mutate it,
 and now everyone with a copy of that reference has mutated state.
-C<MooseX::Extreme> offers B<EXPERIMENTAL> support for cloning, but differently
+C<MooseX::SafeDefaults> offers B<EXPERIMENTAL> support for cloning, but differently
 from how we see it typically done. You can just pass the C<< clone => 1 >>
 argument to your attribute and it will be clone with L<Storable>'s C<dclone>
 function every time you read or write that attribute, it will be cloned if
@@ -166,8 +166,8 @@ C<< $self, $attribute_name, $value_to_clone >>. Here's a full example, taken
 from our test suite.
 
     package My::Class {
-        use MooseX::Extreme;
-        use MooseX::Extreme::Types qw(NonEmptyStr HashRef InstanceOf);
+        use MooseX::SafeDefaults;
+        use MooseX::SafeDefaults::Types qw(NonEmptyStr HashRef InstanceOf);
 
         param name => ( isa => NonEmptyStr );
 
@@ -216,13 +216,13 @@ However, we apply L<MooseX::StrictConstructor> to avoid this problem:
     );
 
 By default, misspelled arguments to the L<Moose> constructor are silently discarded,
-leading to hard-to-diagnose bugs. With L<MooseX::Extreme>, they're a fatal error.
+leading to hard-to-diagnose bugs. With L<MooseX::SafeDefaults>, they're a fatal error.
 
 If you need to pass arbitrary "sideband" data, explicitly declare it as such:
 
     param sideband => ( isa => HashRef, default => sub { {} } );
 
-Naturally, because we bundle C<MooseX::Extreme::Types>, you can do much
+Naturally, because we bundle C<MooseX::SafeDefaults::Types>, you can do much
 finer-grained data validation on that, if needed.
 
 =head1 FUNCTIONS
@@ -319,8 +319,8 @@ When using C<field> or C<param>, we have some attribute shortcuts:
 These can also be used when you pass an array reference to the function:
 
     package Point {
-        use MooseX::Extreme;
-        use MooseX::Extreme::Types qw(Int);
+        use MooseX::SafeDefaults;
+        use MooseX::SafeDefaults::Types qw(Int);
 
         param [ 'x', 'y' ] => (
             isa     => Int,
@@ -469,7 +469,7 @@ name is clearly invalid.
     my $object = Some::Class->new( name => 'WhoAmI' );
     say $object->name;
 
-C<MooseX::Extreme> will throw a C<Moose::Exception::InvalidAttributeDefinition> exception
+C<MooseX::SafeDefaults> will throw a C<Moose::Exception::InvalidAttributeDefinition> exception
 if it encounters an illegal method name for an attribute.
 
 This also applies to various attributes which allow method names, such as
@@ -479,13 +479,13 @@ C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
 
 =over 4
 
-=item * L<MooseX::Extreme::Types> is included in the distribution.
+=item * L<MooseX::SafeDefaults::Types> is included in the distribution.
 
 This provides core types for you.
 
-=item * L<MooseX::Extreme::Role> is included in the distribution.
+=item * L<MooseX::SafeDefaults::Role> is included in the distribution.
 
-C<MooseX::Extreme>, but for roles.
+C<MooseX::SafeDefaults>, but for roles.
 
 =back
 
@@ -500,13 +500,13 @@ Tests! Many more tests! Volunteers welcome :)
 
 =head2 Configurable Types
 
-We provide C<MooseX::Extreme::Types> for convenience. It would be even more
+We provide C<MooseX::SafeDefaults::Types> for convenience. It would be even more
 convenient if we offered an easier for people to build something like
-C<MooseX::Extreme::Types::Mine> so they can customize it.
+C<MooseX::SafeDefaults::Types::Mine> so they can customize it.
  
 =head2 Configurability
 
-Not everyone wants everything. In particular, using C<MooseX::Extreme> with
+Not everyone wants everything. In particular, using C<MooseX::SafeDefaults> with
 L<DBIx::Class> will be fatal because the latter allows unknown arguments to
 constructors.  Or someone might want their "own" extreme Moose, requiring
 C<v5.36.0> or not using the C3 mro. What's the best way to allow this?

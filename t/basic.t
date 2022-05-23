@@ -4,8 +4,8 @@ use lib 'lib';
 use Test::Most;
 
 package My::Names {
-    use MooseX::Extreme;
-    use MooseX::Extreme::Types qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
+    use MooseX::SafeDefaults;
+    use MooseX::SafeDefaults::Types qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
     use List::Util 'sum';
 
     param _name => ( isa => NonEmptyStr, init_arg => 'name' );

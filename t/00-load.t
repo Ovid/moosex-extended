@@ -3,12 +3,12 @@
 use lib 'lib';
 use Test::Most;
 
-use MooseX::Extreme        ();
-use MooseX::Extreme::Types ();
-use MooseX::Extreme::Role  ();
+use MooseX::SafeDefaults        ();
+use MooseX::SafeDefaults::Types ();
+use MooseX::SafeDefaults::Role  ();
 
 pass "We were able to lood our primary modules";
 
-diag "Testing MooseX::Extreme $MooseX::Extreme::VERSION, Perl $], $^X";
+diag "Testing MooseX::SafeDefaults $MooseX::SafeDefaults::VERSION, Perl $], $^X";
 
 done_testing;
