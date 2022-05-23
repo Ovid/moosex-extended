@@ -115,17 +115,45 @@ argument to your attribute and it will be clone with [Storable](https://metacpan
 function every time you read or write that attribute, it will be cloned if
 it's a reference, ensuring that your object is effectively immutable.
 
+If you prefer, you can also pass a code reference or the name of a method you
+will use to clone the object. Each will receive three arguments:
+`$self, $attribute_name, $value_to_clone`. Here's a full example, taken
+from our test suite.
+
 ```perl
 package My::Class {
-    use v5.20.0;
     use MooseX::Extreme;
-    use MooseX::Extreme::Types qw(NonEmptyStr HashRef);
+    use MooseX::Extreme::Types qw(NonEmptyStr HashRef InstanceOf);
 
-    param name => ( isa => NonEmptyStr );    # no need to clone
+    param name => ( isa => NonEmptyStr );
+
     param payload => (
-        isa   => HashRef,                    # need to clone
-        clone => 1,
+        isa    => HashRef,
+        clone  => 1,  # uses Storable::dclone
+        writer => 1,
     );
+
+    param start_date => (
+        isa   => InstanceOf ['DateTime'],
+        clone => sub ( $self, $name, $value ) {
+            return $value->clone;
+        },
+    );
+
+    param end_date => (
+        isa    => InstanceOf ['DateTime'],
+        clone  => '_clone_end_date',
+    );
+
+    sub _clone_end_date ( $self, $name, $value ) {
+        return $value->clone;
+    }
+
+    sub BUILD ( $self, @ ) {
+        if ( $self->end_date < $self->start_date ) {
+            croak("End date must not be before start date");
+        }
+    }
 }
 ```
 
