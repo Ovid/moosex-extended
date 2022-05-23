@@ -10,7 +10,10 @@ use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 
 use Storable 'dclone';
-use Ref::Util 'is_plain_arrayref';
+use Ref::Util qw(
+  is_plain_arrayref
+  is_coderef
+);
 use Carp 'croak';
 
 our $VERSION = '0.01';
@@ -102,6 +105,26 @@ sub _is_valid_method_name ($name) {
 
 sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
     return %opt_for unless my $clone = delete $opt_for{clone};
+
+    no warnings 'numeric';    ## no critic (TestingAndDebugging::ProhibitNoWarning)
+    my ( $use_dclone, $use_coderef, $use_method );
+    if ( 1 == length($clone) && 1 == $clone ) {
+        $use_dclone = 1;
+    }
+    elsif ( _is_valid_method_name($clone) ) {
+        $use_method = 1;
+    }
+    elsif ( is_coderef($clone) ) {
+        $use_coderef = 1;
+    }
+    else {
+        throw_exception(
+            'InvalidAttributeDefinition',
+            attribute_name => 'clone',
+            class_name     => $meta->name,
+            messsage       => "Attribute 'clone' has an invalid option value, clone => '$clone'",
+        );
+    }
 
     # here be dragons ...
     debug("Adding cloning for $name");
