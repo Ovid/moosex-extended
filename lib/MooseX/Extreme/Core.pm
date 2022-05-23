@@ -120,9 +120,9 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
     else {
         throw_exception(
             'InvalidAttributeDefinition',
-            attribute_name => 'clone',
+            attribute_name => $name,
             class_name     => $meta->name,
-            messsage       => "Attribute 'clone' has an invalid option value, clone => '$clone'",
+            messsage       => "Attribute '$name' has an invalid option value, clone => '$clone'",
         );
     }
 
@@ -137,11 +137,21 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
         debug("Calling reader method for $name");
         my $attr  = $meta->get_attribute($name);
         my $value = $attr->get_value($self);
-        return ref $value ? dclone($value) : $value;
+        return $value unless ref $value;
+        return
+            $use_dclone                 ? dclone($value)
+          : $use_method || $use_coderef ? $self->$clone( $name, $value )
+          :                               croak("PANIC: this should never happen. Do not know how to clone '$name'");
     };
+
     my $writer_method = sub ( $self, $new_value ) {
         debug("Calling writer method for $name");
         my $attr = $meta->get_attribute($name);
+        $new_value
+          = !ref $new_value             ? $new_value
+          : $use_dclone                 ? dclone($new_value)
+          : $use_method || $use_coderef ? $self->$clone( $name, $new_value )
+          :                               croak("PANIC: this should never happen. Do not know how to clone '$name'");
         $new_value = ref $new_value ? dclone($new_value) : $new_value;
         $attr->set_value( $self, $new_value );
         return $new_value;
