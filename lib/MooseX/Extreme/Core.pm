@@ -89,9 +89,7 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
         $opt_for{is} = 'rw';
     }
 
-    if ( delete $opt_for{clone} ) {
-        %opt_for = _add_cloning_method( $meta, $name, %opt_for );
-    }
+    %opt_for = _maybe_add_cloning_method( $meta, $name, %opt_for );
 
     debug( "Setting $attr_type, '$name'", \%opt_for );
     $meta->add_attribute( $name, %opt_for );
@@ -102,7 +100,8 @@ sub _is_valid_method_name ($name) {
     return $name =~ qr/\A[a-z_]\w*\z/ai;
 }
 
-sub _add_cloning_method ( $meta, $name, %opt_for ) {
+sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
+    return %opt_for unless my $clone = delete $opt_for{clone};
 
     # here be dragons ...
     debug("Adding cloning for $name");
