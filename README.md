@@ -459,6 +459,29 @@ has title => (
 Obviously, a "private" attribute, such as `_auth_token` would get a build named
 `_build__auth_token` (note the two underscores between "build" and "auth\_token").
 
+# INVALID ATTRIBUTE NAMES
+
+The following [Moose](https://metacpan.org/pod/Moose) code will print `WhoAmI`. However, the second attribute
+name is clearly invalid.
+
+```perl
+package Some::Class {
+    use Moose;
+
+    has name   => ( is => 'ro' );
+    has '-bad' => ( is => 'ro' );
+}
+
+my $object = Some::Class->new( name => 'WhoAmI' );
+say $object->name;
+```
+
+`MooseX::Extreme` will throw a `Moose::Exception::InvalidAttributeDefinition` exception
+if it encounters an illegal method name for an attribute.
+
+This also applies to various attributes which allow method names, such as
+`clone`, `builder`, `clearer`, `writer`, `reader`, and `predicate`.
+
 # RELATED MODULES
 
 - [MooseX::Extreme::Types](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ATypes) is included in the distribution.

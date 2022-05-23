@@ -454,6 +454,27 @@ Is the same as this:
 Obviously, a "private" attribute, such as C<_auth_token> would get a build named
 C<_build__auth_token> (note the two underscores between "build" and "auth_token").
 
+=head1 INVALID ATTRIBUTE NAMES
+
+The following L<Moose> code will print C<WhoAmI>. However, the second attribute
+name is clearly invalid.
+
+    package Some::Class {
+        use Moose;
+
+        has name   => ( is => 'ro' );
+        has '-bad' => ( is => 'ro' );
+    }
+
+    my $object = Some::Class->new( name => 'WhoAmI' );
+    say $object->name;
+
+C<MooseX::Extreme> will throw a C<Moose::Exception::InvalidAttributeDefinition> exception
+if it encounters an illegal method name for an attribute.
+
+This also applies to various attributes which allow method names, such as
+C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
+
 =head1 RELATED MODULES
 
 =over 4
