@@ -51,9 +51,7 @@ sub field ( $meta, $name, %opt_for ) {
 sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
     debug("Finalizing options for $name");
 
-    my $valid_method_name = qr/\A[a-z_]\w*\z/ai;
-
-    if ( $name !~ $valid_method_name ) {
+    unless ( _is_valid_method_name($name) ) {
         throw_exception(
             'InvalidAttributeDefinition',
             attribute_name => $name,
@@ -77,7 +75,7 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
             my $option_name = $shortcut_for->{$option}->($name);
             $opt_for{$option} = $option_name;
         }
-        if ( $opt_for{$option} !~ $valid_method_name ) {
+        unless ( _is_valid_method_name( $opt_for{$option} ) ) {
             throw_exception(
                 'InvalidAttributeDefinition',
                 attribute_name => $name,
@@ -97,6 +95,11 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
 
     debug( "Setting $attr_type, '$name'", \%opt_for );
     $meta->add_attribute( $name, %opt_for );
+}
+
+sub _is_valid_method_name ($name) {
+    return if ref $name;
+    return $name =~ qr/\A[a-z_]\w*\z/ai;
 }
 
 sub _add_cloning_method ( $meta, $name, %opt_for ) {
