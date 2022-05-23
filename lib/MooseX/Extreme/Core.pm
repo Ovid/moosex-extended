@@ -10,7 +10,10 @@ use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 
 use Storable 'dclone';
-use Ref::Util 'is_plain_arrayref';
+use Ref::Util qw(
+  is_plain_arrayref
+  is_coderef
+);
 use Carp 'croak';
 
 our $VERSION = '0.01';
@@ -51,9 +54,7 @@ sub field ( $meta, $name, %opt_for ) {
 sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
     debug("Finalizing options for $name");
 
-    my $valid_method_name = qr/\A[a-z_]\w*\z/ai;
-
-    if ( $name !~ $valid_method_name ) {
+    unless ( _is_valid_method_name($name) ) {
         throw_exception(
             'InvalidAttributeDefinition',
             attribute_name => $name,
@@ -77,7 +78,7 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
             my $option_name = $shortcut_for->{$option}->($name);
             $opt_for{$option} = $option_name;
         }
-        if ( $opt_for{$option} !~ $valid_method_name ) {
+        unless ( _is_valid_method_name( $opt_for{$option} ) ) {
             throw_exception(
                 'InvalidAttributeDefinition',
                 attribute_name => $name,
@@ -91,15 +92,39 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
         $opt_for{is} = 'rw';
     }
 
-    if ( delete $opt_for{clone} ) {
-        %opt_for = _add_cloning_method( $meta, $name, %opt_for );
-    }
+    %opt_for = _maybe_add_cloning_method( $meta, $name, %opt_for );
 
     debug( "Setting $attr_type, '$name'", \%opt_for );
     $meta->add_attribute( $name, %opt_for );
 }
 
-sub _add_cloning_method ( $meta, $name, %opt_for ) {
+sub _is_valid_method_name ($name) {
+    return if ref $name;
+    return $name =~ qr/\A[a-z_]\w*\z/ai;
+}
+
+sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
+    return %opt_for unless my $clone = delete $opt_for{clone};
+
+    no warnings 'numeric';    ## no critic (TestingAndDebugging::ProhibitNoWarning)
+    my ( $use_dclone, $use_coderef, $use_method );
+    if ( 1 == length($clone) && 1 == $clone ) {
+        $use_dclone = 1;
+    }
+    elsif ( _is_valid_method_name($clone) ) {
+        $use_method = 1;
+    }
+    elsif ( is_coderef($clone) ) {
+        $use_coderef = 1;
+    }
+    else {
+        throw_exception(
+            'InvalidAttributeDefinition',
+            attribute_name => $name,
+            class_name     => $meta->name,
+            messsage       => "Attribute '$name' has an invalid option value, clone => '$clone'",
+        );
+    }
 
     # here be dragons ...
     debug("Adding cloning for $name");
@@ -112,11 +137,21 @@ sub _add_cloning_method ( $meta, $name, %opt_for ) {
         debug("Calling reader method for $name");
         my $attr  = $meta->get_attribute($name);
         my $value = $attr->get_value($self);
-        return ref $value ? dclone($value) : $value;
+        return $value unless ref $value;
+        return
+            $use_dclone                 ? dclone($value)
+          : $use_method || $use_coderef ? $self->$clone( $name, $value )
+          :                               croak("PANIC: this should never happen. Do not know how to clone '$name'");
     };
+
     my $writer_method = sub ( $self, $new_value ) {
         debug("Calling writer method for $name");
         my $attr = $meta->get_attribute($name);
+        $new_value
+          = !ref $new_value             ? $new_value
+          : $use_dclone                 ? dclone($new_value)
+          : $use_method || $use_coderef ? $self->$clone( $name, $new_value )
+          :                               croak("PANIC: this should never happen. Do not know how to clone '$name'");
         $new_value = ref $new_value ? dclone($new_value) : $new_value;
         $attr->set_value( $self, $new_value );
         return $new_value;

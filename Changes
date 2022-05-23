@@ -2,6 +2,8 @@ Revision history for MooseX-Extreme
 
 {{$NEXT}}
 
+          - Make cloning much more flexible (thanks to Leon Timmermans for
+            pointing out that my previous approach wasn't enough).
           - Start adding exceptions
           - Throw exceptions if attribute names or shortcut names are invalid
           - Support v5.20.0
