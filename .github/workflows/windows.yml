@@ -1,4 +1,5 @@
-# https://github.com/skaji/perl-github-actions-sample/blob/master/.github/workflows/windows.yml
+# Hacked from https://github.com/skaji/perl-github-actions-sample/blob/master/.github/workflows/windows.yml
+# See also: https://perlmaven.com/github-actions-running-on-3-operating-systems
 name: windows
 
 on:
