@@ -1,0 +1,42 @@
+# https://github.com/skaji/perl-github-actions-sample/blob/master/.github/workflows/windows.yml
+name: windows
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  perl:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          - '5.20'
+          - '5.22'
+          - '5.24'
+          - '5.26'
+          - '5.28'
+          - '5.30'
+          - '5.32'
+          - '5.34'
+          - 'latest'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Perl
+        run: |
+          choco install strawberryperl
+          echo "C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin" >> $GITHUB_PATH
+      - name: perl -V
+        run: perl -V
+      - name: Install Dependencies
+        run: curl -sL https://git.io/cpm | perl - install -g --show-build-log-on-failure Dist::Zilla
+      - name: Run Tests
+        run: |
+          dzil authordeps --missing | cpanm --notest
+          dzil listdeps --author --missing | cpanm --notest
+          dzil test --author --release
