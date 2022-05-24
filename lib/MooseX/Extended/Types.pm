@@ -1,6 +1,6 @@
 package MooseX::Extended::Types;
 
-# ABSTRACT: Keep our type tools orgnanized
+# ABSTRACT: Keep our type tools organized
 
 use strict;
 use warnings;

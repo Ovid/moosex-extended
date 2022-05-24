@@ -210,7 +210,7 @@ behavioral differences you should be aware of.
 
 - No `namespace::autoclean`
 
-    It's very frustratting when running under the debugger and doing this:
+    It's very frustrating when running under the debugger and doing this:
 
     ```perl
         13==>       my $total = sum(3,4,5);

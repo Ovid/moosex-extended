@@ -95,4 +95,3 @@ Every C<field> is lazy by default. This is because there's no guarantee the code
 them, but this makes it very easy for a C<field> to rely on a C<param> value being present.
 
 Every C<param> is not lazy by default, but you can add C<< lazy => 1 >> if you need to.
-

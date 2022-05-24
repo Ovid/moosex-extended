@@ -55,5 +55,3 @@ from our test suite.
 B<Warning>: setting the value via the constructor for the first time doesn't
 clone the data. All other gets and sets will clone it. We need to figure out a
 clean, performant solution for this.
-
-

@@ -251,7 +251,7 @@ the debugger. Your classes may run a bit slower, but hey, it's the debugger!
 
 =item * No C<namespace::autoclean>
 
-It's very frustratting when running under the debugger and doing this:
+It's very frustrating when running under the debugger and doing this:
 
 	13==>       my $total = sum(3,4,5);
 	DB<4>
