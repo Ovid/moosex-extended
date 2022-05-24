@@ -112,11 +112,11 @@ and now everyone with a copy of that reference has mutated state.
 
 To handle that, we offer a new `clone => $clone_type` pair for attributes.
 
-See the [MooseX::Extended::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3ACloning)> documentation.
+See the [MooseX::Extended::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3ACloning)> documentation.
 
 # OBJECT CONSTRUCTION
 
-Objection construction for [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults) is like Moose, so no
+Objection construction for [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) is like Moose, so no
 changes are needed.  However, in addition to `has`, we also provide `param`
 and `field` attributes, both of which are `is => 'ro` by default.
 
@@ -150,7 +150,7 @@ package Silly::Name {
 }
 ```
 
-See [MooseX::Extended::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AConstruction) for a full explanation.
+See [MooseX::Extended::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AConstruction) for a full explanation.
 
 # ATTRIBUTE SHORTCUTS
 
@@ -171,7 +171,7 @@ sub _build_name ($self) {
 }
 ```
 
-See [MooseX::Extended::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AShortcuts) for a full explanation.
+See [MooseX::Extended::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AShortcuts) for a full explanation.
 
 # INVALID ATTRIBUTE NAMES
 
@@ -198,7 +198,7 @@ This also applies to various attributes which allow method names, such as
 
 # DEBUGGER SUPPORT
 
-When running [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults) under the debugger, there are some
+When running [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) under the debugger, there are some
 behavioral differences you should be aware of.
 
 - Your classes won't be immutable
@@ -227,18 +227,18 @@ behavioral differences you should be aware of.
 
 # MANUAL
 
-- [MooseX::Extended::Manual::Overview](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AOverview)
-- [MooseX::Extended::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AConstruction)
-- [MooseX::Extended::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AShortcuts)
-- [MooseX::Extended::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3ACloning)
+- [MooseX::Extended::Manual::Overview](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AOverview)
+- [MooseX::Extended::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AConstruction)
+- [MooseX::Extended::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AShortcuts)
+- [MooseX::Extended::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3ACloning)
 
 # RELATED MODULES
 
-- [MooseX::Extended::Types](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3ATypes) is included in the distribution.
+- [MooseX::Extended::Types](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3ATypes) is included in the distribution.
 
     This provides core types for you.
 
-- [MooseX::Extended::Role](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3ARole) is included in the distribution.
+- [MooseX::Extended::Role](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3ARole) is included in the distribution.
 
     `MooseX::Extended`, but for roles.
 
