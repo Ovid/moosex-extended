@@ -40,17 +40,13 @@ sub init_meta ( $class, %params ) {
     Carp->import::into($for_class);
     feature->import( _enabled_features() );
     warnings->unimport(_disabled_warnings);
+    namespace::autoclean->import::into($for_class);
 
     # see perldoc -v '$^P'
     if ($^P) {
         say STDERR "We are running under the debugger. $for_class is not immutable";
     }
     else {
-        # we also remove namespace::autoclean because when those symbols get
-        # removed from the symbol table, you can't access them under the
-        # debugger! Very frustrating
-        namespace::autoclean->import::into($for_class);
-
         # after_runtime is loaded too late under the debugger
         after_runtime { $for_class->meta->make_immutable };
     }
@@ -254,7 +250,7 @@ relies on L<B::Hooks::AtRuntime>'s C<after_runtime> function. However, that
 runs too late under the debugger and dies. Thus, we disable this feature under
 the debugger. Your classes may run a bit slower, but hey, it's the debugger!
 
-=item * No C<namespace::autoclean>
+=item * C<namespace::autoclean> will frustrate you
 
 It's very frustrating when running under the debugger and doing this:
 
@@ -262,11 +258,8 @@ It's very frustrating when running under the debugger and doing this:
 	DB<4>
 	Undefined subroutine &main::sum called at (eval 423) ...
 
-You can I<see> the function defined there, so we can't you call it? Quite
-often, that's because L<namespace::autoclean> or L<namespace::clean> has been
-used, removing the symbol from the namespace, even though the subroutines are
-already bound in the code. Thus, if you're running under the debugger, we
-disable C<namespace::autoclean> to make the code easier to debug.
+We had removed C<namespace::autoclean> when running under the debugger, but
+backed that out: L<https://github.com/Ovid/moosex-extreme/issues/11>.
 
 =back
 

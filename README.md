@@ -208,7 +208,7 @@ behavioral differences you should be aware of.
     runs too late under the debugger and dies. Thus, we disable this feature under
     the debugger. Your classes may run a bit slower, but hey, it's the debugger!
 
-- No `namespace::autoclean`
+- `namespace::autoclean` will frustrate you
 
     It's very frustrating when running under the debugger and doing this:
 
@@ -218,11 +218,8 @@ behavioral differences you should be aware of.
         Undefined subroutine &main::sum called at (eval 423) ...
     ```
 
-    You can _see_ the function defined there, so we can't you call it? Quite
-    often, that's because [namespace::autoclean](https://metacpan.org/pod/namespace%3A%3Aautoclean) or [namespace::clean](https://metacpan.org/pod/namespace%3A%3Aclean) has been
-    used, removing the symbol from the namespace, even though the subroutines are
-    already bound in the code. Thus, if you're running under the debugger, we
-    disable `namespace::autoclean` to make the code easier to debug.
+    We had removed `namespace::autoclean` when running under the debugger, but
+    backed that out: [https://github.com/Ovid/moosex-extreme/issues/11](https://github.com/Ovid/moosex-extreme/issues/11).
 
 # MANUAL
 
