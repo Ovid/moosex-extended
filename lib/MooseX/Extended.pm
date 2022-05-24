@@ -347,6 +347,10 @@ L<B::Hooks::AtRuntime>'s C<after_runtime> function to set it.
 
 We do not need a true value at the end of a module because we use L<true>.
 
+This module was originally released on github as C<MooseX::Extreme>, but
+enough people pointed out that it was not extreme at all. That's why the
+repository is L<https://github.com/Ovid/moosex-extreme/>.
+
 =head1 SEE ALSO
 
 =over 4

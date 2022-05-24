@@ -299,6 +299,10 @@ We do not need `__PACKAGE__->meta->make_immutable` because we use
 
 We do not need a true value at the end of a module because we use [true](https://metacpan.org/pod/true).
 
+This module was originally released on github as `MooseX::Extreme`, but
+enough people pointed out that it was not extreme at all. That's why the
+repository is [https://github.com/Ovid/moosex-extreme/](https://github.com/Ovid/moosex-extreme/).
+
 # SEE ALSO
 
 - [MooseX::Modern](https://metacpan.org/pod/MooseX::Modern)
