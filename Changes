@@ -4,6 +4,7 @@ Revision history for MooseX-Extended
 
 0.02      2022-05-24 10:06:47 CEST
 
+          - support postderef_qq (thanks, haarg)
           - Fix broken POD name, causing the overview to not be linked
 
 0.01      2022-05-24 09:44:44 CEST

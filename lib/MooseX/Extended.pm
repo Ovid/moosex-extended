@@ -4,18 +4,23 @@ package MooseX::Extended;
 
 use 5.20.0;
 use warnings;
-use feature qw(signatures);
 
 use Moose::Exporter;
 use Moose                     ();
 use MooseX::StrictConstructor ();
 use mro                       ();
 use namespace::autoclean      ();
-use MooseX::Extended::Core qw(field param);
+use MooseX::Extended::Core qw(
+  field
+  param
+  _enabled_features
+  _disabled_warnings
+);
+use feature _enabled_features();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
-no warnings qw(experimental::signatures experimental::postderef);
+no warnings _disabled_warnings();
 use true;
 
 our $VERSION = '0.03';
@@ -33,8 +38,8 @@ sub init_meta ( $class, %params ) {
     Moose->init_meta(%params);
     MooseX::StrictConstructor->import( { into => $for_class } );
     Carp->import::into($for_class);
-    feature->import(qw/signatures postderef :5.20/);
-    warnings->unimport(qw/experimental::postderef experimental::signatures/);
+    feature->import( _enabled_features() );
+    warnings->unimport(_disabled_warnings);
 
     # see perldoc -v '$^P'
     if ($^P) {
@@ -117,7 +122,7 @@ Is sort of the equivalent to:
         use v5.20.0;
         use Moose;
         use MooseX::StrictConstructor;
-        use feature qw( signatures postderef );
+        use feature qw( signatures postderef postderef_qq);
         no warnings qw( experimental::signatures experimental::postderef );
         use namespace::autoclean;
         use Carp;

@@ -69,7 +69,7 @@ package My::Class {
     use v5.20.0;
     use Moose;
     use MooseX::StrictConstructor;
-    use feature qw( signatures postderef );
+    use feature qw( signatures postderef postderef_qq);
     no warnings qw( experimental::signatures experimental::postderef );
     use namespace::autoclean;
     use Carp;

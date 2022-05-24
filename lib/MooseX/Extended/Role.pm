@@ -5,15 +5,20 @@ package MooseX::Extended::Role;
 use strict;
 use warnings;
 use Moose::Exporter;
-use MooseX::Extended::Core qw(field param);
+use MooseX::Extended::Core qw(
+  field
+  param
+  _enabled_features
+  _disabled_warnings
+);
 use MooseX::Role::WarnOnConflict ();
 use Moose::Role;
 use Moose::Meta::Role;
 use namespace::autoclean ();
 use Import::Into;
 use true;
-use feature 'signatures';
-no warnings 'experimental::signatures';
+use feature _enabled_features();
+no warnings _disabled_warnings();
 
 our $VERSION = '0.03';
 
@@ -26,8 +31,8 @@ sub init_meta {
 
     my $for_class = $params{for_class};
     Carp->import::into($for_class);
-    warnings->unimport(qw(experimental::signatures experimental::postderef));
-    feature->import(qw/signatures postderef :5.20/);
+    warnings->unimport( _disabled_warnings() );
+    feature->import( _enabled_features() );
     namespace::autoclean->import::into($for_class);
     true->import;              # no need for `1` at the end of the module
     MooseX::Role::WarnOnConflict->import::into($for_class);
