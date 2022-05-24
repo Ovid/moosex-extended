@@ -18,7 +18,7 @@ use Import::Into;
 no warnings qw(experimental::signatures experimental::postderef);
 use true;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 Moose::Exporter->setup_import_methods(
     with_meta => [ 'field', 'param' ],
