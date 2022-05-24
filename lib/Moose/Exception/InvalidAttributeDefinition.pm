@@ -1,5 +1,7 @@
 package Moose::Exception::InvalidAttributeDefinition;
 
+# ABSTRACT: Exceptions for invalid attribute definitions.
+
 use Moose;
 extends 'Moose::Exception';
 our $VERSION = '0.1';
