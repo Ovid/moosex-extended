@@ -2,6 +2,8 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Fix broken POD name, causing the overview to not be linked
+
 0.01      2022-05-24 09:44:44 CEST
 
           - Reorganize docs to provide links to a manual
