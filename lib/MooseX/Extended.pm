@@ -137,7 +137,7 @@ allowed to be passed to the constructor.
 
 Note that the C<has> function is still available, even if it's not needed.
 
-=head1 Immutability
+=head1 IMMUTABILITY
 
 =head2 Making Your Class Immutable
 
@@ -149,7 +149,7 @@ That prevents further changes to the class and provides some optimizations to
 make the code run much faster. However, it's somewhat annoying to type. We do
 this for you, via C<B::Hooks::AtRuntime>. You no longer need to do this yourself.
 
-=head2 Making Your Instances Immutable
+=head2 Making Your Instance Immutable
 
 By default, attributes defined via C<param> and C<field> are read-only.
 However, if they contain a reference, you can fetch the reference, mutate it,
@@ -163,7 +163,7 @@ See the L<MooseX::Extended::Manual::Cloning> documentation.
 
 Objection construction for L<MooseX::Extended> is like Moose, so no
 changes are needed.  However, in addition to C<has>, we also provide C<param>
-and C<field> attributes, both of which are C<< is => 'ro'>> by default.
+and C<field> attributes, both of which are C<< is => 'ro' >> by default.
 
 The C<param> is I<required>, whether by passing it to the constructor, or using
 C<default> or C<builder>.

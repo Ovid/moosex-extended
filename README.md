@@ -90,7 +90,7 @@ allowed to be passed to the constructor.
 
 Note that the `has` function is still available, even if it's not needed.
 
-# Immutability
+# IMMUTABILITY
 
 ## Making Your Class Immutable
 
@@ -104,7 +104,7 @@ That prevents further changes to the class and provides some optimizations to
 make the code run much faster. However, it's somewhat annoying to type. We do
 this for you, via `B::Hooks::AtRuntime`. You no longer need to do this yourself.
 
-## Making Your Instances Immutable
+## Making Your Instance Immutable
 
 By default, attributes defined via `param` and `field` are read-only.
 However, if they contain a reference, you can fetch the reference, mutate it,
@@ -118,7 +118,7 @@ See the [MooseX::Extended::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3
 
 Objection construction for [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) is like Moose, so no
 changes are needed.  However, in addition to `has`, we also provide `param`
-and `field` attributes, both of which are `is => 'ro'>> by default.`
+and `field` attributes, both of which are `is => 'ro'` by default.
 
 The `param` is _required_, whether by passing it to the constructor, or using
 `default` or `builder`.
@@ -319,11 +319,3 @@ This is free software, licensed under:
 ```
 The Artistic License 2.0 (GPL Compatible)
 ```
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 115:
-
-    Unterminated C< ... > sequence
