@@ -1,6 +1,6 @@
 package MooseX::Extended;
 
-# ABSTRACT: Moose on Steroids
+# ABSTRACT: Extend Moose with safe defaults and useful features
 
 use 5.20.0;
 use warnings;

@@ -1,6 +1,6 @@
 # NAME
 
-MooseX::Extended - Moose on Steroids
+MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
