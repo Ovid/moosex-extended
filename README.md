@@ -4,7 +4,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
-version 0.02
+version 0.03
 
 # SYNOPSIS
 
@@ -43,7 +43,7 @@ package My::Names {
 
 # DESCRIPTION
 
-This module is **EXPERIMENTAL**! All features subject to change.
+This module is **ALPHA** code.
 
 This class attempts to create a safer version of Moose that defaults to
 read-only attributes and is easier to read and write.
@@ -94,7 +94,7 @@ Note that the `has` function is still available, even if it's not needed.
 
 ## Making Your Class Immutable
 
-Typically Moose classes should end with this:
+You no longer need to end your Moose classes with:
 
 ```
 __PACKAGE__->meta->make_immutable;
@@ -104,7 +104,7 @@ That prevents further changes to the class and provides some optimizations to
 make the code run much faster. However, it's somewhat annoying to type. We do
 this for you, via `B::Hooks::AtRuntime`. You no longer need to do this yourself.
 
-## Immutable Objects
+## Making Your Instances Immutable
 
 By default, attributes defined via `param` and `field` are read-only.
 However, if they contain a reference, you can fetch the reference, mutate it,
@@ -118,7 +118,7 @@ See the [MooseX::Extended::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3
 
 Objection construction for [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) is like Moose, so no
 changes are needed.  However, in addition to `has`, we also provide `param`
-and `field` attributes, both of which are `is => 'ro` by default.
+and `field` attributes, both of which are `is => 'ro'>> by default.`
 
 The `param` is _required_, whether by passing it to the constructor, or using
 `default` or `builder`.
@@ -213,10 +213,9 @@ behavioral differences you should be aware of.
     It's very frustratting when running under the debugger and doing this:
 
     ```perl
-    DB<4>
-          13==>       my $total = sum(3,4,5);
-          DB<4>
-          Undefined subroutine &main::sum called at (eval 423) ...
+        13==>       my $total = sum(3,4,5);
+        DB<4>
+        Undefined subroutine &main::sum called at (eval 423) ...
     ```
 
     You can _see_ the function defined there, so we can't you call it? Quite
@@ -295,12 +294,8 @@ There are a few things you might be interested to know about this module when
 evaluating it.
 
 Most of this is written with bog-standard [Moose](https://metacpan.org/pod/Moose), so there's nothing
-terribly weird inside. However, there are a couple of modules which stand out.
-
-We do not need `__PACKAGE__->meta->make_immutable` because we use
-[B::Hooks::AtRuntime](https://metacpan.org/pod/B%3A%3AHooks%3A%3AAtRuntime)'s `after_runtime` function to set it.
-
-We do not need a true value at the end of a module because we use [true](https://metacpan.org/pod/true).
+terribly weird inside, but you may wish to note that we use
+[B::Hooks::AtRuntime](https://metacpan.org/pod/B%3A%3AHooks%3A%3AAtRuntime) and [true](https://metacpan.org/pod/true). They seem sane, but _caveat emptor_.
 
 This module was originally released on github as `MooseX::Extreme`, but
 enough people pointed out that it was not extreme at all. That's why the
@@ -324,3 +319,11 @@ This is free software, licensed under:
 ```
 The Artistic License 2.0 (GPL Compatible)
 ```
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 115:
+
+    Unterminated C< ... > sequence

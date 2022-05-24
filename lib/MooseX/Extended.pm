@@ -94,7 +94,7 @@ __END__
 
 =head1 DESCRIPTION
 
-This module is B<EXPERIMENTAL>! All features subject to change.
+This module is B<ALPHA> code.
 
 This class attempts to create a safer version of Moose that defaults to
 read-only attributes and is easier to read and write.
@@ -141,7 +141,7 @@ Note that the C<has> function is still available, even if it's not needed.
 
 =head2 Making Your Class Immutable
 
-Typically Moose classes should end with this:
+You no longer need to end your Moose classes with:
 
     __PACKAGE__->meta->make_immutable;
 
@@ -149,7 +149,7 @@ That prevents further changes to the class and provides some optimizations to
 make the code run much faster. However, it's somewhat annoying to type. We do
 this for you, via C<B::Hooks::AtRuntime>. You no longer need to do this yourself.
 
-=head2 Immutable Objects
+=head2 Making Your Instances Immutable
 
 By default, attributes defined via C<param> and C<field> are read-only.
 However, if they contain a reference, you can fetch the reference, mutate it,
@@ -163,7 +163,7 @@ See the L<MooseX::Extended::Manual::Cloning> documentation.
 
 Objection construction for L<MooseX::Extended> is like Moose, so no
 changes are needed.  However, in addition to C<has>, we also provide C<param>
-and C<field> attributes, both of which are C<< is => 'ro >> by default.
+and C<field> attributes, both of which are C<< is => 'ro'>> by default.
 
 The C<param> is I<required>, whether by passing it to the constructor, or using
 C<default> or C<builder>.
@@ -253,7 +253,6 @@ the debugger. Your classes may run a bit slower, but hey, it's the debugger!
 
 It's very frustratting when running under the debugger and doing this:
 
-  DB<4>
 	13==>       my $total = sum(3,4,5);
 	DB<4>
 	Undefined subroutine &main::sum called at (eval 423) ...
@@ -343,12 +342,8 @@ There are a few things you might be interested to know about this module when
 evaluating it.
 
 Most of this is written with bog-standard L<Moose>, so there's nothing
-terribly weird inside. However, there are a couple of modules which stand out.
-
-We do not need C<< __PACKAGE__->meta->make_immutable >> because we use
-L<B::Hooks::AtRuntime>'s C<after_runtime> function to set it.
-
-We do not need a true value at the end of a module because we use L<true>.
+terribly weird inside, but you may wish to note that we use
+L<B::Hooks::AtRuntime> and L<true>. They seem sane, but I<caveat emptor>.
 
 This module was originally released on github as C<MooseX::Extreme>, but
 enough people pointed out that it was not extreme at all. That's why the
