@@ -1,4 +1,4 @@
-# PODNAME: MooseX::Extended Overview
+# PODNAME: MooseX::Extended::Manual::Overview
 # ABSTRACT: Work-in-progress overview for MooseX::Extended
 
 =head1 CONVERTING FROM MOOSE
