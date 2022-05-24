@@ -5,13 +5,13 @@ use Test::Most;
 use Scalar::Util 'refaddr';
 use DateTime;
 
-#$MooseX::SafeDefaults::Debug = 1;
+#$MooseX::Extended::Debug = 1;
 
 my $clone_end_date_called = 0;
 
 package My::Class {
-    use MooseX::SafeDefaults;
-    use MooseX::SafeDefaults::Types qw(NonEmptyStr HashRef InstanceOf);
+    use MooseX::Extended;
+    use MooseX::Extended::Types qw(NonEmptyStr HashRef InstanceOf);
 
     param name => ( isa => NonEmptyStr );
     param payload => (

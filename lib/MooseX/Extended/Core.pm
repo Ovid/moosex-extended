@@ -1,6 +1,6 @@
-package MooseX::SafeDefaults::Core;
+package MooseX::Extended::Core;
 
-# ABSTRACT: Internal module for MooseX::SafeDefaults
+# ABSTRACT: Internal module for MooseX::Extended
 
 use v5.20.0;
 use warnings;
@@ -181,9 +181,9 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
 }
 
 sub debug ( $message, $data = undef ) {
-    $MooseX::SafeDefaults::Debug = $MooseX::SafeDefaults::Debug;    # suppress "once" warnings
-    return unless $MooseX::SafeDefaults::Debug;
-    if ( 2 == @_ ) {                                                # yup, still want multidispatch
+    $MooseX::Extended::Debug = $MooseX::Extended::Debug;    # suppress "once" warnings
+    return unless $MooseX::Extended::Debug;
+    if ( 2 == @_ ) {                                        # yup, still want multidispatch
         require Data::Dumper;
         local $Data::Dumper::Indent   = 1;
         local $Data::Dumper::Sortkeys = 1;
@@ -201,4 +201,4 @@ __END__
 =head1 DESCRIPTION
 
 This is not for public consumption. Provides the C<field> and C<param>
-functions to L<MooseX::SafeDefaults> and L<MooseX::SafeDefaults::Role>.
+functions to L<MooseX::Extended> and L<MooseX::Extended::Role>.

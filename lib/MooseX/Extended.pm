@@ -1,4 +1,4 @@
-package MooseX::SafeDefaults;
+package MooseX::Extended;
 
 # ABSTRACT: Moose on Steroids
 
@@ -11,7 +11,7 @@ use Moose                     ();
 use MooseX::StrictConstructor ();
 use mro                       ();
 use namespace::autoclean      ();
-use MooseX::SafeDefaults::Core qw(field param);
+use MooseX::Extended::Core qw(field param);
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
@@ -62,8 +62,8 @@ __END__
 =head1 SYNOPSIS
 
     package My::Names {
-        use MooseX::SafeDefaults;
-        use MooseX::SafeDefaults::Types
+        use MooseX::Extended;
+        use MooseX::Extended::Types
           qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
         use List::Util 'sum';
 
@@ -106,7 +106,7 @@ true encapsulation and true methods).
 This:
 
     package My::Class {
-        use MooseX::SafeDefaults;
+        use MooseX::Extended;
 
         ... your code here
     }
@@ -157,11 +157,11 @@ and now everyone with a copy of that reference has mutated state.
 
 To handle that, we offer a new C<< clone => $clone_type >> pair for attributes.
 
-See the L<MooseX::SafeDefaults::Manual::Cloning>> documentation.
+See the L<MooseX::Extended::Manual::Cloning>> documentation.
 
 =head1 OBJECT CONSTRUCTION
 
-Objection construction for L<MooseX::SafeDefaults> is like Moose, so no
+Objection construction for L<MooseX::Extended> is like Moose, so no
 changes are needed.  However, in addition to C<has>, we also provide C<param>
 and C<field> attributes, both of which are C<< is => 'ro >> by default.
 
@@ -173,8 +173,8 @@ The C<field> is I<forbidden> in the constructor and lazy by default.
 Here's a short example:
 
     package Silly::Name {
-        use MooseX::SafeDefaults;
-        use MooseX::SafeDefaults::Types qw(compile Num NonEmptyStr Str);
+        use MooseX::Extended;
+        use MooseX::Extended::Types qw(compile Num NonEmptyStr Str);
 
         # these default to 'ro' (but you can override that) and are required
         param _name => ( isa => NonEmptyStr, init_arg => 'name' );
@@ -193,7 +193,7 @@ Here's a short example:
         );
     }
 
-See L<MooseX::SafeDefaults::Manual::Construction> for a full explanation.
+See L<MooseX::Extended::Manual::Construction> for a full explanation.
 
 =head1 ATTRIBUTE SHORTCUTS
 
@@ -212,7 +212,7 @@ When using C<field> or C<param>, we have some attribute shortcuts:
         ...
     }
 
-See L<MooseX::SafeDefaults::Manual::Shortcuts> for a full explanation.
+See L<MooseX::Extended::Manual::Shortcuts> for a full explanation.
 
 =head1 INVALID ATTRIBUTE NAMES
 
@@ -229,7 +229,7 @@ name is clearly invalid.
     my $object = Some::Class->new( name => 'WhoAmI' );
     say $object->name;
 
-C<MooseX::SafeDefaults> will throw a C<Moose::Exception::InvalidAttributeDefinition> exception
+C<MooseX::Extended> will throw a C<Moose::Exception::InvalidAttributeDefinition> exception
 if it encounters an illegal method name for an attribute.
 
 This also applies to various attributes which allow method names, such as
@@ -237,7 +237,7 @@ C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
 
 =head1 DEBUGGER SUPPORT
 
-When running L<MooseX::SafeDefaults> under the debugger, there are some
+When running L<MooseX::Extended> under the debugger, there are some
 behavioral differences you should be aware of.
 
 =over 4
@@ -270,13 +270,13 @@ disable C<namespace::autoclean> to make the code easier to debug.
 
 =over 4
 
-=item * L<MooseX::SafeDefaults::Manual::Overview>
+=item * L<MooseX::Extended::Manual::Overview>
 
-=item * L<MooseX::SafeDefaults::Manual::Construction>
+=item * L<MooseX::Extended::Manual::Construction>
 
-=item * L<MooseX::SafeDefaults::Manual::Shortcuts>
+=item * L<MooseX::Extended::Manual::Shortcuts>
 
-=item * L<MooseX::SafeDefaults::Manual::Cloning>
+=item * L<MooseX::Extended::Manual::Cloning>
 
 =back
 
@@ -284,13 +284,13 @@ disable C<namespace::autoclean> to make the code easier to debug.
 
 =over 4
 
-=item * L<MooseX::SafeDefaults::Types> is included in the distribution.
+=item * L<MooseX::Extended::Types> is included in the distribution.
 
 This provides core types for you.
 
-=item * L<MooseX::SafeDefaults::Role> is included in the distribution.
+=item * L<MooseX::Extended::Role> is included in the distribution.
 
-C<MooseX::SafeDefaults>, but for roles.
+C<MooseX::Extended>, but for roles.
 
 =back
 
@@ -305,20 +305,20 @@ Tests! Many more tests! Volunteers welcome :)
 
 =head2 Configurable Types
 
-We provide C<MooseX::SafeDefaults::Types> for convenience. It would be even more
+We provide C<MooseX::Extended::Types> for convenience. It would be even more
 convenient if we offered an easier for people to build something like
-C<MooseX::SafeDefaults::Types::Mine> so they can customize it.
+C<MooseX::Extended::Types::Mine> so they can customize it.
  
 =head2 Configurability
 
-Not everyone wants everything. In particular, using C<MooseX::SafeDefaults> with
+Not everyone wants everything. In particular, using C<MooseX::Extended> with
 L<DBIx::Class> will be fatal because the latter allows unknown arguments to
 constructors.  Or someone might want their "own" extreme Moose, requiring
 C<v5.36.0> or not using the C3 mro. What's the best way to allow this?
 
 =head2 C<BEGIN::Lift>
 
-This idea maybe belongs in C<MooseX::SafeDefaults::OverKill>, but ...
+This idea maybe belongs in C<MooseX::Extended::OverKill>, but ...
 
 Quite often you see things like this:
 

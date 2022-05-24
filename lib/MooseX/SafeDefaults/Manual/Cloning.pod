@@ -1,9 +1,9 @@
-# PODNAME: MooseX::SafeDefaults::Manual::Cloning
+# PODNAME: MooseX::Extended::Manual::Cloning
 # ABSTRACT: Explain the new C<clone => 1> feature.
 
 =head1 CLONING SUPPORT
 
-L<MooseX::SafeDefaults> offers B<EXPERIMENTAL> support for cloning, but differently
+L<MooseX::Extended> offers B<EXPERIMENTAL> support for cloning, but differently
 from how we see it typically done. You can just pass the C<< clone => 1 >>
 argument to your attribute and it will be clone with L<Storable>'s C<dclone>
 function every time you read or write that attribute, it will be cloned if
@@ -15,8 +15,8 @@ C<< $self, $attribute_name, $value_to_clone >>. Here's a full example, taken
 from our test suite.
 
     package My::Class {
-        use MooseX::SafeDefaults;
-        use MooseX::SafeDefaults::Types qw(NonEmptyStr HashRef InstanceOf);
+        use MooseX::Extended;
+        use MooseX::Extended::Types qw(NonEmptyStr HashRef InstanceOf);
 
         param name => ( isa => NonEmptyStr );
 

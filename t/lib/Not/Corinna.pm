@@ -1,6 +1,6 @@
 package Not::Corinna {
-    use MooseX::SafeDefaults;
-    use MooseX::SafeDefaults::Types qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
+    use MooseX::Extended;
+    use MooseX::Extended::Types qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
     use List::Util 'sum';
 
     with qw(
@@ -34,5 +34,5 @@ package Not::Corinna {
     }
 
     # There is no need for __PACKAGE__->meta->make_immutable or to end in a true
-    # value. MooseX::SafeDefaults takes care of that for you.
+    # value. MooseX::Extended takes care of that for you.
 }

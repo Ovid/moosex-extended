@@ -1,4 +1,4 @@
-# PODNAME: MooseX::SafeDefaults::Manual::Shortcuts
+# PODNAME: MooseX::Extended::Manual::Shortcuts
 # ABSTRACT: Shortcuts to make your Moose easier to write
 
 our $VERSION = '0.01';
@@ -23,8 +23,8 @@ When using C<field> or C<param>, we have some attribute shortcuts:
 These can also be used when you pass an array reference to the function:
 
     package Point {
-        use MooseX::SafeDefaults;
-        use MooseX::SafeDefaults::Types qw(Int);
+        use MooseX::Extended;
+        use MooseX::Extended::Types qw(Int);
 
         param [ 'x', 'y' ] => (
             isa     => Int,

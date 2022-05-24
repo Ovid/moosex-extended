@@ -1,6 +1,6 @@
 # NAME
 
-MooseX::SafeDefaults - Moose on Steroids
+MooseX::Extended - Moose on Steroids
 
 # VERSION
 
@@ -10,8 +10,8 @@ version 0.01
 
 ```perl
 package My::Names {
-    use MooseX::SafeDefaults;
-    use MooseX::SafeDefaults::Types
+    use MooseX::Extended;
+    use MooseX::Extended::Types
       qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
     use List::Util 'sum';
 
@@ -56,7 +56,7 @@ This:
 
 ```perl
 package My::Class {
-    use MooseX::SafeDefaults;
+    use MooseX::Extended;
 
     ... your code here
 }
@@ -112,11 +112,11 @@ and now everyone with a copy of that reference has mutated state.
 
 To handle that, we offer a new `clone => $clone_type` pair for attributes.
 
-See the [MooseX::SafeDefaults::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3ACloning)> documentation.
+See the [MooseX::Extended::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3ACloning)> documentation.
 
 # OBJECT CONSTRUCTION
 
-Objection construction for [MooseX::SafeDefaults](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults) is like Moose, so no
+Objection construction for [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults) is like Moose, so no
 changes are needed.  However, in addition to `has`, we also provide `param`
 and `field` attributes, both of which are `is => 'ro` by default.
 
@@ -129,8 +129,8 @@ Here's a short example:
 
 ```perl
 package Silly::Name {
-    use MooseX::SafeDefaults;
-    use MooseX::SafeDefaults::Types qw(compile Num NonEmptyStr Str);
+    use MooseX::Extended;
+    use MooseX::Extended::Types qw(compile Num NonEmptyStr Str);
 
     # these default to 'ro' (but you can override that) and are required
     param _name => ( isa => NonEmptyStr, init_arg => 'name' );
@@ -150,7 +150,7 @@ package Silly::Name {
 }
 ```
 
-See [MooseX::SafeDefaults::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AConstruction) for a full explanation.
+See [MooseX::Extended::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AConstruction) for a full explanation.
 
 # ATTRIBUTE SHORTCUTS
 
@@ -171,7 +171,7 @@ sub _build_name ($self) {
 }
 ```
 
-See [MooseX::SafeDefaults::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AShortcuts) for a full explanation.
+See [MooseX::Extended::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AShortcuts) for a full explanation.
 
 # INVALID ATTRIBUTE NAMES
 
@@ -190,7 +190,7 @@ my $object = Some::Class->new( name => 'WhoAmI' );
 say $object->name;
 ```
 
-`MooseX::SafeDefaults` will throw a `Moose::Exception::InvalidAttributeDefinition` exception
+`MooseX::Extended` will throw a `Moose::Exception::InvalidAttributeDefinition` exception
 if it encounters an illegal method name for an attribute.
 
 This also applies to various attributes which allow method names, such as
@@ -198,7 +198,7 @@ This also applies to various attributes which allow method names, such as
 
 # DEBUGGER SUPPORT
 
-When running [MooseX::SafeDefaults](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults) under the debugger, there are some
+When running [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults) under the debugger, there are some
 behavioral differences you should be aware of.
 
 - Your classes won't be immutable
@@ -227,20 +227,20 @@ behavioral differences you should be aware of.
 
 # MANUAL
 
-- [MooseX::SafeDefaults::Manual::Overview](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AOverview)
-- [MooseX::SafeDefaults::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AConstruction)
-- [MooseX::SafeDefaults::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AShortcuts)
-- [MooseX::SafeDefaults::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3ACloning)
+- [MooseX::Extended::Manual::Overview](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AOverview)
+- [MooseX::Extended::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AConstruction)
+- [MooseX::Extended::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AShortcuts)
+- [MooseX::Extended::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3ACloning)
 
 # RELATED MODULES
 
-- [MooseX::SafeDefaults::Types](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3ATypes) is included in the distribution.
+- [MooseX::Extended::Types](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3ATypes) is included in the distribution.
 
     This provides core types for you.
 
-- [MooseX::SafeDefaults::Role](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3ARole) is included in the distribution.
+- [MooseX::Extended::Role](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3ARole) is included in the distribution.
 
-    `MooseX::SafeDefaults`, but for roles.
+    `MooseX::Extended`, but for roles.
 
 # TODO
 
@@ -253,20 +253,20 @@ Tests! Many more tests! Volunteers welcome :)
 
 ## Configurable Types
 
-We provide `MooseX::SafeDefaults::Types` for convenience. It would be even more
+We provide `MooseX::Extended::Types` for convenience. It would be even more
 convenient if we offered an easier for people to build something like
-`MooseX::SafeDefaults::Types::Mine` so they can customize it.
+`MooseX::Extended::Types::Mine` so they can customize it.
 
 ## Configurability
 
-Not everyone wants everything. In particular, using `MooseX::SafeDefaults` with
+Not everyone wants everything. In particular, using `MooseX::Extended` with
 [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass) will be fatal because the latter allows unknown arguments to
 constructors.  Or someone might want their "own" extreme Moose, requiring
 `v5.36.0` or not using the C3 mro. What's the best way to allow this?
 
 ## `BEGIN::Lift`
 
-This idea maybe belongs in `MooseX::SafeDefaults::OverKill`, but ...
+This idea maybe belongs in `MooseX::Extended::OverKill`, but ...
 
 Quite often you see things like this:
 
