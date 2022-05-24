@@ -15,7 +15,7 @@ use true;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 Moose::Exporter->setup_import_methods(
     with_meta => [ 'field', 'param' ],

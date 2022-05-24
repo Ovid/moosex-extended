@@ -16,7 +16,7 @@ use Ref::Util qw(
 );
 use Carp 'croak';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @EXPORT_OK = qw(field param);
 
