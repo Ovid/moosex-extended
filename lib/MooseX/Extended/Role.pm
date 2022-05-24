@@ -1,11 +1,11 @@
-package MooseX::Extreme::Role;
+package MooseX::Extended::Role;
 
-# ABSTRACT: MooseX::Extreme roles
+# ABSTRACT: MooseX::Extended roles
 
 use strict;
 use warnings;
 use Moose::Exporter;
-use MooseX::Extreme::Core qw(field param);
+use MooseX::Extended::Core qw(field param);
 use MooseX::Role::WarnOnConflict ();
 use Moose::Role;
 use Moose::Meta::Role;
@@ -43,13 +43,13 @@ __END__
 =head1 SYNOPSIS
 
     package Not::Corinna::Role::Created {
-        use MooseX::Extreme::Role;
-        use MooseX::Extreme::Types qw(PositiveInt);
+        use MooseX::Extended::Role;
+        use MooseX::Extended::Types qw(PositiveInt);
 
         field created => ( isa => PositiveInt, default => sub { time } );
     }
 
-Similar to L<MooseX::Extreme>, this provides C<field> and C<param> to the role.
+Similar to L<MooseX::Extended>, this provides C<field> and C<param> to the role.
 
 Note that there is no need to add a C<1> at the end of the role.
 
@@ -57,19 +57,19 @@ Note that there is no need to add a C<1> at the end of the role.
 
 In L<Moose> if a class defines a method of the name as the method of a role
 it's consuming, the role's method is I<silently> discarded. With
-L<MooseX::Extreme::Role>, you get a warning. This makes maintenance easier
+L<MooseX::Extended::Role>, you get a warning. This makes maintenance easier
 when to prevent you from accidentally overriding a method.
 
 For example:
 
     package My::Role {
-        use MooseX::Extreme::Role;
+        use MooseX::Extended::Role;
 
         sub name {'Ovid'}
     }
 
     package My::Class {
-        use MooseX::Extreme;
+        use MooseX::Extended;
         with 'My::Role';
         sub name {'Bob'}
     }
@@ -83,7 +83,7 @@ The above code will still run, but you'll get a very verbose warning:
 To silence the warning, just be explicit about your intent:
 
     package My::Class {
-        use MooseX::Extreme;
+        use MooseX::Extended;
         with 'My::Role' => { -excludes => ['name'] };
         sub name {'Bob'}
     }

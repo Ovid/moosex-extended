@@ -1,4 +1,4 @@
-package MooseX::Extreme::Types;
+package MooseX::Extended::Types;
 
 # ABSTRACT: Keep our type tools orgnanized
 
@@ -33,9 +33,9 @@ __END__
 
 =head1 SYNOPSIS
 
-    package MooseX::Extreme::Types;
+    package MooseX::Extended::Types;
 
-    use MooseX::Extreme::Types qw(
+    use MooseX::Extended::Types qw(
       ArrayRef
       Dict
       Enum
@@ -47,7 +47,7 @@ __END__
 
 =head1 DESCRIPTION
 
-A basic set of useful types for C<MooseX::Extreme>. Using these is preferred
+A basic set of useful types for C<MooseX::Extended>. Using these is preferred
 to using using strings due to runtime versus compile-time failures. For
 example:
 

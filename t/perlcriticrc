@@ -3,10 +3,10 @@ severity = 4
 exclude = Freenode
 
 [TestingAndDebugging::RequireUseStrict]
-equivalent_modules = Moose Test::Most MooseX::Extreme MooseX::Extreme::Role 
+equivalent_modules = Moose Test::Most MooseX::Extended MooseX::Extended::Role 
 
 [TestingAndDebugging::RequireUseWarnings]
-equivalent_modules = Moose Test::Most MooseX::Extreme MooseX::Extreme::Role 
+equivalent_modules = Moose Test::Most MooseX::Extended MooseX::Extended::Role 
 
 [TestingAndDebugging::ProhibitNoWarnings]
 allow = experimental::signatures experimental::postderef
@@ -31,6 +31,6 @@ allow_import_of = utf8
 [-Modules::ProhibitMultiplePackages]
 [-Subroutines::RequireArgUnpacking]
 
-# MooseX::Extreme provides these, so skip 'em
+# MooseX::Extended provides these, so skip 'em
 [-Moose::RequireMakeImmutable]
 [-Modules::RequireEndWithOne]

@@ -1,10 +1,10 @@
-# PODNAME: MooseX::Extreme Tutorial
-# ABSTRACT: Work-in-progress tutorial for MooseX::Extreme
+# PODNAME: MooseX::Extended Overview
+# ABSTRACT: Work-in-progress overview for MooseX::Extended
 
 =head1 CONVERTING FROM MOOSE
 
-For most sane codebases, converting from L<Moose> to L<MooseX::Extreme> is as
-simple as C<< s/Moose/MooseX::Extreme/ >>. We I<try> to be
+For most sane codebases, converting from L<Moose> to L<MooseX::Extended> is as
+simple as C<< s/Moose/MooseX::Extended/ >>. We I<try> to be
 backwards-compatible, but some issues are glaring enough that they can't be
 fixed. Run your tests, folks.
 
@@ -17,7 +17,7 @@ From there, if you're not using signatures, convert your methods to
 using signatures. You'll almost definitely get test failures there as many
 functions handle arguments poorly.
 
-For roles, just C<< s/Moose::Role/MooseX::Role::Extreme/ >> and repeat the
+For roles, just C<< s/Moose::Role/MooseX::Extended::Roles/ >> and repeat the
 process (and run your tests, folks).
 
 Along the way, you can probably delete your references to
@@ -27,7 +27,7 @@ L<namespace::autoclean> and friends because we provide that for you.
 
 You can skip this section if you like.
 
-L<MooseX::Extreme> is built on years of experience hacking on L<Moose> and
+L<MooseX::Extended> is built on years of experience hacking on L<Moose> and
 being the lead designer of the L<Corinna|https://github.com/Ovid/Cor> project
 to bring modern OO to the Perl language. We love Moose, but over the years,
 it's become clear that there are some problematic design choices. Plus,
@@ -39,7 +39,7 @@ has accepted it), so for now, let's see how far we can push the envelope.
 This:
 
     package My::Class {
-        use MooseX::Extreme;
+        use MooseX::Extended;
 
         ... your code here
     }
@@ -63,7 +63,7 @@ Is sort of the equivalent to:
 
     1;
 
-We get tired of typing a lot of boilerplate, so C<MooseX::Extreme> does away
+We get tired of typing a lot of boilerplate, so C<MooseX::Extended> does away
 with it.
 
 =head1 CONSTRUCTOR
@@ -98,7 +98,7 @@ you want it to.
 
 There's an arcane C<< init_arg => undef >> pair to pass to each to say "this
 cannot be set via the constructor," but many developers are either unaware of
-this is simply forget about it. C<MooseX::Extreme> solves with by separating
+this is simply forget about it. C<MooseX::Extended> solves with by separating
 C<has> into C<param> (allowed in the constructor, but you can also use
 C<default> or C<builder>) and C<field>, which if forbidden in the constructor.
 We can rewrite the above as this:
@@ -144,12 +144,12 @@ Here's another fun bug:
 This is because Moose, by default, ignores any unknown arguments to the
 constructor and in the above example, we misspelled "serial" as "seriel".
 
-C<MooseX::Extreme> applies C<MooseX::StrictConstructor> to your class so you
+C<MooseX::Extended> applies C<MooseX::StrictConstructor> to your class so you
 never have to face this problem again.
 
 B<WARNING>: Be careful when using this in existing class hierarchies. While
-C<MooseX::Extreme> is compatible with Moose (Moose classes can always use
-C<MooseX::Extreme> classes and roles), the reverse isn't always true. We've
+C<MooseX::Extended> is compatible with Moose (Moose classes can always use
+C<MooseX::Extended> classes and roles), the reverse isn't always true. We've
 found, for example, that trying to use C<MooseX::StrictConstructor> with
 L<DBIx::Class> does not work.
 
@@ -163,7 +163,7 @@ problem|https://en.wikipedia.org/wiki/Multiple_inheritance> if you'd like to
 learn more.
 
 Rather than remembering to include C<use mro 'c3'> in your code,
-L<MooseX::Extreme> does it for you.
+L<MooseX::Extended> does it for you.
 
 If you have existing code that breaks under this, you should investigate
 carefully. You probably have a bug in your code.
@@ -184,7 +184,7 @@ However, that doesn't work under the debugger. So if you're running under the
 debugger, we disable this. Please keep that in mind. As a convenience, when
 running under the debugger, we issue a series of warnings for every class that
 is impacted. For a large codebase, that could be a considerable number of
-classes if they use C<MooseX::Extreme>:
+classes if they use C<MooseX::Extended>:
 
     We are running under the debugger. My::Name is not immutable
     We are running under the debugger. My::Product is not immutable
@@ -257,8 +257,8 @@ When using C<field> or C<param>, we have some attribute shortcuts:
 These can also be used when you pass an array reference to the function:
 
     package Point {
-        use MooseX::Extreme;
-        use MooseX::Extreme::Types qw(Int);
+        use MooseX::Extended;
+        use MooseX::Extended::Types qw(Int);
 
         param [ 'x', 'y' ] => (
             isa     => Int,

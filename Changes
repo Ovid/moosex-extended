@@ -1,7 +1,8 @@
-Revision history for MooseX-Extreme
+Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Reorganize docs to provide links to a manual
           - Make cloning much more flexible (thanks to Leon Timmermans for
             pointing out that my previous approach wasn't enough).
           - Start adding exceptions

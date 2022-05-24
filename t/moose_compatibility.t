@@ -3,12 +3,12 @@
 use lib 'lib';
 use Test::Most;
 
-#$MooseX::Extreme::Debug = 1;
+#$MooseX::Extended::Debug = 1;
 
 package My::Point::Moose {
     use v5.20.0;
     use Moose;
-    use MooseX::Extreme::Types qw(Num);
+    use MooseX::Extended::Types qw(Num);
     use MooseX::StrictConstructor;
     use feature qw( signatures postderef );
     no warnings qw( experimental::signatures experimental::postderef );
@@ -43,14 +43,14 @@ package My::Point::Mutable::Moose {
 }
 
 package My::Point {
-    use MooseX::Extreme;
-    use MooseX::Extreme::Types qw(Num);
+    use MooseX::Extended;
+    use MooseX::Extended::Types qw(Num);
 
     param [ 'x', 'y' ] => ( isa => Num );
 }
 
 package My::Point::Mutable {
-    use MooseX::Extreme;
+    use MooseX::Extended;
     extends 'My::Point';
 
     param [ '+x', '+y' ] => ( writer => 1, clearer => 1, default => 0 );

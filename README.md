@@ -1,6 +1,6 @@
 # NAME
 
-MooseX::Extreme - Moose on Steroids
+MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
@@ -10,8 +10,8 @@ version 0.01
 
 ```perl
 package My::Names {
-    use MooseX::Extreme;
-    use MooseX::Extreme::Types
+    use MooseX::Extended;
+    use MooseX::Extended::Types
       qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
     use List::Util 'sum';
 
@@ -56,7 +56,7 @@ This:
 
 ```perl
 package My::Class {
-    use MooseX::Extreme;
+    use MooseX::Extended;
 
     ... your code here
 }
@@ -109,172 +109,48 @@ this for you, via `B::Hooks::AtRuntime`. You no longer need to do this yourself.
 By default, attributes defined via `param` and `field` are read-only.
 However, if they contain a reference, you can fetch the reference, mutate it,
 and now everyone with a copy of that reference has mutated state.
-`MooseX::Extreme` offers **EXPERIMENTAL** support for cloning, but differently
-from how we see it typically done. You can just pass the `clone => 1`
-argument to your attribute and it will be clone with [Storable](https://metacpan.org/pod/Storable)'s `dclone`
-function every time you read or write that attribute, it will be cloned if
-it's a reference, ensuring that your object is effectively immutable.
 
-If you prefer, you can also pass a code reference or the name of a method you
-will use to clone the object. Each will receive three arguments:
-`$self, $attribute_name, $value_to_clone`. Here's a full example, taken
-from our test suite.
+To handle that, we offer a new `clone => $clone_type` pair for attributes.
 
-```perl
-package My::Class {
-    use MooseX::Extreme;
-    use MooseX::Extreme::Types qw(NonEmptyStr HashRef InstanceOf);
-
-    param name => ( isa => NonEmptyStr );
-
-    param payload => (
-        isa    => HashRef,
-        clone  => 1,  # uses Storable::dclone
-        writer => 1,
-    );
-
-    param start_date => (
-        isa   => InstanceOf ['DateTime'],
-        clone => sub ( $self, $name, $value ) {
-            return $value->clone;
-        },
-    );
-
-    param end_date => (
-        isa    => InstanceOf ['DateTime'],
-        clone  => '_clone_end_date',
-    );
-
-    sub _clone_end_date ( $self, $name, $value ) {
-        return $value->clone;
-    }
-
-    sub BUILD ( $self, @ ) {
-        if ( $self->end_date < $self->start_date ) {
-            croak("End date must not be before start date");
-        }
-    }
-}
-```
-
-**Warning**: setting the value via the constructor for the first time doesn't
-clone the data. All other gets and sets will clone it. We need to figure out a
-clean, performant solution for this.
+See the [MooseX::Extended::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3ACloning)> documentation.
 
 # OBJECT CONSTRUCTION
 
-The normal `new`, `BUILD`, and `BUILDARGS` functions work as expected.
-However, we apply [MooseX::StrictConstructor](https://metacpan.org/pod/MooseX%3A%3AStrictConstructor) to avoid this problem:
+Objection construction for [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) is like Moose, so no
+changes are needed.  However, in addition to `has`, we also provide `param`
+and `field` attributes, both of which are `is => 'ro` by default.
+
+The `param` is _required_, whether by passing it to the constructor, or using
+`default` or `builder`.
+
+The `field` is _forbidden_ in the constructor and lazy by default.
+
+Here's a short example:
 
 ```perl
-my $soldier = Soldier->new(
-    name   => $name,
-    rank   => $rank,
-    seriel => $serial, # should be serial
-);
+package Silly::Name {
+    use MooseX::Extended;
+    use MooseX::Extended::Types qw(compile Num NonEmptyStr Str);
+
+    # these default to 'ro' (but you can override that) and are required
+    param _name => ( isa => NonEmptyStr, init_arg => 'name' );
+    param title => ( isa => Str,         required => 0 );
+
+    # fields must never be passed to the constructor
+    # note that ->title and ->name are guaranteed to be set before
+    # this because fields are lazy by default
+    field name => (
+        isa     => NonEmptyStr,
+        default => sub ($self) {
+            my $title = $self->title;
+            my $name  = $self->_name;
+            return $title ? "$title $name" : $name;
+        },
+    );
+}
 ```
 
-By default, misspelled arguments to the [Moose](https://metacpan.org/pod/Moose) constructor are silently discarded,
-leading to hard-to-diagnose bugs. With [MooseX::Extreme](https://metacpan.org/pod/MooseX%3A%3AExtreme), they're a fatal error.
-
-If you need to pass arbitrary "sideband" data, explicitly declare it as such:
-
-```perl
-param sideband => ( isa => HashRef, default => sub { {} } );
-```
-
-Naturally, because we bundle `MooseX::Extreme::Types`, you can do much
-finer-grained data validation on that, if needed.
-
-# FUNCTIONS
-
-The following two functions are exported into your namespace.
-
-## `param`
-
-```perl
-param name => ( isa => NonEmptyStr );
-```
-
-A similar function to Moose's `has`. A `param` is required. You may pass it
-to the constructor, or use a `default` or `builder` to supply this value.
-
-The above `param` definition is equivalent to:
-
-```perl
-has name => (
-    is       => 'ro',
-    isa      => NonEmptyStr,
-    required => 1,
-);
-```
-
-If you want a parameter that has no `default` or `builder` and can
-_optionally_ be passed to the constructor, just use `required => 0`.
-
-```perl
-param title => ( isa => Str, required => 0 );
-```
-
-Note that `param`, like `field`, defaults to read-only, `is => 'ro'`.
-You can override this:
-
-```perl
-param name => ( is => 'rw', isa => NonEmptyStr );
-```
-
-Otherwise, it behaves like `has`. You can pass in any arguments that `has`
-accepts.
-
-```perl
-# we'll make it private, but allow it to be passed to the constructor
-# as `name`
-param _name   => ( isa => NonEmptyStr, init_arg => 'name' );
-```
-
-## `field`
-
-```perl
-field created => ( isa => PositiveInt, default => sub { time } );
-```
-
-A similar function to Moose's `has`. A `field` is never allowed to be passed
-to the constructor, but you can still use `default` or `builder`, as normal.
-
-The above `field` definition is equivalent to:
-
-```perl
-has created => (
-    is       => 'ro',
-    isa      => PositiveInt,
-    init_arg => undef,        # not allowed in the constructor
-    default  => sub { time },
-    lazy     => 1,
-);
-```
-
-Note that `field`, like `param`, defaults to read-only, `is => 'ro'`.
-You can override this:
-
-```perl
-field some_data => ( is => 'rw', isa => NonEmptyStr );
-```
-
-Otherwise, it behaves like `has`. You can pass in any arguments that `has`
-accepts.
-
-**WARNING**: if you pass `field` an `init_arg` with a defined value, The code
-will `croak`. A `field` is just for instance data the class uses. It's not
-to be passed to the constructor. If you want that, just use `param`.
-
-Later, we'll add proper exceptions.
-
-### Lazy Fields
-
-Every `field` is lazy by default. This is because there's no guarantee the code will call
-them, but this makes it very easy for a `field` to rely on a `param` value being present.
-
-Every `param` is not lazy by default, but you can add `lazy => 1` if you need to.
+See [MooseX::Extended::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AConstruction) for a full explanation.
 
 # ATTRIBUTE SHORTCUTS
 
@@ -295,169 +171,7 @@ sub _build_name ($self) {
 }
 ```
 
-These can also be used when you pass an array reference to the function:
-
-```perl
-package Point {
-    use MooseX::Extreme;
-    use MooseX::Extreme::Types qw(Int);
-
-    param [ 'x', 'y' ] => (
-        isa     => Int,
-        clearer => 1,     # clear_x and clear_y available
-        default => 0,
-    ) :;
-}
-```
-
-Note that these are _shortcuts_ and they make attributes easier to write and more consistent.
-However, you can still use full names:
-
-```perl
-field authz_delegate => (
-    builder => '_build_my_darned_authz_delegate',
-);
-```
-
-## `writer`
-
-If an attribute has `writer` is set to `1` (the number one), a method
-named `set_$attribute_name` is created.
-
-This:
-
-```perl
-param title => (
-    isa       => Undef | NonEmptyStr,
-    default   => undef,
-    writer => 1,
-);
-```
-
-Is the same as this:
-
-```perl
-has title => (
-    is      => 'rw',                  # we change this from 'ro'
-    isa     => Undef | NonEmptyStr,
-    default => undef,
-    writer  => 'set_title',
-);
-```
-
-## `reader`
-
-By default, the reader (accessor) for the attribute is the same as the name.
-You can always change this:
-
-```perl
-has payload => ( is => 'ro', reader => 'the_payload' );
-```
-
-However, if you want to change the reader name
-
-If an attribute has `reader` is set to `1` (the number one), a method
-named `get_$attribute_name` is created.
-
-This:
-
-```perl
-param title => (
-    isa       => Undef | NonEmptyStr,
-    default   => undef,
-    reader => 1,
-);
-```
-
-Is the same as this:
-
-```perl
-has title => (
-    is      => 'rw',                  # we change this from 'ro'
-    isa     => Undef | NonEmptyStr,
-    default => undef,
-    reader  => 'get_title',
-);
-```
-
-## `predicate`
-
-If an attribute has `predicate` is set to `1` (the number one), a method
-named `has_$attribute_name` is created.
-
-This:
-
-```perl
-param title => (
-    isa       => Undef | NonEmptyStr,
-    default   => undef,
-    predicate => 1,
-);
-```
-
-Is the same as this:
-
-```perl
-has title => (
-    is        => 'ro',
-    isa       => Undef | NonEmptyStr,
-    default   => undef,
-    predicate => 'has_title',
-);
-```
-
-## `clearer`
-
-If an attribute has `clearer` is set to `1` (the number one), a method
-named `clear_$attribute_name` is created.
-
-This:
-
-```perl
-param title => (
-    isa     => Undef | NonEmptyStr,
-    default => undef,
-    clearer => 1,
-);
-```
-
-Is the same as this:
-
-```perl
-has title => (
-    is      => 'ro',
-    isa     => Undef | NonEmptyStr,
-    default => undef,
-    clearer => 'clear_title',
-);
-```
-
-## `builder`
-
-If an attribute has `builder` is set to `1` (the number one), a method
-named `_build_$attribute_name`.
-
-This:
-
-```perl
-param title => (
-    isa     =>  NonEmptyStr,
-    builder => 1,
-);
-```
-
-Is the same as this:
-
-```perl
-has title => (
-    is      => 'ro',
-    isa     => NonEmptyStr,
-    builder => '_build_title',
-);
-```
-
-Obviously, a "private" attribute, such as `_auth_token` would get a build named
-`_build__auth_token` (note the two underscores between "build" and "auth\_token").
+See [MooseX::Extended::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AShortcuts) for a full explanation.
 
 # INVALID ATTRIBUTE NAMES
 
@@ -476,21 +190,57 @@ my $object = Some::Class->new( name => 'WhoAmI' );
 say $object->name;
 ```
 
-`MooseX::Extreme` will throw a `Moose::Exception::InvalidAttributeDefinition` exception
+`MooseX::Extended` will throw a `Moose::Exception::InvalidAttributeDefinition` exception
 if it encounters an illegal method name for an attribute.
 
 This also applies to various attributes which allow method names, such as
 `clone`, `builder`, `clearer`, `writer`, `reader`, and `predicate`.
 
+# DEBUGGER SUPPORT
+
+When running [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) under the debugger, there are some
+behavioral differences you should be aware of.
+
+- Your classes won't be immutable
+
+    Ordinarily, we call `__PACKAGE__->meta->make_immutable` for you. This
+    relies on [B::Hooks::AtRuntime](https://metacpan.org/pod/B%3A%3AHooks%3A%3AAtRuntime)'s `after_runtime` function. However, that
+    runs too late under the debugger and dies. Thus, we disable this feature under
+    the debugger. Your classes may run a bit slower, but hey, it's the debugger!
+
+- No `namespace::autoclean`
+
+    It's very frustratting when running under the debugger and doing this:
+
+    ```perl
+    DB<4>
+          13==>       my $total = sum(3,4,5);
+          DB<4>
+          Undefined subroutine &main::sum called at (eval 423) ...
+    ```
+
+    You can _see_ the function defined there, so we can't you call it? Quite
+    often, that's because [namespace::autoclean](https://metacpan.org/pod/namespace%3A%3Aautoclean) or [namespace::clean](https://metacpan.org/pod/namespace%3A%3Aclean) has been
+    used, removing the symbol from the namespace, even though the subroutines are
+    already bound in the code. Thus, if you're running under the debugger, we
+    disable `namespace::autoclean` to make the code easier to debug.
+
+# MANUAL
+
+- [MooseX::Extended::Manual::Overview](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AOverview)
+- [MooseX::Extended::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AConstruction)
+- [MooseX::Extended::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AShortcuts)
+- [MooseX::Extended::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3ACloning)
+
 # RELATED MODULES
 
-- [MooseX::Extreme::Types](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ATypes) is included in the distribution.
+- [MooseX::Extended::Types](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3ATypes) is included in the distribution.
 
     This provides core types for you.
 
-- [MooseX::Extreme::Role](https://metacpan.org/pod/MooseX%3A%3AExtreme%3A%3ARole) is included in the distribution.
+- [MooseX::Extended::Role](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3ARole) is included in the distribution.
 
-    `MooseX::Extreme`, but for roles.
+    `MooseX::Extended`, but for roles.
 
 # TODO
 
@@ -503,20 +253,20 @@ Tests! Many more tests! Volunteers welcome :)
 
 ## Configurable Types
 
-We provide `MooseX::Extreme::Types` for convenience. It would be even more
+We provide `MooseX::Extended::Types` for convenience. It would be even more
 convenient if we offered an easier for people to build something like
-`MooseX::Extreme::Types::Mine` so they can customize it.
+`MooseX::Extended::Types::Mine` so they can customize it.
 
 ## Configurability
 
-Not everyone wants everything. In particular, using `MooseX::Extreme` with
+Not everyone wants everything. In particular, using `MooseX::Extended` with
 [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass) will be fatal because the latter allows unknown arguments to
 constructors.  Or someone might want their "own" extreme Moose, requiring
 `v5.36.0` or not using the C3 mro. What's the best way to allow this?
 
 ## `BEGIN::Lift`
 
-This idea maybe belongs in `MooseX::Extremely::Extreme`, but ...
+This idea maybe belongs in `MooseX::Extended::OverKill`, but ...
 
 Quite often you see things like this:
 
@@ -548,6 +298,10 @@ We do not need `__PACKAGE__->meta->make_immutable` because we use
 [B::Hooks::AtRuntime](https://metacpan.org/pod/B%3A%3AHooks%3A%3AAtRuntime)'s `after_runtime` function to set it.
 
 We do not need a true value at the end of a module because we use [true](https://metacpan.org/pod/true).
+
+This module was originally released on github as `MooseX::Extreme`, but
+enough people pointed out that it was not extreme at all. That's why the
+repository is [https://github.com/Ovid/moosex-extreme/](https://github.com/Ovid/moosex-extreme/).
 
 # SEE ALSO
 
