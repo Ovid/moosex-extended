@@ -161,98 +161,39 @@ See the L<MooseX::SafeDefaults::Manual::Cloning>> documentation.
 
 =head1 OBJECT CONSTRUCTION
 
-The normal C<new>, C<BUILD>, and C<BUILDARGS> functions work as expected.
-However, we apply L<MooseX::StrictConstructor> to avoid this problem:
+Objection construction for L<MooseX::SafeDefaults> is like Moose, so no
+changes are needed.  However, in addition to C<has>, we also provide C<param>
+and C<field> attributes, both of which are C<< is => 'ro >> by default.
 
-    my $soldier = Soldier->new(
-        name   => $name,
-        rank   => $rank,
-        seriel => $serial, # should be serial
-    );
+The C<param> is I<required>, whether by passing it to the constructor, or using
+C<default> or C<builder>.
 
-By default, misspelled arguments to the L<Moose> constructor are silently discarded,
-leading to hard-to-diagnose bugs. With L<MooseX::SafeDefaults>, they're a fatal error.
+The C<field> is I<forbidden> in the constructor and lazy by default.
 
-If you need to pass arbitrary "sideband" data, explicitly declare it as such:
+Here's a short example:
 
-    param sideband => ( isa => HashRef, default => sub { {} } );
+    package Silly::Name {
+        use MooseX::SafeDefaults;
+        use MooseX::SafeDefaults::Types qw(compile Num NonEmptyStr Str);
 
-Naturally, because we bundle C<MooseX::SafeDefaults::Types>, you can do much
-finer-grained data validation on that, if needed.
+        # these default to 'ro' (but you can override that) and are required
+        param _name => ( isa => NonEmptyStr, init_arg => 'name' );
+        param title => ( isa => Str,         required => 0 );
 
-=head1 FUNCTIONS
+        # fields must never be passed to the constructor
+        # note that ->title and ->name are guaranteed to be set before
+        # this because fields are lazy by default
+        field name => (
+            isa     => NonEmptyStr,
+            default => sub ($self) {
+                my $title = $self->title;
+                my $name  = $self->_name;
+                return $title ? "$title $name" : $name;
+            },
+        );
+    }
 
-The following two functions are exported into your namespace.
-
-=head2 C<param>
-
-    param name => ( isa => NonEmptyStr );
-
-A similar function to Moose's C<has>. A C<param> is required. You may pass it
-to the constructor, or use a C<default> or C<builder> to supply this value.
-
-The above C<param> definition is equivalent to:
-
-    has name => (
-        is       => 'ro',
-        isa      => NonEmptyStr,
-        required => 1,
-    );
-
-If you want a parameter that has no C<default> or C<builder> and can
-I<optionally> be passed to the constructor, just use C<< required => 0 >>.
-
-    param title => ( isa => Str, required => 0 );
-
-Note that C<param>, like C<field>, defaults to read-only, C<< is => 'ro' >>.
-You can override this:
-
-    param name => ( is => 'rw', isa => NonEmptyStr );
-
-Otherwise, it behaves like C<has>. You can pass in any arguments that C<has>
-accepts.
-
-    # we'll make it private, but allow it to be passed to the constructor
-    # as `name`
-    param _name   => ( isa => NonEmptyStr, init_arg => 'name' );
-
-=head2 C<field>
-
-    field created => ( isa => PositiveInt, default => sub { time } );
-
-A similar function to Moose's C<has>. A C<field> is never allowed to be passed
-to the constructor, but you can still use C<default> or C<builder>, as normal.
-
-The above C<field> definition is equivalent to:
-
-    has created => (
-        is       => 'ro',
-        isa      => PositiveInt,
-        init_arg => undef,        # not allowed in the constructor
-        default  => sub { time },
-        lazy     => 1,
-    );
-
-Note that C<field>, like C<param>, defaults to read-only, C<< is => 'ro' >>.
-You can override this:
-
-    field some_data => ( is => 'rw', isa => NonEmptyStr );
-
-Otherwise, it behaves like C<has>. You can pass in any arguments that C<has>
-accepts.
-
-B<WARNING>: if you pass C<field> an C<init_arg> with a defined value, The code
-will C<croak>. A C<field> is just for instance data the class uses. It's not
-to be passed to the constructor. If you want that, just use C<param>.
-
-Later, we'll add proper exceptions.
-
-=head3 Lazy Fields
-
-Every C<field> is lazy by default. This is because there's no guarantee the code will call
-them, but this makes it very easy for a C<field> to rely on a C<param> value being present.
-
-Every C<param> is not lazy by default, but you can add C<< lazy => 1 >> if you need to.
+See L<MooseX::SafeDefaults::Manual::Construction> for a full explanation.
 
 =head1 ATTRIBUTE SHORTCUTS
 
@@ -293,6 +234,51 @@ if it encounters an illegal method name for an attribute.
 
 This also applies to various attributes which allow method names, such as
 C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
+
+=head1 DEBUGGER SUPPORT
+
+When running L<MooseX::SafeDefaults> under the debugger, there are some
+behavioral differences you should be aware of.
+
+=over 4
+
+=item * Your classes won't be immutable
+
+Ordinarily, we call C<< __PACKAGE__->meta->make_immutable >> for you. This
+relies on L<B::Hooks::AtRuntime>'s C<after_runtime> function. However, that
+runs too late under the debugger and dies. Thus, we disable this feature under
+the debugger. Your classes may run a bit slower, but hey, it's the debugger!
+
+=item * No C<namespace::autoclean>
+
+It's very frustratting when running under the debugger and doing this:
+
+  DB<4>
+	13==>       my $total = sum(3,4,5);
+	DB<4>
+	Undefined subroutine &main::sum called at (eval 423) ...
+
+You can I<see> the function defined there, so we can't you call it? Quite
+often, that's because L<namespace::autoclean> or L<namespace::clean> has been
+used, removing the symbol from the namespace, even though the subroutines are
+already bound in the code. Thus, if you're running under the debugger, we
+disable C<namespace::autoclean> to make the code easier to debug.
+
+=back
+
+=head1 MANUAL
+
+=over 4
+
+=item * L<MooseX::SafeDefaults::Manual::Overview>
+
+=item * L<MooseX::SafeDefaults::Manual::Construction>
+
+=item * L<MooseX::SafeDefaults::Manual::Shortcuts>
+
+=item * L<MooseX::SafeDefaults::Manual::Cloning>
+
+=back
 
 =head1 RELATED MODULES
 

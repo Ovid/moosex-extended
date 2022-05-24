@@ -116,118 +116,41 @@ See the [MooseX::SafeDefaults::Manual::Cloning](https://metacpan.org/pod/MooseX%
 
 # OBJECT CONSTRUCTION
 
-The normal `new`, `BUILD`, and `BUILDARGS` functions work as expected.
-However, we apply [MooseX::StrictConstructor](https://metacpan.org/pod/MooseX%3A%3AStrictConstructor) to avoid this problem:
+Objection construction for [MooseX::SafeDefaults](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults) is like Moose, so no
+changes are needed.  However, in addition to `has`, we also provide `param`
+and `field` attributes, both of which are `is => 'ro` by default.
+
+The `param` is _required_, whether by passing it to the constructor, or using
+`default` or `builder`.
+
+The `field` is _forbidden_ in the constructor and lazy by default.
+
+Here's a short example:
 
 ```perl
-my $soldier = Soldier->new(
-    name   => $name,
-    rank   => $rank,
-    seriel => $serial, # should be serial
-);
+package Silly::Name {
+    use MooseX::SafeDefaults;
+    use MooseX::SafeDefaults::Types qw(compile Num NonEmptyStr Str);
+
+    # these default to 'ro' (but you can override that) and are required
+    param _name => ( isa => NonEmptyStr, init_arg => 'name' );
+    param title => ( isa => Str,         required => 0 );
+
+    # fields must never be passed to the constructor
+    # note that ->title and ->name are guaranteed to be set before
+    # this because fields are lazy by default
+    field name => (
+        isa     => NonEmptyStr,
+        default => sub ($self) {
+            my $title = $self->title;
+            my $name  = $self->_name;
+            return $title ? "$title $name" : $name;
+        },
+    );
+}
 ```
 
-By default, misspelled arguments to the [Moose](https://metacpan.org/pod/Moose) constructor are silently discarded,
-leading to hard-to-diagnose bugs. With [MooseX::SafeDefaults](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults), they're a fatal error.
-
-If you need to pass arbitrary "sideband" data, explicitly declare it as such:
-
-```perl
-param sideband => ( isa => HashRef, default => sub { {} } );
-```
-
-Naturally, because we bundle `MooseX::SafeDefaults::Types`, you can do much
-finer-grained data validation on that, if needed.
-
-# FUNCTIONS
-
-The following two functions are exported into your namespace.
-
-## `param`
-
-```perl
-param name => ( isa => NonEmptyStr );
-```
-
-A similar function to Moose's `has`. A `param` is required. You may pass it
-to the constructor, or use a `default` or `builder` to supply this value.
-
-The above `param` definition is equivalent to:
-
-```perl
-has name => (
-    is       => 'ro',
-    isa      => NonEmptyStr,
-    required => 1,
-);
-```
-
-If you want a parameter that has no `default` or `builder` and can
-_optionally_ be passed to the constructor, just use `required => 0`.
-
-```perl
-param title => ( isa => Str, required => 0 );
-```
-
-Note that `param`, like `field`, defaults to read-only, `is => 'ro'`.
-You can override this:
-
-```perl
-param name => ( is => 'rw', isa => NonEmptyStr );
-```
-
-Otherwise, it behaves like `has`. You can pass in any arguments that `has`
-accepts.
-
-```perl
-# we'll make it private, but allow it to be passed to the constructor
-# as `name`
-param _name   => ( isa => NonEmptyStr, init_arg => 'name' );
-```
-
-## `field`
-
-```perl
-field created => ( isa => PositiveInt, default => sub { time } );
-```
-
-A similar function to Moose's `has`. A `field` is never allowed to be passed
-to the constructor, but you can still use `default` or `builder`, as normal.
-
-The above `field` definition is equivalent to:
-
-```perl
-has created => (
-    is       => 'ro',
-    isa      => PositiveInt,
-    init_arg => undef,        # not allowed in the constructor
-    default  => sub { time },
-    lazy     => 1,
-);
-```
-
-Note that `field`, like `param`, defaults to read-only, `is => 'ro'`.
-You can override this:
-
-```perl
-field some_data => ( is => 'rw', isa => NonEmptyStr );
-```
-
-Otherwise, it behaves like `has`. You can pass in any arguments that `has`
-accepts.
-
-**WARNING**: if you pass `field` an `init_arg` with a defined value, The code
-will `croak`. A `field` is just for instance data the class uses. It's not
-to be passed to the constructor. If you want that, just use `param`.
-
-Later, we'll add proper exceptions.
-
-### Lazy Fields
-
-Every `field` is lazy by default. This is because there's no guarantee the code will call
-them, but this makes it very easy for a `field` to rely on a `param` value being present.
-
-Every `param` is not lazy by default, but you can add `lazy => 1` if you need to.
+See [MooseX::SafeDefaults::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AConstruction) for a full explanation.
 
 # ATTRIBUTE SHORTCUTS
 
@@ -272,6 +195,42 @@ if it encounters an illegal method name for an attribute.
 
 This also applies to various attributes which allow method names, such as
 `clone`, `builder`, `clearer`, `writer`, `reader`, and `predicate`.
+
+# DEBUGGER SUPPORT
+
+When running [MooseX::SafeDefaults](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults) under the debugger, there are some
+behavioral differences you should be aware of.
+
+- Your classes won't be immutable
+
+    Ordinarily, we call `__PACKAGE__->meta->make_immutable` for you. This
+    relies on [B::Hooks::AtRuntime](https://metacpan.org/pod/B%3A%3AHooks%3A%3AAtRuntime)'s `after_runtime` function. However, that
+    runs too late under the debugger and dies. Thus, we disable this feature under
+    the debugger. Your classes may run a bit slower, but hey, it's the debugger!
+
+- No `namespace::autoclean`
+
+    It's very frustratting when running under the debugger and doing this:
+
+    ```perl
+    DB<4>
+          13==>       my $total = sum(3,4,5);
+          DB<4>
+          Undefined subroutine &main::sum called at (eval 423) ...
+    ```
+
+    You can _see_ the function defined there, so we can't you call it? Quite
+    often, that's because [namespace::autoclean](https://metacpan.org/pod/namespace%3A%3Aautoclean) or [namespace::clean](https://metacpan.org/pod/namespace%3A%3Aclean) has been
+    used, removing the symbol from the namespace, even though the subroutines are
+    already bound in the code. Thus, if you're running under the debugger, we
+    disable `namespace::autoclean` to make the code easier to debug.
+
+# MANUAL
+
+- [MooseX::SafeDefaults::Manual::Overview](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AOverview)
+- [MooseX::SafeDefaults::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AConstruction)
+- [MooseX::SafeDefaults::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3AShortcuts)
+- [MooseX::SafeDefaults::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3ASafeDefaults%3A%3AManual%3A%3ACloning)
 
 # RELATED MODULES
 

@@ -1,5 +1,5 @@
-# PODNAME: MooseX::SafeDefaults Tutorial
-# ABSTRACT: Work-in-progress tutorial for MooseX::SafeDefaults
+# PODNAME: MooseX::SafeDefaults Overview
+# ABSTRACT: Work-in-progress overview for MooseX::SafeDefaults
 
 =head1 CONVERTING FROM MOOSE
 
