@@ -18,7 +18,15 @@ use Carp 'croak';
 
 our $VERSION = '0.03';
 
-our @EXPORT_OK = qw(field param);
+our @EXPORT_OK = qw(
+  field
+  param
+  _enabled_features
+  _disabled_warnings
+);
+
+sub _enabled_features  {qw/signatures postderef postderef_qq :5.20/}             # internal use only
+sub _disabled_warnings {qw/experimental::signatures experimental::postderef/}    # internal use only
 
 sub param ( $meta, $name, %opt_for ) {
     $opt_for{is}       //= 'ro';

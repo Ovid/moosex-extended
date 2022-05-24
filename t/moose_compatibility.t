@@ -8,15 +8,20 @@ use Test::Most;
 package My::Point::Moose {
     use v5.20.0;
     use Moose;
-    use MooseX::Extended::Types qw(Num);
+    use MooseX::Extended::Types qw(Num HashRef);
     use MooseX::StrictConstructor;
-    use feature qw( signatures postderef );
+    use feature qw( signatures postderef postderef_qq );
     no warnings qw( experimental::signatures experimental::postderef );
     use namespace::autoclean;
     use mro 'c3';
 
     has [ 'x', 'y' ] => ( is => 'ro', isa => Num );
+    has session => ( is => 'ro', isa => HashRef, init_arg => undef, default => sub { { session => 1234 } } );
 
+    sub session_id ($self) {
+        my $session = $self->session;
+        return "$session->@{session}";
+    }
     __PACKAGE__->meta->make_immutable;
 }
 
@@ -25,7 +30,7 @@ package My::Point::Mutable::Moose {
     use Moose;
     extends 'My::Point::Moose';
     use MooseX::StrictConstructor;
-    use feature qw( signatures postderef );
+    use feature qw( signatures postderef postderef_qq );
     no warnings qw( experimental::signatures experimental::postderef );
     use namespace::autoclean;
     use mro 'c3';
@@ -44,9 +49,15 @@ package My::Point::Mutable::Moose {
 
 package My::Point {
     use MooseX::Extended;
-    use MooseX::Extended::Types qw(Num);
+    use MooseX::Extended::Types qw(Num HashRef);
 
     param [ 'x', 'y' ] => ( isa => Num );
+    field session => ( isa => HashRef, init_arg => undef, default => sub { { session => 1234 } } );
+
+    sub session_id ($self) {
+        my $session = $self->session;
+        return "$session->@{session}";
+    }
 }
 
 package My::Point::Mutable {
@@ -66,8 +77,9 @@ foreach my $class (qw/My::Point::Moose My::Point/) {
     subtest "moose and moosex should behave the same" => sub {
         subtest 'Read-only' => sub {
             my $point = $class->new( x => 7, y => 7.3 );
-            is $point->x, 7,   'x should be correct';
-            is $point->y, 7.3, 'y should be correct';
+            is $point->x,          7,    'x should be correct';
+            is $point->y,          7.3,  'y should be correct';
+            is $point->session_id, 1234, "postderef_qq should work";
 
             throws_ok { $point->x(3) }
             'Moose::Exception::CannotAssignValueToReadOnlyAccessor',
