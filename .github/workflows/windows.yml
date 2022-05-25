@@ -1,0 +1,45 @@
+# https://stackoverflow.com/questions/72367353/testing-perl-on-windows-with-github-actions
+name: windows
+
+on:
+  #push:
+  #  branches:
+  #    - '*'
+  #  tags-ignore:
+  #    - '*'
+  pull_request:
+jobs:
+  perl:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        perl-version:
+          - '5.20'
+          - '5.22'
+          - '5.24'
+          - '5.26'
+          - '5.28'
+          - '5.30'
+          - '5.32'
+            # - '5.34'
+            # - 'latest'
+    steps:
+      - name: Setup perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl-version }}
+          distribution: strawberry
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - uses: actions/checkout@v2
+      - name: perl -V
+        run: perl -V
+      - name: Ensure we have a working toolchain
+        run: cpanm ExtUtils::Manifest App::cpanminus
+      - name: Install Dependencies
+        run: cpanm -n --installdeps .
+      - name: Run Tests
+        run: cpanm --test-only -v .
