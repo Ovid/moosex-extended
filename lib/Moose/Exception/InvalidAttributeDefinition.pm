@@ -21,6 +21,6 @@ __END__
 
 =head1 WHY NOT MOOSEX?
 
-This is not called C<MooseX::Exception::InvalidAttributeDefinition?  because
+This is not called C<MooseX::Exception::InvalidAttributeDefinition> because
 L<Moose::Util>'s C<throw_exception> function assumes that all exceptions begin
-with C<Moose::Exception>.
+with C<Moose::Exception::>.
