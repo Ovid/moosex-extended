@@ -55,11 +55,9 @@ my %WriteMakefileArgs = (
     "Scalar::Util" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
-    "Test::Perl::Critic" => 0,
-    "Test::PerlTidy" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -90,8 +88,6 @@ my %FallbackPrereqs = (
   "Storable" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
-  "Test::Perl::Critic" => 0,
-  "Test::PerlTidy" => 0,
   "Type::Library" => 0,
   "Type::Params" => 0,
   "Type::Utils" => 0,
