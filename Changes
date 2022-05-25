@@ -1,8 +1,12 @@
 Revision history for MooseX-Extended
 
 {{$NEXT}}
+          - Moved critic and tidy tests to xt/author to prevent false
+            negatives on CPAN testers
+          - Use github actions to have proper CI for linux and windows
 
 0.03      2022-05-24 18:28:10 CEST
+          - Don't disable namespace::autoclean while using debugger
 
 0.02      2022-05-24 10:06:47 CEST
 
