@@ -5,5 +5,5 @@ use Test::PerlTidy 'run_tests';
 
 run_tests(
     path       => 'lib',
-    perltidyrc => 't/perltidyrc',
+    perltidyrc => 'xt/perltidyrc',
 );
