@@ -1,5 +1,4 @@
-# Hacked from https://github.com/skaji/perl-github-actions-sample/blob/master/.github/workflows/windows.yml
-# See also: https://perlmaven.com/github-actions-running-on-3-operating-systems
+# https://stackoverflow.com/questions/72367353/testing-perl-on-windows-with-github-actions
 name: windows
 
 on:
@@ -9,33 +8,39 @@ on:
     tags-ignore:
       - '*'
   pull_request:
-
 jobs:
   perl:
     runs-on: windows-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         perl-version:
-          - '5.20'
-          - '5.22'
-          - '5.24'
-          - '5.26'
-          - '5.28'
           - '5.30'
-          - '5.32'
-          - '5.34'
-          - 'latest'
+          # - '5.28'
+          # - '5.26'
+          # - '5.24'
+          # - '5.22'
+          # - '5.20'
+          # - '5.18'
+          # - '5.16'
+          - '5.20'
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Perl
+      - name: Setup perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl-version }}
+          distribution: strawberry
+      - name: Set git to use LF
         run: |
-          choco install strawberryperl
-          echo "C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin" >> $GITHUB_PATH
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - uses: actions/checkout@v2
       - name: perl -V
         run: perl -V
+      - name: Ensure we have a working toolchain
+        run: cpanm ExtUtils::Manifest App::cpanminus
       - name: Install Dependencies
-        run: curl -sL https://git.io/cpm | perl - install -g --show-build-log-on-failure Dist::Zilla
+        run: cpanm -n --installdeps .
       - name: Run Tests
         run: |
           dzil authordeps --missing | cpanm --notest
