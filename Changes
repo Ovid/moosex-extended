@@ -1,6 +1,8 @@
 Revision history for MooseX-Extended
 
 {{$NEXT}}
+
+0.04      2022-05-25 10:41:10 CEST
           - Moved critic and tidy tests to xt/author to prevent false
             negatives on CPAN testers
           - Use github actions to have proper CI for linux and windows
