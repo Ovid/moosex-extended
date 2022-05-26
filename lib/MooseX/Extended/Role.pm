@@ -20,7 +20,7 @@ use true;
 use feature _enabled_features();
 no warnings _disabled_warnings();
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 Moose::Exporter->setup_import_methods(
     with_meta => [ 'field', 'param' ],
