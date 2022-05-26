@@ -10,8 +10,7 @@ use DateTime;
 my $clone_end_date_called = 0;
 
 package My::Class {
-    use MooseX::Extended;
-    use MooseX::Extended::Types qw(NonEmptyStr HashRef InstanceOf);
+    use MooseX::Extended types => [qw(NonEmptyStr HashRef InstanceOf)];
 
     param name => ( isa => NonEmptyStr );
     param payload => (
@@ -27,8 +26,8 @@ package My::Class {
         },
     );
     param end_date => (
-        isa    => InstanceOf ['DateTime'],
-        clone  => '_clone_end_date',
+        isa   => InstanceOf ['DateTime'],
+        clone => '_clone_end_date',
     );
 
     sub _clone_end_date ( $self, $name, $value ) {

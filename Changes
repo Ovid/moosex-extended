@@ -2,6 +2,9 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Make it very easy to exclude features and include types.
+
+
 0.05      2022-05-26 10:24:35 CEST
 
           - Assert a minimum version of various Type:: modules due to CPAN

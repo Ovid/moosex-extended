@@ -8,7 +8,7 @@ use Test::Most;
 package My::Point::Moose {
     use v5.20.0;
     use Moose;
-    use MooseX::Extended::Types qw(Num HashRef);
+    use Types::Standard qw(Num HashRef);
     use MooseX::StrictConstructor;
     use feature qw( signatures postderef postderef_qq );
     no warnings qw( experimental::signatures experimental::postderef );
@@ -48,8 +48,7 @@ package My::Point::Mutable::Moose {
 }
 
 package My::Point {
-    use MooseX::Extended;
-    use MooseX::Extended::Types qw(Num HashRef);
+    use MooseX::Extended types => [qw/Num HashRef/];
 
     param [ 'x', 'y' ] => ( isa => Num );
     field session => ( isa => HashRef, init_arg => undef, default => sub { { session => 1234 } } );
