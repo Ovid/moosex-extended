@@ -4,24 +4,22 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
-version 0.05
+version 0.06
 
 # SYNOPSIS
 
 ```perl
 package My::Names {
-    use MooseX::Extended;
-    use MooseX::Extended::Types
-      qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
+    use MooseX::Extended types => [qw(compile Num NonEmptyStr Str PositiveInt ArrayRef)];
     use List::Util 'sum';
 
     # the distinction between `param` and `field` makes it easier to
     # see which are available to `new`
-    param _name   => ( isa => NonEmptyStr, init_arg => 'name' );
-    param title   => ( isa => Str,         required => 0 );
+    param _name => ( isa => NonEmptyStr, init_arg => 'name' );
+    param title => ( isa => Str,         required => 0 );
 
     # forbidden in the constructor
-    field created => ( isa => PositiveInt, default  => sub { time } );
+    field created => ( isa => PositiveInt, default => sub {time} );
 
     sub name ($self) {
         my $title = $self->title;
@@ -30,7 +28,7 @@ package My::Names {
     }
 
     sub add ( $self, $args ) {
-        state $check = compile( ArrayRef [Num, 1] ); # at least one number
+        state $check = compile( ArrayRef [ Num, 1 ] );    # at least one number
         ($args) = $check->($args);
         return sum( $args->@* );
     }
@@ -90,6 +88,87 @@ allowed to be passed to the constructor.
 
 Note that the `has` function is still available, even if it's not needed.
 
+# CONFIGURATION
+
+You may pass an import list to [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended).
+
+```perl
+use MooseX::Extended
+  excludes => [qw/StrictConstructor carp/],      # I don't want these features
+  types    => [qw/compile PositiveInt HashRef/]; # I want these type tools
+```
+
+## `types`
+
+ALlows you to import any types provided by [MooseX::Extended::Types](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3ATypes).
+
+This:
+
+```perl
+use MooseX::Extended::Role types => [qw/compile PositiveInt HashRef/];
+```
+
+Is identical to this:
+
+```perl
+use MooseX::Extended::Role;
+use MooseX::Extended::Types qw( compile PositiveInt HashRef );
+```
+
+## `excludes`
+
+You may find some features to be annoying, or even cause potential bugs (e.g.,
+if you have a \`croak\` method, our importing of `Carp::croak` will be a
+problem. You can exclude the following:
+
+- `StrictConstructor`
+
+    ```perl
+    use MooseX::Extended::Role excludes => ['StrictConstructor'];
+    ```
+
+    Excluding this will no longer import `MooseX::StrictConstructor`.
+
+- `autoclean`
+
+    ```perl
+    use MooseX::Extended::Role excludes => ['autoclean'];
+    ```
+
+    Excluding this will no longer import `namespace::autoclean`.
+
+- `c3`
+
+    ```perl
+    use MooseX::Extended::Role excludes => ['c3'];
+    ```
+
+    Excluding this will no longer apply the C3 mro.
+
+- `carp`
+
+    ```perl
+    use MooseX::Extended::Role excludes => ['carp'];
+    ```
+
+    Excluding this will no longer import `Carp::croak` and `Carp::carp`.
+
+- `immutable`
+
+    ```perl
+    use MooseX::Extended::Role excludes => ['immutable'];
+    ```
+
+    Excluding this will no longer make your class immutable.
+
+- `true`
+
+    ```perl
+    use MooseX::Extended::Role excludes => ['carp'];
+    ```
+
+    Excluding this will require your module to end in a true value.
+
 # IMMUTABILITY
 
 ## Making Your Class Immutable
@@ -128,9 +207,8 @@ The `field` is _forbidden_ in the constructor and lazy by default.
 Here's a short example:
 
 ```perl
-package Silly::Name {
-    use MooseX::Extended;
-    use MooseX::Extended::Types qw(compile Num NonEmptyStr Str);
+package Class::Name {
+    use MooseX::Extended types => [qw(compile Num NonEmptyStr Str)];
 
     # these default to 'ro' (but you can override that) and are required
     param _name => ( isa => NonEmptyStr, init_arg => 'name' );

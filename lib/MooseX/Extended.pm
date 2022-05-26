@@ -6,6 +6,7 @@ use 5.20.0;
 use warnings;
 
 use Moose::Exporter;
+use MooseX::Extended::Types ':all';
 use Moose                     ();
 use MooseX::StrictConstructor ();
 use mro                       ();
@@ -13,6 +14,7 @@ use namespace::autoclean      ();
 use MooseX::Extended::Core qw(
   field
   param
+  _debug
   _enabled_features
   _disabled_warnings
 );
@@ -25,22 +27,95 @@ use true;
 
 our $VERSION = '0.06';
 
-Moose::Exporter->setup_import_methods(
+my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
     with_meta => [ 'field', 'param' ],
+    install   => [qw/unimport/],
     also      => ['Moose'],
 );
 
+# Should this be in the metaclass? It feels like it should, but
+# the MOP really doesn't support these edge cases.
+my %CONFIG_FOR;
+
+sub import {
+    my ( $class, %args ) = @_;
+    my ( $package, $filename, $line ) = caller;
+    state $check = compile_named(
+        debug    => Optional [Bool],
+        types    => Optional [ ArrayRef [NonEmptyStr] ],
+        excludes => Optional [
+            ArrayRef [
+                Enum [
+                    qw/
+                      StrictConstructor
+                      autoclean
+                      c3
+                      carp
+                      immutable
+                      true
+                      /
+                ]
+            ]
+        ],
+    );
+    eval {
+        $check->(%args);
+        1;
+    } or do {
+
+        # Not sure what's happening, but if we don't use the eval to trap the
+        # error, it gets swallowed and we simply get:
+        #
+        # BEGIN failed--compilation aborted at ...
+        my $error = $@;
+        Carp::carp(<<"END");
+Error:    Invalid import list to MooseX::Extended.
+Package:  $package
+Filename: $filename
+Line:     $line
+Details:  $error
+END
+        die;
+    };
+
+    # remap the arrays to hashes for easy lookup
+    $args{excludes} = { map { $_ => 1 } $args{excludes}->@* };
+
+    $CONFIG_FOR{$package} = \%args;
+    @_ = $class;                       # anything else and $import blows up
+    goto $import;
+}
+
 # Internal method setting up exports. No public
 # documentation by design
-
 sub init_meta ( $class, %params ) {
     my $for_class = $params{for_class};
     Moose->init_meta(%params);
-    MooseX::StrictConstructor->import( { into => $for_class } );
-    Carp->import::into($for_class);
-    feature->import( _enabled_features() );
-    warnings->unimport(_disabled_warnings);
-    namespace::autoclean->import::into($for_class);
+
+    my $config = $CONFIG_FOR{$for_class};
+
+    if ( $config->{debug} ) {
+        $MooseX::Extended::Debug = $config->{debug};
+    }
+    if ( exists $config->{excludes} ) {
+        foreach my $category ( sort keys $config->{excludes}->%* ) {
+            _debug("$for_class exclude '$category'");
+        }
+    }
+
+    if ( my $types = $config->{types} ) {
+        _debug("$for_class: importing types '@$types'");
+        MooseX::Extended::Types->import::into( $for_class, @$types );
+    }
+
+    MooseX::StrictConstructor->import( { into => $for_class } )
+      unless $config->{excludes}{StrictConstructor};
+
+    Carp->import::into($for_class)
+      unless $config->{excludes}{carp};
+
+    namespace::autoclean->import::into($for_class)
+      unless $config->{excludes}{autoclean};
 
     # see perldoc -v '$^P'
     if ($^P) {
@@ -48,33 +123,45 @@ sub init_meta ( $class, %params ) {
     }
     else {
         # after_runtime is loaded too late under the debugger
-        after_runtime { $for_class->meta->make_immutable };
+        after_runtime {
+            $for_class->meta->make_immutable;
+            if ( $config->{debug} ) {
+
+                # they're doing debug on a class-by-class basis, so
+                # turn this off after the class compiles
+                $MooseX::Extended::Debug = 0;
+            }
+        }
+        unless $config->{excludes}{immutable};
     }
-    true->import;    # no need for `1` at the end of the module
+    true->import    # no need for `1` at the end of the module
+      unless $config->{excludes}{true};
 
     # If we never use multiple inheritance, this should not be needed.
-    mro::set_mro( $for_class, 'c3' );
+    mro::set_mro( $for_class, 'c3' )
+      unless $config->{excludes}{c3};
+
+    feature->import( _enabled_features() );
+    warnings->unimport(_disabled_warnings);
 }
 
 1;
 
-__END__
+    __END__
 
 =head1 SYNOPSIS
 
     package My::Names {
-        use MooseX::Extended;
-        use MooseX::Extended::Types
-          qw(compile Num NonEmptyStr Str PositiveInt ArrayRef);
+        use MooseX::Extended types => [qw(compile Num NonEmptyStr Str PositiveInt ArrayRef)];
         use List::Util 'sum';
 
         # the distinction between `param` and `field` makes it easier to
         # see which are available to `new`
-        param _name   => ( isa => NonEmptyStr, init_arg => 'name' );
-        param title   => ( isa => Str,         required => 0 );
+        param _name => ( isa => NonEmptyStr, init_arg => 'name' );
+        param title => ( isa => Str,         required => 0 );
 
         # forbidden in the constructor
-        field created => ( isa => PositiveInt, default  => sub { time } );
+        field created => ( isa => PositiveInt, default => sub {time} );
 
         sub name ($self) {
             my $title = $self->title;
@@ -83,7 +170,7 @@ __END__
         }
 
         sub add ( $self, $args ) {
-            state $check = compile( ArrayRef [Num, 1] ); # at least one number
+            state $check = compile( ArrayRef [ Num, 1 ] );    # at least one number
             ($args) = $check->($args);
             return sum( $args->@* );
         }
@@ -138,6 +225,73 @@ allowed to be passed to the constructor.
 
 Note that the C<has> function is still available, even if it's not needed.
 
+=head1 CONFIGURATION
+
+You may pass an import list to L<MooseX::Extended>.
+
+    use MooseX::Extended
+      excludes => [qw/StrictConstructor carp/],      # I don't want these features
+      types    => [qw/compile PositiveInt HashRef/]; # I want these type tools
+
+=head2 C<types>
+
+ALlows you to import any types provided by L<MooseX::Extended::Types>.
+
+This:
+
+    use MooseX::Extended::Role types => [qw/compile PositiveInt HashRef/];
+
+Is identical to this:
+
+    use MooseX::Extended::Role;
+    use MooseX::Extended::Types qw( compile PositiveInt HashRef );
+
+=head2 C<excludes>
+
+You may find some features to be annoying, or even cause potential bugs (e.g.,
+if you have a `croak` method, our importing of C<Carp::croak> will be a
+problem. You can exclude the following:
+
+=over 4
+
+=item * C<StrictConstructor>
+
+    use MooseX::Extended::Role excludes => ['StrictConstructor'];
+
+Excluding this will no longer import C<MooseX::StrictConstructor>.
+
+=item * C<autoclean>
+
+    use MooseX::Extended::Role excludes => ['autoclean'];
+
+Excluding this will no longer import C<namespace::autoclean>.
+
+=item * C<c3>
+
+    use MooseX::Extended::Role excludes => ['c3'];
+
+Excluding this will no longer apply the C3 mro.
+
+=item * C<carp>
+
+    use MooseX::Extended::Role excludes => ['carp'];
+
+Excluding this will no longer import C<Carp::croak> and C<Carp::carp>.
+
+=item * C<immutable>
+
+    use MooseX::Extended::Role excludes => ['immutable'];
+
+Excluding this will no longer make your class immutable.
+
+=item * C<true>
+
+    use MooseX::Extended::Role excludes => ['carp'];
+
+Excluding this will require your module to end in a true value.
+
+=back
+
 =head1 IMMUTABILITY
 
 =head2 Making Your Class Immutable
@@ -173,9 +327,8 @@ The C<field> is I<forbidden> in the constructor and lazy by default.
 
 Here's a short example:
 
-    package Silly::Name {
-        use MooseX::Extended;
-        use MooseX::Extended::Types qw(compile Num NonEmptyStr Str);
+    package Class::Name {
+        use MooseX::Extended types => [qw(compile Num NonEmptyStr Str)];
 
         # these default to 'ro' (but you can override that) and are required
         param _name => ( isa => NonEmptyStr, init_arg => 'name' );

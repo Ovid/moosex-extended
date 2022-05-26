@@ -4,7 +4,8 @@ use lib 'lib';
 use Test::Most;
 
 package My::Names {
-    use MooseX::Extended types => [qw(compile Num NonEmptyStr Str PositiveInt ArrayRef)];
+    use MooseX::Extended excludes => [qw/ StrictConstructor c3 /],
+      types                       => [qw(compile Num NonEmptyStr Str PositiveInt ArrayRef)];
     use List::Util 'sum';
 
     param _name => ( isa => NonEmptyStr, init_arg => 'name' );
@@ -31,7 +32,15 @@ package My::Names {
 subtest 'miscellaneous features' => sub {
     ok +My::Names->meta->is_immutable,
       'We should be able to define an immutable class';
-    is mro::get_mro('My::Names'), 'c3', "Our class's mro should be c3";
+    isnt mro::get_mro('My::Names'), 'c3', "... but we can exclude the C3 mro if we want";
+
+    ok my $instance = My::Names->new(
+        name              => 'Bob',
+        unknown_attribute => 'foo',
+      ),
+      '... and our class does not use MooseX::StrictConstructor';
+    ok !$instance->can('unknown_attribute'),   '... and those arguments get ignored';
+    ok !exists $instance->{unknown_attribute}, '... and are not stored internally';
 };
 
 subtest 'no title' => sub {
@@ -67,10 +76,6 @@ subtest 'exceptions' => sub {
     throws_ok { $person->add( [] ) }
     'Error::TypeTiny::Assertion',
       'passing an empty array reference should be fatal';
-
-    throws_ok { My::Names->new( name => 'Ovid', created => 1 ) }
-    'Moose::Exception',
-      'Attributes not defined as `param` are illegal in the constructor';
 };
 
 done_testing;

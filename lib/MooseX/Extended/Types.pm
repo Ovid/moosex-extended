@@ -25,6 +25,7 @@ BEGIN {
         'compile_named',    # from Type::Params
         'slurpy',
     );
+    our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 }
 
 1;
@@ -33,7 +34,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    package MooseX::Extended::Types;
+    use MooseX::Extended;
+    use MooseX::Extended::Types;
 
     use MooseX::Extended::Types qw(
       ArrayRef
@@ -45,11 +47,23 @@ __END__
       compile
     );
 
+As a convenience, if you're using L<MooseX::Extended>, you can do this:
+
+    use MooseX::Extended types => [qw(
+      ArrayRef
+      Dict
+      Enum
+      HashRef
+      InstanceOf
+      Str
+      compile
+    )];
+
 =head1 DESCRIPTION
 
-A basic set of useful types for C<MooseX::Extended>. Using these is preferred
-to using using strings due to runtime versus compile-time failures. For
-example:
+A basic set of useful types for C<MooseX::Extended>, as provided by
+L<Type::Tiny>. Using these is preferred to using using strings due to runtime
+versus compile-time failures. For example:
 
     # fails at runtime, if ->name is set
     param name => ( isa => 'StR' );

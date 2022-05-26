@@ -18,8 +18,7 @@ C<< $self, $attribute_name, $value_to_clone >>. Here's a full example, taken
 from our test suite.
 
     package My::Class {
-        use MooseX::Extended;
-        use MooseX::Extended::Types qw(NonEmptyStr HashRef InstanceOf);
+        use MooseX::Extended types => [qw(NonEmptyStr HashRef InstanceOf)];
 
         param name => ( isa => NonEmptyStr );
 
