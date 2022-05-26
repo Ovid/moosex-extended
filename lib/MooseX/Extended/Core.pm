@@ -21,6 +21,7 @@ our $VERSION = '0.06';
 our @EXPORT_OK = qw(
   field
   param
+  _debug
   _enabled_features
   _disabled_warnings
 );
@@ -60,7 +61,7 @@ sub field ( $meta, $name, %opt_for ) {
 }
 
 sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
-    debug("Finalizing options for $name");
+    _debug("Finalizing options for '$attr_type $name'");
 
     unless ( _is_valid_method_name($name) ) {
         throw_exception(
@@ -102,7 +103,7 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
 
     %opt_for = _maybe_add_cloning_method( $meta, $name, %opt_for );
 
-    debug( "Setting $attr_type, '$name'", \%opt_for );
+    _debug( "Setting $attr_type, '$name'", \%opt_for );
     $meta->add_attribute( $name, %opt_for );
 }
 
@@ -135,14 +136,14 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
     }
 
     # here be dragons ...
-    debug("Adding cloning for $name");
+    _debug("Adding cloning for $name");
     my $reader = delete( $opt_for{reader} ) // $name;
     my $writer = delete( $opt_for{writer} ) // $reader;
     my $is     = $opt_for{is};
     $opt_for{is} = 'bare';
 
     my $reader_method = sub ($self) {
-        debug("Calling reader method for $name");
+        _debug("Calling reader method for $name");
         my $attr  = $meta->get_attribute($name);
         my $value = $attr->get_value($self);
         return $value unless ref $value;
@@ -153,7 +154,7 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
     };
 
     my $writer_method = sub ( $self, $new_value ) {
-        debug("Calling writer method for $name");
+        _debug("Calling writer method for $name");
         my $attr = $meta->get_attribute($name);
         $new_value
           = !ref $new_value             ? $new_value
@@ -166,19 +167,19 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
     };
 
     if ( $is eq 'ro' ) {
-        debug("Adding read-only reader for $name");
+        _debug("Adding read-only reader for $name");
         $meta->add_method( $reader => $reader_method );
     }
     elsif ( $reader ne $writer ) {
-        debug("Adding separate readers and writers for $name");
+        _debug("Adding separate readers and writers for $name");
         $meta->add_method( $reader => $reader_method );
         $meta->add_method( $writer => $writer_method );
     }
     else {
-        debug("Adding overloaded reader/writer for $name");
+        _debug("Adding overloaded reader/writer for $name");
         $meta->add_method(
             $reader => sub ( $self, $value = undef ) {
-                debug( "Args for overloaded reader/writer for $name", \@_ );
+                _debug( "Args for overloaded reader/writer for $name", \@_ );
                 return @_ == 1
                   ? $self->$reader_method
                   : $self->$writer_method($value);
@@ -188,15 +189,12 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
     return %opt_for;
 }
 
-sub debug ( $message, $data = undef ) {
-    $MooseX::Extended::Debug = $MooseX::Extended::Debug;    # suppress "once" warnings
+sub _debug ( $message, $data = undef ) {
+    $MooseX::Extended::Debug //= $ENV{MOOSEX_EXTENDED_DEBUG};    # suppress "once" warnings
     return unless $MooseX::Extended::Debug;
-    if ( 2 == @_ ) {                                        # yup, still want multidispatch
-        require Data::Dumper;
-        local $Data::Dumper::Indent   = 1;
-        local $Data::Dumper::Sortkeys = 1;
-        local $Data::Dumper::Terse    = 1;
-        $data    = Data::Dumper::Dumper($data);
+    if ( 2 == @_ ) {                                             # yup, still want multidispatch
+        require Data::Printer;
+        $data    = Data::Printer::np($data);
         $message = "$message: $data";
     }
     say STDERR $message;
