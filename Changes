@@ -2,6 +2,9 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Assert a minimum version of various Type:: modules due to CPAN
+            test failures from old versions released eight years ago!
+
 0.04      2022-05-25 10:41:10 CEST
           - Moved critic and tidy tests to xt/author to prevent false
             negatives on CPAN testers

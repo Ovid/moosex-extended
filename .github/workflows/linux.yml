@@ -1,6 +1,6 @@
 # Thanks, Gabor! https://perlmaven.com/setup-github-actions
 
-name: CI Dzil
+name: linux
  
 on:
     push:
