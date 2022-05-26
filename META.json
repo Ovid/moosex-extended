@@ -45,7 +45,7 @@
          "requires" : {
             "B::Hooks::AtRuntime" : "0",
             "Carp" : "0",
-            "Data::Dumper" : "0",
+            "Data::Printer" : "0",
             "Exporter" : "0",
             "Import::Into" : "0",
             "Moose" : "0",
@@ -94,23 +94,23 @@
    "provides" : {
       "Moose::Exception::InvalidAttributeDefinition" : {
          "file" : "lib/Moose/Exception/InvalidAttributeDefinition.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "MooseX::Extended" : {
          "file" : "lib/MooseX/Extended.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "MooseX::Extended::Core" : {
          "file" : "lib/MooseX/Extended/Core.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "MooseX::Extended::Role" : {
          "file" : "lib/MooseX/Extended/Role.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "MooseX::Extended::Types" : {
          "file" : "lib/MooseX/Extended/Types.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -125,7 +125,7 @@
          "web" : "https://github.com/Ovid/moosex-extreme"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Marco Fontani <MFONTANI@cpan.org>",
       "Ovid <ovid@cpan.org>"

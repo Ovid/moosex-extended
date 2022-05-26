@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "B::Hooks::AtRuntime" => 0,
     "Carp" => 0,
-    "Data::Dumper" => 0,
+    "Data::Printer" => 0,
     "Exporter" => 0,
     "Import::Into" => 0,
     "Moose" => 0,
@@ -57,7 +57,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -67,7 +67,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "B::Hooks::AtRuntime" => 0,
   "Carp" => 0,
-  "Data::Dumper" => 0,
+  "Data::Printer" => 0,
   "DateTime" => 0,
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
