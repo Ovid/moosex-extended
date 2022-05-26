@@ -59,12 +59,12 @@
             "MooseX::StrictConstructor" : "0",
             "Ref::Util" : "0",
             "Storable" : "0",
-            "Type::Library" : "0",
-            "Type::Params" : "0",
-            "Type::Utils" : "0",
-            "Types::Common::Numeric" : "0",
-            "Types::Common::String" : "0",
-            "Types::Standard" : "0",
+            "Type::Library" : "1.012004",
+            "Type::Params" : "1.012004",
+            "Type::Utils" : "1.012004",
+            "Types::Common::Numeric" : "1.012004",
+            "Types::Common::String" : "1.012004",
+            "Types::Standard" : "1.012004",
             "feature" : "0",
             "mro" : "0",
             "namespace::autoclean" : "0",
@@ -94,23 +94,23 @@
    "provides" : {
       "Moose::Exception::InvalidAttributeDefinition" : {
          "file" : "lib/Moose/Exception/InvalidAttributeDefinition.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "MooseX::Extended" : {
          "file" : "lib/MooseX/Extended.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "MooseX::Extended::Core" : {
          "file" : "lib/MooseX/Extended/Core.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "MooseX::Extended::Role" : {
          "file" : "lib/MooseX/Extended/Role.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "MooseX::Extended::Types" : {
          "file" : "lib/MooseX/Extended/Types.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -125,7 +125,7 @@
          "web" : "https://github.com/Ovid/moosex-extreme"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "Marco Fontani <MFONTANI@cpan.org>",
       "Ovid <ovid@cpan.org>"
