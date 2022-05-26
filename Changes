@@ -2,6 +2,7 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Add CONTRIBUTING.md
           - Test and document that postfix (package Foo {...}) syntax is not
             required and that we can inline multiple packages in the same
             file.
