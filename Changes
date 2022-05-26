@@ -2,10 +2,13 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Test and document that postfix (package Foo {...}) syntax is not
+            required and that we can inline multiple packages in the same
+            file.
+
 0.06      2022-05-26 14:32:54 CEST
 
           - Make it very easy to exclude features and include types.
-
 
 0.05      2022-05-26 10:24:35 CEST
 

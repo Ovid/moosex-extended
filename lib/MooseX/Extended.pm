@@ -225,6 +225,30 @@ allowed to be passed to the constructor.
 
 Note that the C<has> function is still available, even if it's not needed.
 
+Also, while your author likes the postfix block syntax, it's not required. You
+can even safely inline multiple packages in the same file:
+
+    package My::Point;
+    use MooseX::Extended types => [qw/Num/];
+
+    param [ 'x', 'y' ] => ( isa => Num );
+
+    package My::Point::Mutable;
+    use MooseX::Extended;
+    extends 'My::Point';
+
+    param [ '+x', '+y' ] => ( writer => 1, clearer => 1, default => 0 );
+
+    sub invert ($self) {
+        my ( $x, $y ) = ( $self->x, $self->y );
+        $self->set_x($y);
+        $self->set_y($x);
+    }
+
+# MooseX::Extended will causet this to return true, even if we try to return
+# false
+0;
+
 =head1 CONFIGURATION
 
 You may pass an import list to L<MooseX::Extended>.
