@@ -2,6 +2,9 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Fixed bug where passing a reference to a constructor for a cloned
+            attribute wouldn't be cloned at first.
+          - B::Hooks::AtRuntime and true.pm are not loaded unless required
           - Add CONTRIBUTING.md
           - Test and document that postfix (package Foo {...}) syntax is not
             required and that we can inline multiple packages in the same
