@@ -51,6 +51,6 @@ from our test suite.
         }
     }
 
-B<Warning>: setting the value via the constructor for the first time doesn't
-clone the data. All other gets and sets will clone it. We need to figure out a
-clean, performant solution for this.
+B<Warning>: Be aware that this is a very useful technique, but cloning can be
+very expensive. If you have performance issues, profile your code and see if
+removing the safety of cloning can help.
