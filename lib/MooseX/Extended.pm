@@ -25,7 +25,7 @@ use Import::Into;
 
 no warnings _disabled_warnings();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
     with_meta => [ 'field', 'param' ],
