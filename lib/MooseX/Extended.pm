@@ -151,7 +151,8 @@ sub init_meta ( $class, %params ) {
             1;
         } or do {
             my $error = $@;
-            warn "Could not load 'true': $error. Your class must end in a true value. You can `use MooseX::Extended excludes => ['true'];` to suppress this warning.";
+            warn
+              "Could not load 'true': $error. Your class must end in a true value. You can `use MooseX::Extended excludes => ['true'];` to suppress this warning.";
         };
     }
 

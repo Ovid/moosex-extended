@@ -139,8 +139,6 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
         );
     }
 
-
-
     # here be dragons ...
     _debug("Adding cloning for $name");
     my $reader = delete( $opt_for{reader} ) // $name;
