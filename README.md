@@ -41,7 +41,8 @@ package My::Names {
 
 # DESCRIPTION
 
-This module is **ALPHA** code.
+This module is **BETA** code. It's feature-complete for release and has no
+known bugs, but more testing is warranted.
 
 This class attempts to create a safer version of Moose that defaults to
 read-only attributes and is easier to read and write.

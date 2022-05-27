@@ -201,7 +201,9 @@ sub init_meta ( $class, %params ) {
 
 =head1 DESCRIPTION
 
-This module is B<ALPHA> code.
+This module is B<BETA> code. It's feature-complete for release and has no
+known bugs, but more testing is warranted.
+
 
 This class attempts to create a safer version of Moose that defaults to
 read-only attributes and is easier to read and write.
