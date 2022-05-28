@@ -29,7 +29,7 @@ These can also be used when you pass an array reference to the function:
             isa     => Int,
             clearer => 1,     # clear_x and clear_y available
             default => 0,
-        ) :;
+        );
     }
 
 Note that these are I<shortcuts> and they make attributes easier to write and more consistent.
