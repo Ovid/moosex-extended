@@ -11,6 +11,7 @@ use Moose                     ();
 use MooseX::StrictConstructor ();
 use mro                       ();
 use namespace::autoclean      ();
+use Moose::Util 'throw_exception';
 use Module::Load 'load';
 use MooseX::Extended::Core qw(
   field
@@ -75,7 +76,13 @@ Filename: $filename
 Line:     $line
 Details:  $error
 END
-        die;
+        throw_exception(
+            'InvalidImportList',
+            class_name           => $package,
+            moosex_extended_type => __PACKAGE__,
+            line_number          => $line,
+            messsage             => $error,
+        );
     };
 
     # remap the arrays to hashes for easy lookup
@@ -119,7 +126,7 @@ sub init_meta ( $class, %params ) {
 
     # see perldoc -v '$^P'
     if ($^P) {
-        say STDERR "We are running under the debugger. $for_class is not immutable";
+        say STDERR "We are running under the debugger or using code that uses debugger code (e.g., Devel::Cover). $for_class is not immutable";
     }
     else {
         unless ( $config->{excludes}{immutable} ) {
@@ -202,15 +209,14 @@ sub init_meta ( $class, %params ) {
 =head1 DESCRIPTION
 
 This module is B<BETA> code. It's feature-complete for release and has no
-known bugs, but more testing is warranted.
-
+known bugs.
 
 This class attempts to create a safer version of Moose that defaults to
 read-only attributes and is easier to read and write.
 
-It tries to bring some of the lessons learned from L<the Corinna project|https://github.com/Ovid/Cor>,
-while acknowledging that you can't always get what you want (such as
-true encapsulation and true methods).
+It tries to bring some of the lessons learned from L<the Corinna
+project|https://github.com/Ovid/Cor>, while acknowledging that you can't
+always get what you want (such as true encapsulation and true methods).
 
 This:
 
@@ -266,7 +272,7 @@ can even safely inline multiple packages in the same file:
         $self->set_y($x);
     }
 
-# MooseX::Extended will causet this to return true, even if we try to return
+# MooseX::Extended will cause this to return true, even if we try to return
 # false
 0;
 
@@ -280,7 +286,7 @@ You may pass an import list to L<MooseX::Extended>.
 
 =head2 C<types>
 
-ALlows you to import any types provided by L<MooseX::Extended::Types>.
+Allows you to import any types provided by L<MooseX::Extended::Types>.
 
 This:
 
