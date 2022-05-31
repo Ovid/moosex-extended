@@ -126,7 +126,7 @@ sub init_meta ( $class, %params ) {
 
     # see perldoc -v '$^P'
     if ($^P) {
-        say STDERR "We are running under the debugger. $for_class is not immutable";
+        say STDERR "We are running under the debugger or using code that uses debugger code (e.g., Devel::Cover). $for_class is not immutable";
     }
     else {
         unless ( $config->{excludes}{immutable} ) {
