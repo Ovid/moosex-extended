@@ -16,6 +16,7 @@ use MooseX::Extended::Core qw(
 use MooseX::Role::WarnOnConflict ();
 use Moose::Role;
 use Moose::Meta::Role;
+use Moose::Util 'throw_exception';
 use namespace::autoclean ();
 use Import::Into;
 use true;
@@ -68,7 +69,13 @@ Filename: $filename
 Line:     $line
 Details:  $error
 END
-        die;
+        throw_exception(
+            'InvalidImportList',
+            class_name           => $package,
+            moosex_extended_type => __PACKAGE__,
+            line_number          => $line,
+            messsage             => $error,
+        );
     };
 
     # remap the arrays to hashes for easy lookup

@@ -3,6 +3,7 @@
 use lib 'lib';
 use Test::Most;
 use MooseX::Extended::Core qw(param field);
+use MooseX::Extended::Role ();
 use Capture::Tiny 'capture_stderr';
 
 package Mock::Meta {
@@ -24,6 +25,12 @@ throws_ok {
     capture_stderr { MooseX::Extended->import( not => 'allowed' ) }
 }
 'Moose::Exception::InvalidImportList',
-  'Passing an invalid import list should throw an exception';
+  'Passing an invalid import list to MooseX::Extended should throw an exception';
+
+throws_ok {
+    capture_stderr { MooseX::Extended::Role->import( not => 'allowed' ) }
+}
+'Moose::Exception::InvalidImportList',
+  'Passing an invalid import list to MooseX::Extended::Role should throw an exception';
 
 done_testing;
