@@ -188,7 +188,7 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
     #     my $object = Some::Classs->new( created => $date );
     #
     # Any subsequent code calling $object->created was getting a reference to
-    # $date, so any changes to date would be propagated.
+    # $date, so any changes to $date would be propagated to all instances
     $meta->add_before_method_modifier(
         BUILD => sub ( $self, @ ) {
             my $attr = $meta->get_attribute($name);
