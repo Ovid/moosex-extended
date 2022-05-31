@@ -2,6 +2,8 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Skip Perl::Tidy tests unless Test::PerlTidy is installed
+          - Add some test dependencies for Perl::Critic to dist.ini
           - Add a few more tests to cover edge cases.
           - Convert some die/croak statements to exceptions
           - Fix typos in POD (thanks, bradclawsie!)
