@@ -266,7 +266,7 @@ can even safely inline multiple packages in the same file:
         $self->set_y($x);
     }
 
-# MooseX::Extended will causet this to return true, even if we try to return
+# MooseX::Extended will cause this to return true, even if we try to return
 # false
 0;
 
@@ -280,7 +280,7 @@ You may pass an import list to L<MooseX::Extended>.
 
 =head2 C<types>
 
-ALlows you to import any types provided by L<MooseX::Extended::Types>.
+Allows you to import any types provided by L<MooseX::Extended::Types>.
 
 This:
 
