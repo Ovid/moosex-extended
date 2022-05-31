@@ -11,7 +11,7 @@ has 'attribute_name' => (
     is            => 'ro',
     isa           => 'Str',
     required      => 1,
-    documentation => "The exception is thrown if an attribute name is invalid.",
+    documentation => "This exception is thrown if an attribute definition is invalid.",
 );
 
 __PACKAGE__->meta->make_immutable;

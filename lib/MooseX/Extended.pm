@@ -11,6 +11,7 @@ use Moose                     ();
 use MooseX::StrictConstructor ();
 use mro                       ();
 use namespace::autoclean      ();
+use Moose::Util 'throw_exception';
 use Module::Load 'load';
 use MooseX::Extended::Core qw(
   field
@@ -75,7 +76,13 @@ Filename: $filename
 Line:     $line
 Details:  $error
 END
-        die;
+        throw_exception(
+            'InvalidImportList',
+            class_name           => $package,
+            moosex_extended_type => __PACKAGE__,
+            line_number          => $line,
+            messsage             => $error,
+        );
     };
 
     # remap the arrays to hashes for easy lookup

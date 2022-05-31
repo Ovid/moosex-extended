@@ -3,6 +3,7 @@
 use lib 'lib';
 use Test::Most;
 use MooseX::Extended::Core qw(param field);
+use Capture::Tiny 'capture_stderr';
 
 package Mock::Meta {
     use MooseX::Extended;
@@ -17,5 +18,12 @@ throws_ok { param( $meta, 'foo', isa => 'Str', writer => 'foo_Array(x1233)' ) }
 throws_ok { param( $meta, '42foo', isa => 'Str', writer => 'set_foo' ) }
 'Moose::Exception::InvalidAttributeDefinition',
   'We should get a proper exception if our attributes have attribute names';
+
+explain 'capture_stderr will hide the carp(), but the exception is thrown before it can return STDERR';
+throws_ok {
+    capture_stderr { MooseX::Extended->import( not => 'allowed' ) }
+}
+'Moose::Exception::InvalidImportList',
+  'Passing an invalid import list should throw an exception';
 
 done_testing;

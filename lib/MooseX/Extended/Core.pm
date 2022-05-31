@@ -11,6 +11,11 @@ use Moose::Util qw(
 );
 use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
+BEGIN {
+    if ( $^V && $^V ge v5.36.0 ) {
+        warnings->unimport('experimental::args_array_with_signatures');
+    }
+}
 
 use Storable 'dclone';
 use Ref::Util qw(
