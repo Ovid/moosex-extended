@@ -59,7 +59,12 @@ sub field ( $meta, $name, %opt_for ) {
     foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
         my %options = %opt_for;    # copy each time to avoid overwriting
         if ( defined( my $init_arg = $options{init_arg} ) ) {
-            croak("The 'field.init_arg' must be absent or undef, not '$init_arg'");
+            throw_exception(
+                'InvalidAttributeDefinition',
+                attribute_name => $name,
+                class_name     => $meta->name,
+                messsage       => "The 'field.init_arg' must be absent or undef, not '$init_arg'",
+            );
         }
         $options{init_arg} = undef;
         $options{lazy} //= 1;
