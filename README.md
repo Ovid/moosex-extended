@@ -42,14 +42,14 @@ package My::Names {
 # DESCRIPTION
 
 This module is **BETA** code. It's feature-complete for release and has no
-known bugs, but more testing is warranted.
+known bugs.
 
 This class attempts to create a safer version of Moose that defaults to
 read-only attributes and is easier to read and write.
 
-It tries to bring some of the lessons learned from [the Corinna project](https://github.com/Ovid/Cor),
-while acknowledging that you can't always get what you want (such as
-true encapsulation and true methods).
+It tries to bring some of the lessons learned from [the Corinna
+project](https://github.com/Ovid/Cor), while acknowledging that you can't
+always get what you want (such as true encapsulation and true methods).
 
 This:
 
@@ -111,7 +111,7 @@ sub invert ($self) {
 }
 ```
 
-\# MooseX::Extended will causet this to return true, even if we try to return
+\# MooseX::Extended will cause this to return true, even if we try to return
 \# false
 0;
 
@@ -127,7 +127,7 @@ use MooseX::Extended
 
 ## `types`
 
-ALlows you to import any types provided by [MooseX::Extended::Types](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3ATypes).
+Allows you to import any types provided by [MooseX::Extended::Types](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3ATypes).
 
 This:
 

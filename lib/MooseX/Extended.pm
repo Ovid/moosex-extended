@@ -209,15 +209,14 @@ sub init_meta ( $class, %params ) {
 =head1 DESCRIPTION
 
 This module is B<BETA> code. It's feature-complete for release and has no
-known bugs, but more testing is warranted.
-
+known bugs.
 
 This class attempts to create a safer version of Moose that defaults to
 read-only attributes and is easier to read and write.
 
-It tries to bring some of the lessons learned from L<the Corinna project|https://github.com/Ovid/Cor>,
-while acknowledging that you can't always get what you want (such as
-true encapsulation and true methods).
+It tries to bring some of the lessons learned from L<the Corinna
+project|https://github.com/Ovid/Cor>, while acknowledging that you can't
+always get what you want (such as true encapsulation and true methods).
 
 This:
 
