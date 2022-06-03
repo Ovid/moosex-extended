@@ -4,6 +4,7 @@ Revision history for MooseX-Extended
 
 0.10      2022-05-31 22:26:34 CEST
 
+          - Added .gitignore and cleaned up dist.ini (thanks, haarg!)
           - Skip Perl::Tidy tests unless Test::PerlTidy is installed
           - Add some test dependencies for Perl::Critic to dist.ini
           - Add a few more tests to cover edge cases.
