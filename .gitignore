@@ -1,0 +1,15 @@
+/MANIFEST
+/MANIFEST.bak
+/MYMETA.*
+/Makefile
+/Makefile.old
+/blib/
+/pm_to_blib
+*~
+*#
+.#*
+/MooseX-Extended-*/
+/MooseX-Extended-*.tar
+/MooseX-Extended-*.tar.gz
+/cover_db/
+/.build/
