@@ -21,6 +21,7 @@ use MooseX::Extended::Core qw(
   _disabled_warnings
 );
 use feature _enabled_features();
+no warnings _disabled_warnings();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
@@ -38,8 +39,7 @@ my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
 # the MOP really doesn't support these edge cases.
 my %CONFIG_FOR;
 
-sub import {
-    my ( $class, %args ) = @_;
+sub import ( $class, %args ) {
     my ( $package, $filename, $line ) = caller;
     state $check = compile_named(
         debug    => Optional [Bool],
