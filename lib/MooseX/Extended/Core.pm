@@ -212,23 +212,23 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
     else {
         _debug("Adding overloaded reader/writer for $name");
         $meta->add_method(
-            $reader => sub ( $self, $value = undef ) {
-                _debug( "Args for overloaded reader/writer for $name", \@_ );
-                return @_ == 1
+            $reader => sub ( $self, @value ) {
+                _debug( "Args for overloaded reader/writer for $name", [ $self, @value ] );
+                return @value == 0
                   ? $self->$reader_method
-                  : $self->$writer_method($value);
+                  : $self->$writer_method(@value);
             }
         );
     }
     return %opt_for;
 }
 
-sub _debug ( $message, $data = undef ) {
+sub _debug ( $message, @data ) {
     $MooseX::Extended::Debug //= $ENV{MOOSEX_EXTENDED_DEBUG};    # suppress "once" warnings
     return unless $MooseX::Extended::Debug;
-    if ( 2 == @_ ) {                                             # yup, still want multidispatch
+    if (@data) {                                                 # yup, still want multidispatch
         require Data::Printer;
-        $data    = Data::Printer::np($data);
+        my $data = Data::Printer::np(@data);
         $message = "$message: $data";
     }
     say STDERR $message;

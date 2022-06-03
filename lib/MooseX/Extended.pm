@@ -89,7 +89,10 @@ END
     $args{excludes} = { map { $_ => 1 } $args{excludes}->@* };
 
     $CONFIG_FOR{$package} = \%args;
-    @_ = $class;                       # anything else and $import blows up
+    {
+        no warnings;
+        @_ = $class;                       # anything else and $import blows up
+    }
     goto $import;
 }
 
