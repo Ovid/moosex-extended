@@ -61,6 +61,8 @@ sub _default_import_list () {
 sub _apply_optional_features ( $config, $for_class ) {
     if ( $config->{includes}{multi} ) {
         if ( $^V && $^V lt v5.26.0 ) {
+            explain $config;
+            explain $for_class;
             croak("multi subs not supported in Perl version less than v5.26.0. You have $^V");
         }
 
