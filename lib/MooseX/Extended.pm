@@ -277,9 +277,9 @@ can even safely inline multiple packages in the same file:
         $self->set_y($x);
     }
 
-# MooseX::Extended will cause this to return true, even if we try to return
-# false
-0;
+    # MooseX::Extended will cause this to return true, even if we try to return
+    # false
+    0;
 
 =head1 CONFIGURATION
 
