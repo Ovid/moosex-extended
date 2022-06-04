@@ -64,7 +64,7 @@ sub _apply_optional_features ( $config, $for_class ) {
             croak("multi subs not supported in Perl version less than v5.26.0. You have $^V");
         }
 
-        use Data : Dumper;
+        use Data::Dumper;
         say STDERR Dumper($config);
         say STDERR Dumper($for_class);
 
