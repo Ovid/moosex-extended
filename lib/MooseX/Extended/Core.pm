@@ -9,6 +9,7 @@ use Moose::Util qw(
   add_method_modifier
   throw_exception
 );
+use Module::Load 'load';
 use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 
@@ -27,10 +28,23 @@ our @EXPORT_OK = qw(
   _debug
   _enabled_features
   _disabled_warnings
+  _apply_optional_features
 );
 
 sub _enabled_features  {qw/signatures postderef postderef_qq :5.20/}             # internal use only
 sub _disabled_warnings {qw/experimental::signatures experimental::postderef/}    # internal use only
+
+sub _apply_optional_features ( $config, $for_class ) {
+    if ( $config->{includes}{multi} ) {
+        if ( $^V && $^V lt v5.26.0 ) {
+            croak("multi subs not supported in Perl version less than v5.26.0. You have $^V");
+        }
+
+        # don't trap the error. Let it bubble up.
+        load Syntax::Keyword::MultiSub;
+        Syntax::Keyword::MultiSub->import::into($for_class);
+    }
+}
 
 sub param ( $meta, $name, %opt_for ) {
     $opt_for{is}       //= 'ro';

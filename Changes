@@ -2,6 +2,7 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Add optional multimethod support
           - We no longer use @_ inside signatured subs
 
 0.10      2022-05-31 22:26:34 CEST

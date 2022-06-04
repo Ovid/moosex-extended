@@ -19,6 +19,7 @@ use MooseX::Extended::Core qw(
   _debug
   _enabled_features
   _disabled_warnings
+  _apply_optional_features
 );
 use feature _enabled_features();
 no warnings _disabled_warnings();
@@ -131,18 +132,6 @@ sub init_meta ( $class, %params ) {
 
     _apply_default_features( $config, $for_class );
     _apply_optional_features( $config, $for_class );
-}
-
-sub _apply_optional_features ( $config, $for_class ) {
-    if ( $config->{includes}{multi} ) {
-        if ( $^V && $^V lt v5.26.0 ) {
-            croak("multi subs not supported in Perl version less than v5.26.0. You have $^V");
-        }
-
-        # don't trap the error. Let it bubble up.
-        load Syntax::Keyword::MultiSub;
-        Syntax::Keyword::MultiSub->import::into($for_class);
-    }
 }
 
 sub _apply_default_features ( $config, $for_class ) {

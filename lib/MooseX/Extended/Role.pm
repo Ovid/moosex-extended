@@ -12,6 +12,7 @@ use MooseX::Extended::Core qw(
   _debug
   _enabled_features
   _disabled_warnings
+  _apply_optional_features
 );
 use MooseX::Role::WarnOnConflict ();
 use Moose::Role;
@@ -54,6 +55,15 @@ sub import {
                 ]
             ]
         ],
+        includes => Optional [
+            ArrayRef [
+                Enum [
+                    qw/
+                      multi
+                      /
+                ]
+            ]
+        ],
     );
     eval {
         $check->(%args);
@@ -82,7 +92,9 @@ END
     };
 
     # remap the arrays to hashes for easy lookup
-    $args{excludes} = { map { $_ => 1 } $args{excludes}->@* };
+    foreach my $features (qw/includes excludes/) {
+        $args{$features} = { map { $_ => 1 } $args{$features}->@* };
+    }
 
     $CONFIG_FOR{$package} = \%args;
 
@@ -98,38 +110,42 @@ sub init_meta ( $class, %params ) {
     if ( $config->{debug} ) {
         $MooseX::Extended::Debug = $config->{debug};
     }
-    if ( exists $config->{excludes} ) {
-        foreach my $category ( sort keys $config->{excludes}->%* ) {
-            _debug("$for_class exclude '$category'");
+
+    foreach my $feature (qw/includes excludes/) {
+        if ( exists $config->{$feature} ) {
+            foreach my $category ( sort keys $config->{$feature}->%* ) {
+                _debug("$for_class $feature '$category'");
+            }
         }
     }
+
+    _apply_default_features( $config, $for_class, \%params );
+    _apply_optional_features( $config, $for_class );
+    return $for_class->meta;
+}
+
+sub _apply_default_features ( $config, $for_class, $params ) {
 
     if ( my $types = $config->{types} ) {
         _debug("$for_class: importing types '@$types'");
         MooseX::Extended::Types->import::into( $for_class, @$types );
     }
 
-    Carp->import::into($for_class)
-      unless $config->{excludes}{carp};
-
-    namespace::autoclean->import::into($for_class)
-      unless $config->{excludes}{autoclean};
-
-    true->import    # no need for `1` at the end of the module
-      unless $config->{excludes}{true};
-
-    MooseX::Role::WarnOnConflict->import::into($for_class)
-      unless $config->{excludes}{WarnOnConflict};
+    Carp->import::into($for_class)                         unless $config->{excludes}{carp};
+    namespace::autoclean->import::into($for_class)         unless $config->{excludes}{autoclean};
+    true->import                                           unless $config->{excludes}{true};
+    MooseX::Role::WarnOnConflict->import::into($for_class) unless $config->{excludes}{WarnOnConflict};
 
     feature->import( _enabled_features() );
     warnings->unimport(_disabled_warnings);
 
     Moose::Role->init_meta(    ##
-        %params,               ##
+        %$params,              ##
         metaclass => 'Moose::Meta::Role'
     );
-    return $for_class->meta;
 }
+
+1;
 
 __END__
 
