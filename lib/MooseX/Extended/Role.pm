@@ -10,6 +10,7 @@ use MooseX::Extended::Core qw(
   field
   param
   _debug
+  _default_import_list
   _enabled_features
   _disabled_warnings
   _apply_optional_features
@@ -41,8 +42,7 @@ sub import {
     my ( $class, %args ) = @_;
     my ( $package, $filename, $line ) = caller;
     state $check = compile_named(
-        debug    => Optional [Bool],
-        types    => Optional [ ArrayRef [NonEmptyStr] ],
+        _default_import_list(),
         excludes => Optional [
             ArrayRef [
                 Enum [
@@ -51,15 +51,6 @@ sub import {
                       autoclean
                       carp
                       true
-                      /
-                ]
-            ]
-        ],
-        includes => Optional [
-            ArrayRef [
-                Enum [
-                    qw/
-                      multi
                       /
                 ]
             ]

@@ -17,6 +17,7 @@ use MooseX::Extended::Core qw(
   field
   param
   _debug
+  _default_import_list
   _enabled_features
   _disabled_warnings
   _apply_optional_features
@@ -43,12 +44,11 @@ my %CONFIG_FOR;
 sub import {
 
     # don' use signatures for this import because we need @_ later. @_ is
-    # intended to be removed for singatures subs.
+    # intended to be removed for subs with signature
     my ( $class, %args ) = @_;
     my ( $package, $filename, $line ) = caller;
     state $check = compile_named(
-        debug    => Optional [Bool],
-        types    => Optional [ ArrayRef [NonEmptyStr] ],
+        _default_import_list(),
         excludes => Optional [
             ArrayRef [
                 Enum [
@@ -59,15 +59,6 @@ sub import {
                       carp
                       immutable
                       true
-                      /
-                ]
-            ]
-        ],
-        includes => Optional [
-            ArrayRef [
-                Enum [
-                    qw/
-                      multi
                       /
                 ]
             ]
