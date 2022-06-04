@@ -2,6 +2,8 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - We no longer use @_ inside signatured subs
+
 0.10      2022-05-31 22:26:34 CEST
 
           - Added .gitignore and cleaned up dist.ini (thanks, haarg!)
