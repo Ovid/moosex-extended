@@ -21,6 +21,7 @@ use MooseX::Extended::Core qw(
   _disabled_warnings
 );
 use feature _enabled_features();
+no warnings _disabled_warnings();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
@@ -39,6 +40,9 @@ my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
 my %CONFIG_FOR;
 
 sub import {
+
+    # don' use signatures for this import because we need @_ later. @_ is
+    # intended to be removed for singatures subs.
     my ( $class, %args ) = @_;
     my ( $package, $filename, $line ) = caller;
     state $check = compile_named(
@@ -89,7 +93,8 @@ END
     $args{excludes} = { map { $_ => 1 } $args{excludes}->@* };
 
     $CONFIG_FOR{$package} = \%args;
-    @_ = $class;                       # anything else and $import blows up
+
+    @_ = $class;    # anything else and $import blows up
     goto $import;
 }
 
