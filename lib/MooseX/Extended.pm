@@ -62,6 +62,15 @@ sub import {
                 ]
             ]
         ],
+        includes => Optional [
+            ArrayRef [
+                Enum [
+                    qw/
+                      multi
+                      /
+                ]
+            ]
+        ],
     );
     eval {
         $check->(%args);
@@ -90,7 +99,9 @@ END
     };
 
     # remap the arrays to hashes for easy lookup
-    $args{excludes} = { map { $_ => 1 } $args{excludes}->@* };
+    foreach my $features (qw/includes excludes/) {
+        $args{$features} = { map { $_ => 1 } $args{$features}->@* };
+    }
 
     $CONFIG_FOR{$package} = \%args;
 
@@ -109,25 +120,40 @@ sub init_meta ( $class, %params ) {
     if ( $config->{debug} ) {
         $MooseX::Extended::Debug = $config->{debug};
     }
-    if ( exists $config->{excludes} ) {
-        foreach my $category ( sort keys $config->{excludes}->%* ) {
-            _debug("$for_class exclude '$category'");
+
+    foreach my $feature (qw/includes excludes/) {
+        if ( exists $config->{$feature} ) {
+            foreach my $category ( sort keys $config->{$feature}->%* ) {
+                _debug("$for_class $feature '$category'");
+            }
         }
     }
 
+    _apply_default_features( $config, $for_class );
+    _apply_optional_features( $config, $for_class );
+}
+
+sub _apply_optional_features ( $config, $for_class ) {
+    if ( $config->{includes}{multi} ) {
+        if ( $^V && $^V lt v5.26.0 ) {
+            croak("multi subs not supported in Perl version less than v5.26.0. You have $^V");
+        }
+
+        # don't trap the error. Let it bubble up.
+        load Syntax::Keyword::MultiSub;
+        Syntax::Keyword::MultiSub->import::into($for_class);
+    }
+}
+
+sub _apply_default_features ( $config, $for_class ) {
     if ( my $types = $config->{types} ) {
         _debug("$for_class: importing types '@$types'");
         MooseX::Extended::Types->import::into( $for_class, @$types );
     }
 
-    MooseX::StrictConstructor->import( { into => $for_class } )
-      unless $config->{excludes}{StrictConstructor};
-
-    Carp->import::into($for_class)
-      unless $config->{excludes}{carp};
-
-    namespace::autoclean->import::into($for_class)
-      unless $config->{excludes}{autoclean};
+    MooseX::StrictConstructor->import( { into => $for_class } ) unless $config->{excludes}{StrictConstructor};
+    Carp->import::into($for_class)                              unless $config->{excludes}{carp};
+    namespace::autoclean->import::into($for_class)              unless $config->{excludes}{autoclean};
 
     # see perldoc -v '$^P'
     if ($^P) {
@@ -174,8 +200,8 @@ sub init_meta ( $class, %params ) {
 
     feature->import( _enabled_features() );
     warnings->unimport(_disabled_warnings);
-}
 
+}
 1;
 
     __END__
