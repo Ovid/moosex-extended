@@ -33,7 +33,11 @@ my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
 # the MOP really doesn't support these edge cases.
 my %CONFIG_FOR;
 
-sub import ( $class, %args ) {
+sub import {
+
+    # don' use signatures for this import because we need @_ later. @_ is
+    # intended to be removed for singatures subs.
+    my ( $class, %args ) = @_;
     my ( $package, $filename, $line ) = caller;
     state $check = compile_named(
         debug    => Optional [Bool],
@@ -81,10 +85,8 @@ END
     $args{excludes} = { map { $_ => 1 } $args{excludes}->@* };
 
     $CONFIG_FOR{$package} = \%args;
-    {
-        no warnings;
-        @_ = $class;                       # anything else and $import blows up
-    }
+
+    @_ = $class;    # anything else and $import blows up
     goto $import;
 }
 
