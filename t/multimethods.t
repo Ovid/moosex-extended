@@ -2,16 +2,22 @@
 
 use Test::Most;
 use Module::Load 'load';
-if ( $^V && $^V lt v5.26.0 ) {
-    plan skip_all => 'Version v5.26.0 or greater required for multimethod support';
+
+BEGIN {
+    # do this in a BEGIN  block to exit early. Otherwise, the rest of
+    # the code won't even compile if we don't have Syntax::Keyword::MultiSub
+    # installed.
+    if ( $^V && $^V lt v5.26.0 ) {
+        plan skip_all => 'Version v5.26.0 or greater required for multimethod support';
+    }
+    eval {
+        load Syntax::Keyword::MultiSub;
+        1;
+    } or do {
+        my $error = $@ || "<unknown error>";
+        plan skip_all => "Could not load Syntax::Keyword::MultiSub: $error";
+    };
 }
-eval {
-    load Syntax::Keyword::MultiSub;
-    1;
-} or do {
-    my $error = $@ || "<unknown error>";
-    plan skip_all => "Could not load Syntax::Keyword::MultiSub: $error";
-};
 
 package My::Point {
     use MooseX::Extended types => [qw/Num/];
