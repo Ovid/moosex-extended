@@ -184,7 +184,7 @@ sub _apply_default_features ( $config, $for_class ) {
 }
 1;
 
-    __END__
+__END__
 
 =head1 SYNOPSIS
 
@@ -452,6 +452,46 @@ This also applies to various attributes which allow method names, such as
 C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
 
 Trying to pass a defined C<init_arg> to C<field> will also this exception.
+
+=head1 OPTIONAL FEATURES
+
+By default, L<MooseX::Extended> tries to be relatively conservative. However,
+you might want to turn it up to 11. There are optional features you can use
+for this. They're turned by the C<includes> flag:
+
+=head2 C<multi>
+
+    package My::Multi::Role {
+        use MooseX::Extended::Role includes => [qw/multi/];
+
+        multi sub point ( $self, $x, $y ) {
+            return My::Point->new( x => $x, y => $y );
+        }
+        multi sub point ( $self, $x, $y, $z ) {
+            return My::Point::3D->new( x => $x, y => $y, z => $z );
+        }
+    }
+
+C<multi> allows you to provide multiple method (or subroutine) bodies with the
+same name. We use L<Syntax::Keyword::MultiSub> to implement this, so see that module
+for caveats.
+
+It's quite possible to define multi subs that are ambiguous:
+
+    package Foo {
+        use MooseX::Extended includes => [qw/multi/];
+
+        multi sub foo ($self, @bar) { return '@bar' }
+        multi sub foo ($self, $bar) { return '$bar' }
+    }
+
+    say +Foo->new->foo(1);
+    say +Foo->new->foo(1,2,3);
+
+Both of the above will print the string C<@bar>. The second definition of
+C<foo> is effectively lost.
+
+C<multi> is available for Perl versions 5.26 or higher.
 
 =head1 DEBUGGER SUPPORT
 
