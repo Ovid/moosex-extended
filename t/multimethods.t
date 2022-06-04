@@ -1,9 +1,17 @@
 #!/usr/bin/env perl
 
 use Test::Most;
+use Module::Load 'load';
 if ( $^V && $^V lt v5.26.0 ) {
     plan skip_all => 'Version v5.26.0 or greater required for multimethod support';
 }
+eval {
+    load Syntax::Keyword::MultiSub;
+    1;
+} or do {
+    my $error = $@ || "<unknown error>";
+    plan skip_all => "Could not load Syntax::Keyword::MultiSub: $error";
+};
 
 package My::Point {
     use MooseX::Extended types => [qw/Num/];
