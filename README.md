@@ -145,7 +145,7 @@ use MooseX::Extended::Types qw( compile PositiveInt HashRef );
 ## `excludes`
 
 You may find some features to be annoying, or even cause potential bugs (e.g.,
-if you have a \`croak\` method, our importing of `Carp::croak` will be a
+if you have a `croak` method, our importing of `Carp::croak` will be a
 problem. You can exclude the following:
 
 - `StrictConstructor`
@@ -301,7 +301,7 @@ if it encounters an illegal method name for an attribute.
 This also applies to various attributes which allow method names, such as
 `clone`, `builder`, `clearer`, `writer`, `reader`, and `predicate`.
 
-Trying to pass a defined \`init\_arg\` to \`field\` will also this exception.
+Trying to pass a defined `init_arg` to `field` will also this exception.
 
 # DEBUGGER SUPPORT
 

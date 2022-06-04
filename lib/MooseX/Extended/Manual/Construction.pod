@@ -19,7 +19,7 @@ If you need to pass arbitrary "sideband" data, explicitly declare it as such:
 
     param sideband => ( isa => HashRef, default => sub { {} } );
 
-Naturally, because we bundle C<MooseX::Extended::Types>, you can do much
+Naturally, because we bundle L<MooseX::Extended::Types>, you can do much
 finer-grained data validation on that, if needed.
 
 =head1 FUNCTIONS

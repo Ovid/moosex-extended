@@ -305,7 +305,7 @@ Is identical to this:
 =head2 C<excludes>
 
 You may find some features to be annoying, or even cause potential bugs (e.g.,
-if you have a `croak` method, our importing of C<Carp::croak> will be a
+if you have a C<croak> method, our importing of C<Carp::croak> will be a
 problem. You can exclude the following:
 
 =over 4
@@ -445,7 +445,7 @@ if it encounters an illegal method name for an attribute.
 This also applies to various attributes which allow method names, such as
 C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
 
-Trying to pass a defined `init_arg` to `field` will also this exception.
+Trying to pass a defined C<init_arg> to C<field> will also this exception.
 
 =head1 DEBUGGER SUPPORT
 
