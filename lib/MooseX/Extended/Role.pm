@@ -209,6 +209,30 @@ Excluding this will require your module to end in a true value.
 
 =back
 
+=head2 C<includes>
+
+Some experimental features are useful, but might not be quite what you want.
+
+=over 4
+
+=item * C<multi>
+
+    use MooseX::Extended::Role includes => [qw/multi/];
+
+    multi sub foo ($self, $x)      { ... }
+    multi sub foo ($self, $x, $y ) { ... }
+
+Allows you to redeclare a method (or subroutine) and the dispatch will use the number
+of arguments to determine which subroutine to use. Note that "slurpy" arguments such as
+arrays or hashes will take precedence over scalars:
+
+    multi sub foo ($self, @x) { ... }
+    multi sub foo ($self, $x) { ... } # will never be called
+
+Only available on Perl v5.26.0 or higher. Requires L<Syntax::Keyword::MultiSub>.
+
+=back
+
 =head1 IDENTICAL METHOD NAMES IN CLASSES AND ROLES
 
 In L<Moose> if a class defines a method of the name as the method of a role

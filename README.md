@@ -196,6 +196,30 @@ problem. You can exclude the following:
 
     Excluding this will require your module to end in a true value.
 
+## `includes`
+
+Some experimental features are useful, but might not be quite what you want.
+
+- `multi`
+
+    ```perl
+    use MooseX::Extended includes => [qw/multi/];
+
+    multi sub foo ($self, $x)      { ... }
+    multi sub foo ($self, $x, $y ) { ... }
+    ```
+
+    Allows you to redeclare a method (or subroutine) and the dispatch will use the number
+    of arguments to determine which subroutine to use. Note that "slurpy" arguments such as
+    arrays or hashes will take precedence over scalars:
+
+    ```perl
+    multi sub foo ($self, @x) { ... }
+    multi sub foo ($self, $x) { ... } # will never be called
+    ```
+
+    Only available on Perl v5.26.0 or higher. Requires [Syntax::Keyword::MultiSub](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3AMultiSub).
+
 # IMMUTABILITY
 
 ## Making Your Class Immutable

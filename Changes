@@ -2,6 +2,7 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Linux CI now includes v.5.36.0
           - Add optional multimethod support
           - We no longer use @_ inside signatured subs
 
