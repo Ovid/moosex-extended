@@ -35,5 +35,5 @@ jobs:
       - name: Run tests
         run: |
           dzil authordeps --missing | cpanm --notest
-          dzil listdeps --author --suggests | cpanm --notest
+          dzil listdeps --author --missing | cpanm --notest
           dzil test --author --release
