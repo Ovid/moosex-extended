@@ -4,7 +4,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
-version 0.10
+version 0.11
 
 # SYNOPSIS
 
@@ -109,11 +109,11 @@ sub invert ($self) {
     $self->set_x($y);
     $self->set_y($x);
 }
-```
 
-\# MooseX::Extended will cause this to return true, even if we try to return
-\# false
+# MooseX::Extended will cause this to return true, even if we try to return
+# false
 0;
+```
 
 # CONFIGURATION
 
@@ -208,7 +208,7 @@ __PACKAGE__->meta->make_immutable;
 
 That prevents further changes to the class and provides some optimizations to
 make the code run much faster. However, it's somewhat annoying to type. We do
-this for you, via `B::Hooks::AtRuntime`. You no longer need to do this yourself.
+this for you, via [B::Hooks::AtRuntime](https://metacpan.org/pod/B%3A%3AHooks%3A%3AAtRuntime). You no longer need to do this yourself.
 
 ## Making Your Instance Immutable
 
@@ -278,7 +278,7 @@ sub _build_name ($self) {
 
 See [MooseX::Extended::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AShortcuts) for a full explanation.
 
-# INVALID ATTRIBUTE NAMES
+# INVALID ATTRIBUTE DEFINITIONS
 
 The following [Moose](https://metacpan.org/pod/Moose) code will print `WhoAmI`. However, the second attribute
 name is clearly invalid.
@@ -295,11 +295,13 @@ my $object = Some::Class->new( name => 'WhoAmI' );
 say $object->name;
 ```
 
-`MooseX::Extended` will throw a `Moose::Exception::InvalidAttributeDefinition` exception
+`MooseX::Extended` will throw a [Moose::Exception::InvalidAttributeDefinition](https://metacpan.org/pod/Moose%3A%3AException%3A%3AInvalidAttributeDefinition) exception
 if it encounters an illegal method name for an attribute.
 
 This also applies to various attributes which allow method names, such as
 `clone`, `builder`, `clearer`, `writer`, `reader`, and `predicate`.
+
+Trying to pass a defined \`init\_arg\` to \`field\` will also this exception.
 
 # DEBUGGER SUPPORT
 
