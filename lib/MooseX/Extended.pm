@@ -17,8 +17,10 @@ use MooseX::Extended::Core qw(
   field
   param
   _debug
+  _default_import_list
   _enabled_features
   _disabled_warnings
+  _apply_optional_features
 );
 use feature _enabled_features();
 no warnings _disabled_warnings();
@@ -42,12 +44,11 @@ my %CONFIG_FOR;
 sub import {
 
     # don' use signatures for this import because we need @_ later. @_ is
-    # intended to be removed for singatures subs.
+    # intended to be removed for subs with signature
     my ( $class, %args ) = @_;
     my ( $package, $filename, $line ) = caller;
     state $check = compile_named(
-        debug    => Optional [Bool],
-        types    => Optional [ ArrayRef [NonEmptyStr] ],
+        _default_import_list(),
         excludes => Optional [
             ArrayRef [
                 Enum [
@@ -90,7 +91,9 @@ END
     };
 
     # remap the arrays to hashes for easy lookup
-    $args{excludes} = { map { $_ => 1 } $args{excludes}->@* };
+    foreach my $features (qw/includes excludes/) {
+        $args{$features} = { map { $_ => 1 } $args{$features}->@* };
+    }
 
     $CONFIG_FOR{$package} = \%args;
 
@@ -109,25 +112,28 @@ sub init_meta ( $class, %params ) {
     if ( $config->{debug} ) {
         $MooseX::Extended::Debug = $config->{debug};
     }
-    if ( exists $config->{excludes} ) {
-        foreach my $category ( sort keys $config->{excludes}->%* ) {
-            _debug("$for_class exclude '$category'");
+
+    foreach my $feature (qw/includes excludes/) {
+        if ( exists $config->{$feature} ) {
+            foreach my $category ( sort keys $config->{$feature}->%* ) {
+                _debug("$for_class $feature '$category'");
+            }
         }
     }
 
+    _apply_default_features( $config, $for_class );
+    _apply_optional_features( $config, $for_class );
+}
+
+sub _apply_default_features ( $config, $for_class ) {
     if ( my $types = $config->{types} ) {
         _debug("$for_class: importing types '@$types'");
         MooseX::Extended::Types->import::into( $for_class, @$types );
     }
 
-    MooseX::StrictConstructor->import( { into => $for_class } )
-      unless $config->{excludes}{StrictConstructor};
-
-    Carp->import::into($for_class)
-      unless $config->{excludes}{carp};
-
-    namespace::autoclean->import::into($for_class)
-      unless $config->{excludes}{autoclean};
+    MooseX::StrictConstructor->import( { into => $for_class } ) unless $config->{excludes}{StrictConstructor};
+    Carp->import::into($for_class)                              unless $config->{excludes}{carp};
+    namespace::autoclean->import::into($for_class)              unless $config->{excludes}{autoclean};
 
     # see perldoc -v '$^P'
     if ($^P) {
@@ -174,11 +180,11 @@ sub init_meta ( $class, %params ) {
 
     feature->import( _enabled_features() );
     warnings->unimport(_disabled_warnings);
-}
 
+}
 1;
 
-    __END__
+__END__
 
 =head1 SYNOPSIS
 
@@ -348,6 +354,30 @@ Excluding this will require your module to end in a true value.
 
 =back
 
+=head2 C<includes>
+
+Some experimental features are useful, but might not be quite what you want.
+
+=over 4
+
+=item * C<multi>
+
+    use MooseX::Extended includes => [qw/multi/];
+
+    multi sub foo ($self, $x)      { ... }
+    multi sub foo ($self, $x, $y ) { ... }
+
+Allows you to redeclare a method (or subroutine) and the dispatch will use the number
+of arguments to determine which subroutine to use. Note that "slurpy" arguments such as
+arrays or hashes will take precedence over scalars:
+
+    multi sub foo ($self, @x) { ... }
+    multi sub foo ($self, $x) { ... } # will never be called
+
+Only available on Perl v5.26.0 or higher. Requires L<Syntax::Keyword::MultiSub>.
+
+=back
+
 =head1 IMMUTABILITY
 
 =head2 Making Your Class Immutable
@@ -446,6 +476,46 @@ This also applies to various attributes which allow method names, such as
 C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
 
 Trying to pass a defined C<init_arg> to C<field> will also this exception.
+
+=head1 OPTIONAL FEATURES
+
+By default, L<MooseX::Extended> tries to be relatively conservative. However,
+you might want to turn it up to 11. There are optional features you can use
+for this. They're turned by the C<includes> flag:
+
+=head2 C<multi>
+
+    package My::Multi::Role {
+        use MooseX::Extended::Role includes => [qw/multi/];
+
+        multi sub point ( $self, $x, $y ) {
+            return My::Point->new( x => $x, y => $y );
+        }
+        multi sub point ( $self, $x, $y, $z ) {
+            return My::Point::3D->new( x => $x, y => $y, z => $z );
+        }
+    }
+
+C<multi> allows you to provide multiple method (or subroutine) bodies with the
+same name. We use L<Syntax::Keyword::MultiSub> to implement this, so see that module
+for caveats.
+
+It's quite possible to define multi subs that are ambiguous:
+
+    package Foo {
+        use MooseX::Extended includes => [qw/multi/];
+
+        multi sub foo ($self, @bar) { return '@bar' }
+        multi sub foo ($self, $bar) { return '$bar' }
+    }
+
+    say +Foo->new->foo(1);
+    say +Foo->new->foo(1,2,3);
+
+Both of the above will print the string C<@bar>. The second definition of
+C<foo> is effectively lost.
+
+C<multi> is available for Perl versions 5.26 or higher.
 
 =head1 DEBUGGER SUPPORT
 

@@ -10,8 +10,10 @@ use MooseX::Extended::Core qw(
   field
   param
   _debug
+  _default_import_list
   _enabled_features
   _disabled_warnings
+  _apply_optional_features
 );
 use MooseX::Role::WarnOnConflict ();
 use Moose::Role;
@@ -40,8 +42,7 @@ sub import {
     my ( $class, %args ) = @_;
     my ( $package, $filename, $line ) = caller;
     state $check = compile_named(
-        debug    => Optional [Bool],
-        types    => Optional [ ArrayRef [NonEmptyStr] ],
+        _default_import_list(),
         excludes => Optional [
             ArrayRef [
                 Enum [
@@ -82,7 +83,9 @@ END
     };
 
     # remap the arrays to hashes for easy lookup
-    $args{excludes} = { map { $_ => 1 } $args{excludes}->@* };
+    foreach my $features (qw/includes excludes/) {
+        $args{$features} = { map { $_ => 1 } $args{$features}->@* };
+    }
 
     $CONFIG_FOR{$package} = \%args;
 
@@ -98,38 +101,42 @@ sub init_meta ( $class, %params ) {
     if ( $config->{debug} ) {
         $MooseX::Extended::Debug = $config->{debug};
     }
-    if ( exists $config->{excludes} ) {
-        foreach my $category ( sort keys $config->{excludes}->%* ) {
-            _debug("$for_class exclude '$category'");
+
+    foreach my $feature (qw/includes excludes/) {
+        if ( exists $config->{$feature} ) {
+            foreach my $category ( sort keys $config->{$feature}->%* ) {
+                _debug("$for_class $feature '$category'");
+            }
         }
     }
+
+    _apply_default_features( $config, $for_class, \%params );
+    _apply_optional_features( $config, $for_class );
+    return $for_class->meta;
+}
+
+sub _apply_default_features ( $config, $for_class, $params ) {
 
     if ( my $types = $config->{types} ) {
         _debug("$for_class: importing types '@$types'");
         MooseX::Extended::Types->import::into( $for_class, @$types );
     }
 
-    Carp->import::into($for_class)
-      unless $config->{excludes}{carp};
-
-    namespace::autoclean->import::into($for_class)
-      unless $config->{excludes}{autoclean};
-
-    true->import    # no need for `1` at the end of the module
-      unless $config->{excludes}{true};
-
-    MooseX::Role::WarnOnConflict->import::into($for_class)
-      unless $config->{excludes}{WarnOnConflict};
+    Carp->import::into($for_class)                         unless $config->{excludes}{carp};
+    namespace::autoclean->import::into($for_class)         unless $config->{excludes}{autoclean};
+    true->import                                           unless $config->{excludes}{true};
+    MooseX::Role::WarnOnConflict->import::into($for_class) unless $config->{excludes}{WarnOnConflict};
 
     feature->import( _enabled_features() );
     warnings->unimport(_disabled_warnings);
 
     Moose::Role->init_meta(    ##
-        %params,               ##
+        %$params,              ##
         metaclass => 'Moose::Meta::Role'
     );
-    return $for_class->meta;
 }
+
+1;
 
 __END__
 
@@ -199,6 +206,30 @@ Excluding this will no longer import C<Carp::croak> and C<Carp::carp>.
     use MooseX::Extended::Role excludes => ['carp'];
 
 Excluding this will require your module to end in a true value.
+
+=back
+
+=head2 C<includes>
+
+Some experimental features are useful, but might not be quite what you want.
+
+=over 4
+
+=item * C<multi>
+
+    use MooseX::Extended::Role includes => [qw/multi/];
+
+    multi sub foo ($self, $x)      { ... }
+    multi sub foo ($self, $x, $y ) { ... }
+
+Allows you to redeclare a method (or subroutine) and the dispatch will use the number
+of arguments to determine which subroutine to use. Note that "slurpy" arguments such as
+arrays or hashes will take precedence over scalars:
+
+    multi sub foo ($self, @x) { ... }
+    multi sub foo ($self, $x) { ... } # will never be called
+
+Only available on Perl v5.26.0 or higher. Requires L<Syntax::Keyword::MultiSub>.
 
 =back
 
