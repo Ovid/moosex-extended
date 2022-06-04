@@ -358,7 +358,7 @@ You no longer need to end your Moose classes with:
 
 That prevents further changes to the class and provides some optimizations to
 make the code run much faster. However, it's somewhat annoying to type. We do
-this for you, via C<B::Hooks::AtRuntime>. You no longer need to do this yourself.
+this for you, via L<B::Hooks::AtRuntime>. You no longer need to do this yourself.
 
 =head2 Making Your Instance Immutable
 
@@ -424,7 +424,7 @@ When using C<field> or C<param>, we have some attribute shortcuts:
 
 See L<MooseX::Extended::Manual::Shortcuts> for a full explanation.
 
-=head1 INVALID ATTRIBUTE NAMES
+=head1 INVALID ATTRIBUTE DEFINITIONS
 
 The following L<Moose> code will print C<WhoAmI>. However, the second attribute
 name is clearly invalid.
@@ -439,11 +439,13 @@ name is clearly invalid.
     my $object = Some::Class->new( name => 'WhoAmI' );
     say $object->name;
 
-C<MooseX::Extended> will throw a C<Moose::Exception::InvalidAttributeDefinition> exception
+C<MooseX::Extended> will throw a L<Moose::Exception::InvalidAttributeDefinition> exception
 if it encounters an illegal method name for an attribute.
 
 This also applies to various attributes which allow method names, such as
 C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
+
+Trying to pass a defined `init_arg` to `field` will also this exception.
 
 =head1 DEBUGGER SUPPORT
 
