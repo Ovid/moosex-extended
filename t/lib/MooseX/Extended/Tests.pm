@@ -8,6 +8,7 @@ package MooseX::Extended::Tests {
     use Import::Into;
     use Ref::Util 'is_plain_arrayref';
     use feature 'postderef';
+    no warnings 'experimental::postderef';
 
     sub import {
         my ( $class, %arg_for ) = @_;
