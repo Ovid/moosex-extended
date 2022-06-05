@@ -220,6 +220,32 @@ Some experimental features are useful, but might not be quite what you want.
 
     Only available on Perl v5.26.0 or higher. Requires [Syntax::Keyword::MultiSub](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3AMultiSub).
 
+- `async`
+
+    ```perl
+    package My::Thing {
+        use MooseX::Extended
+        types    => [qw/Str/],
+        includes => ['async'];
+        use IO::Async::Loop;
+
+        field output => ( is => 'rw', isa => Str, default => '' );
+
+        async sub doit ( $self, @list ) {
+            my $loop = IO::Async::Loop->new;
+            $self->output('> ');
+            foreach my $item (@list) {
+                await $loop->delay_future( after => 0.01 );
+                $self->output( $self->output . "$item " );
+            }
+        }
+    }
+    ```
+
+    Allows you to write asynchronous code with `async` and `await`.
+
+    Only available on Perl v5.26.0 or higher. Requires [Future::AsyncAwait](https://metacpan.org/pod/Future%3A%3AAsyncAwait).
+
 # IMMUTABILITY
 
 ## Making Your Class Immutable
