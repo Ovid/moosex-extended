@@ -1,23 +1,10 @@
 #!/usr/bin/env perl
 
-use Test::Most;
-use Module::Load 'load';
-
-BEGIN {
-    # do this in a BEGIN  block to exit early. Otherwise, the rest of
-    # the code won't even compile if we don't have Syntax::Keyword::MultiSub
-    # installed.
-    if ( $^V && $^V lt v5.26.0 ) {
-        plan skip_all => 'Version v5.26.0 or greater required for multimethod support';
-    }
-    eval {
-        load Syntax::Keyword::MultiSub;
-        1;
-    } or do {
-        my $error = $@ || "<unknown error>";
-        plan skip_all => "Could not load Syntax::Keyword::MultiSub: $error";
-    };
-}
+use lib 't/lib';
+use MooseX::Extended::Tests
+  name    => 'multimethods',
+  module  => 'Syntax::Keyword::MultiSub',
+  version => v5.26.0;
 
 package My::Point {
     use MooseX::Extended types => [qw/Num/];

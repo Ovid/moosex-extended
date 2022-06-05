@@ -231,6 +231,30 @@ arrays or hashes will take precedence over scalars:
 
 Only available on Perl v5.26.0 or higher. Requires L<Syntax::Keyword::MultiSub>.
 
+=item * C<async>
+
+    package My::Thing {
+        use MooseX::Extended
+        types    => [qw/Str/],
+        includes => ['async'];
+        use IO::Async::Loop;
+
+        field output => ( is => 'rw', isa => Str, default => '' );
+
+        async sub doit ( $self, @list ) {
+            my $loop = IO::Async::Loop->new;
+            $self->output('> ');
+            foreach my $item (@list) {
+                await $loop->delay_future( after => 0.01 );
+                $self->output( $self->output . "$item " );
+            }
+        }
+    }
+
+Allows you to write asynchronous code with C<async> and C<await>.
+
+Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
+
 =back
 
 =head1 IDENTICAL METHOD NAMES IN CLASSES AND ROLES
