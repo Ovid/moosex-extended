@@ -31,22 +31,17 @@ no warnings _disabled_warnings();
 
 our $VERSION = '0.11';
 
-my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
-    with_meta => [ 'field', 'param' ],
-    install   => [qw/unimport/],
-    also      => ['Moose'],
-);
-
 # Should this be in the metaclass? It feels like it should, but
 # the MOP really doesn't support these edge cases.
 my %CONFIG_FOR;
 
 sub import {
 
-    # don' use signatures for this import because we need @_ later. @_ is
+    # don't use signatures for this import because we need @_ later. @_ is
     # intended to be removed for subs with signature
     my ( $class, %args ) = @_;
     my ( $package, $filename, $line ) = caller;
+
     state $check = compile_named(
         _default_import_list(),
         excludes => Optional [
@@ -96,6 +91,12 @@ END
     }
 
     $CONFIG_FOR{$package} = \%args;
+
+    my ( $import, undef, undef ) = Moose::Exporter->setup_import_methods(
+        with_meta => [ 'field', 'param' ],
+        install   => [qw/unimport/],
+        also      => ['Moose'],
+    );
 
     @_ = $class;    # anything else and $import blows up
     goto $import;
