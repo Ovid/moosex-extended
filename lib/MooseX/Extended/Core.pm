@@ -44,9 +44,11 @@ sub _disabled_warnings {qw/experimental::signatures experimental::postderef/}   
 
 sub _default_import_list () {
     return (
-        debug    => Optional [Bool],
-        types    => Optional [ ArrayRef [NonEmptyStr] ],
-        includes => Optional [
+        call_level => Optional [ Enum [ 1, 0 ] ],
+        debug      => Optional [Bool],
+        for_class  => Optional [NonEmptyStr],
+        types      => Optional [ ArrayRef [NonEmptyStr] ],
+        includes   => Optional [
             ArrayRef [
                 Enum [
                     qw/

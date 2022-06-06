@@ -27,8 +27,6 @@ no warnings _disabled_warnings();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
-no warnings _disabled_warnings();
-
 our $VERSION = '0.11';
 
 # Should this be in the metaclass? It feels like it should, but
@@ -40,7 +38,8 @@ sub import {
     # don't use signatures for this import because we need @_ later. @_ is
     # intended to be removed for subs with signature
     my ( $class, %args ) = @_;
-    my ( $package, $filename, $line ) = caller;
+    my ( $package, $filename, $line ) = caller( $args{call_level} // 0 );
+    my $target_class = $args{for_class} // $package;
 
     state $check = compile_named(
         _default_import_list(),
@@ -68,6 +67,9 @@ sub import {
         # error, it gets swallowed and we simply get:
         #
         # BEGIN failed--compilation aborted at ...
+        #
+        # Also, don't use $target_class here because if it's different from
+        # $package, the filename and line number won't match
         my $error = $@;
         Carp::carp(<<"END");
 Error:    Invalid import list to MooseX::Extended.
@@ -90,7 +92,7 @@ END
         $args{$features} = { map { $_ => 1 } $args{$features}->@* };
     }
 
-    $CONFIG_FOR{$package} = \%args;
+    $CONFIG_FOR{$target_class} = \%args;
 
     my ( $import, undef, undef ) = Moose::Exporter->setup_import_methods(
         with_meta => [ 'field', 'param' ],
@@ -98,7 +100,10 @@ END
         also      => ['Moose'],
     );
 
-    @_ = $class;    # anything else and $import blows up
+    # Moose::Exporter uses Sub::Exporter to handle exporting, so it accepts an 
+    # { into =>> $target_class } to say where we're exporting this to. This is
+    # used by our ::Custom modules to let people define their own versions
+    @_ = ( $class, { into => $target_class } );    # anything else and $import blows up
     goto $import;
 }
 
@@ -166,7 +171,7 @@ sub _apply_default_features ( $config, $for_class ) {
     unless ( $config->{excludes}{true} ) {
         eval {
             load true;
-            true->import;    # no need for `1` at the end of the module
+            true->import::into($for_class);    # no need for `1` at the end of the module
             1;
         } or do {
             my $error = $@;
