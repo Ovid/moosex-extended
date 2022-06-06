@@ -6,6 +6,7 @@ package MooseX::Extended::Tests {
     use Test::Builder;
     use Test::Most ();
     use Import::Into;
+    use Capture::Tiny ();
     use Ref::Util 'is_plain_arrayref';
     use feature 'postderef';
     no warnings 'experimental::postderef';
@@ -42,6 +43,7 @@ package MooseX::Extended::Tests {
         }
 
         Test::Most->import::into($package);
+        Capture::Tiny->import::into( $package, ':all' );
     }
 }
 

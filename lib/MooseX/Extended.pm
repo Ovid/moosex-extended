@@ -186,7 +186,6 @@ sub _apply_default_features ( $config, $for_class ) {
 
     feature->import( _enabled_features() );
     warnings->unimport(_disabled_warnings);
-
 }
 1;
 

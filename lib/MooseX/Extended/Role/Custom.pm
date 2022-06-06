@@ -1,6 +1,6 @@
-package MooseX::Extended::Custom;
+package MooseX::Extended::Role::Custom;
 
-# ABSTRACT: Build a custom Moose, just for you.
+# ABSTRACT: Build a custom Moose::Role, just for you.
 
 use 5.20.0;
 use strict;
@@ -12,7 +12,7 @@ use MooseX::Extended::Core qw(
 );
 use namespace::autoclean;
 
-use MooseX::Extended ();
+use MooseX::Extended::Role ();
 
 sub import {
     my $custom_moose = caller;    # this is our custom Moose definition
@@ -27,7 +27,7 @@ sub import {
 sub create {
     my ( $class, %args ) = @_;
     my $target_class = caller(1);    # this is the class consuming our custom Moose
-    MooseX::Extended->import(
+    MooseX::Extended::Role->import(
         %args,
         call_level => 1,
         for_class  => $target_class,
@@ -42,13 +42,13 @@ __END__
 
 Define your own version of L<MooseX::Extended>:
 
-    package My::Moose {
-        use MooseX::Extended::Custom;
+    package My::Moose::Role {
+        use MooseX::Extended::Role::Custom;
 
         sub import {
             my ( $class, %args ) = @_;
-            MooseX::Extended::Custom->create(
-                excludes => [qw/ StrictConstructor c3 /],
+            MooseX::Extended::Role::Custom->create(
+                excludes => [qw/ carp /],
                 includes => ['multi'],
                 %args    # you need this to allow customization of your customization
             );
@@ -59,10 +59,10 @@ Define your own version of L<MooseX::Extended>:
 
 And then use it:
 
-    package Some::Class {
-        use My::Moose types => [qw/ArrayRef Num/];
+    package Some::Class::Role {
+        use My::Moose::Role types => [qw/ArrayRef Num/];
 
-        param numbers ( isa => ArrayRef[Num] );
+        param numbers => ( isa => ArrayRef[Num] );
 
         multi sub foo ($self)       { ... }
         multi sub foo ($self, $bar) { ... }
@@ -70,12 +70,14 @@ And then use it:
 
 =head1 DESCRIPTION
 
-I hate boilerplate, so let's get rid of it. Let's say you don't want L<namespace::autoclean> or
-C<carp>, but you do want C<multi>. Plus, you have custom versions of C<carp> and C<croak>:
+I hate boilerplate, so let's get rid of it. Let's say you don't want warnings
+on classes implicitly overriding role methods, L<namespace::autoclean> or
+C<carp>, but you do want C<multi>. Plus, you have custom versions of C<carp>
+and C<croak>:
 
     package Some::Class {
         use MooseX::Extended
-          excludes => [qw/ autoclean carp /],
+          excludes => [qw/ WarnOnConflict autoclean carp /],
           includes => ['multi'];
         use My::Carp q(carp croak);
 

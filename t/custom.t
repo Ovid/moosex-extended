@@ -28,6 +28,33 @@ package My::Names {
     }
 }
 
+package Some::Class::Role {
+    use My::Moose::Role types => [qw/ArrayRef Num/];
+    param numbers => ( isa => ArrayRef[Num] );
+
+    sub conflict ($self) {}
+}
+
+subtest 'custom roles' => sub {
+    my $stderr = capture_stderr {
+        eval <<'END';
+        package Some::Class::With::Role {
+            use My::Moose;
+            with 'Some::Class::Role';
+            
+            sub conflict ($self) {}
+        }
+END
+    };
+    ok !$stderr, 'We should have no warnings if we have excluded WarnOnConflict';
+
+    my $with_role = Some::Class::With::Role->new(
+        numbers => [qw/1 2 3/],
+    );
+    ok !$with_role->can('carp'),
+        'Both our class and our role exclude carp()';
+};
+
 subtest 'miscellaneous features' => sub {
     SKIP: {
         skip "Classes cannot be immutable while running under the debugger", 1 if $^P;

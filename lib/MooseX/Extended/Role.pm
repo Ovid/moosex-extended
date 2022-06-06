@@ -37,6 +37,7 @@ sub import {
     # intended to be removed for singatures subs.
     my ( $class, %args ) = @_;
     my ( $package, $filename, $line ) = caller;
+    my $target_class = $args{for_class} // $package;
 
     state $check = compile_named(
         _default_import_list(),
@@ -62,6 +63,9 @@ sub import {
         # error, it gets swallowed and we simply get:
         #
         # BEGIN failed--compilation aborted at ...
+        #
+        # Also, don't use $target_class here because if it's different from
+        # $package, the filename and line number won't match
         my $error = $@;
         Carp::carp(<<"END");
 Error:    Invalid import list to MooseX::Extended::Role.
@@ -84,13 +88,16 @@ END
         $args{$features} = { map { $_ => 1 } $args{$features}->@* };
     }
 
-    $CONFIG_FOR{$package} = \%args;
+    $CONFIG_FOR{$target_class} = \%args;
 
     my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
         with_meta => [ 'field', 'param' ],
     );
 
-    @_ = $class;    # anything else and $import blows up
+    # Moose::Exporter uses Sub::Exporter to handle exporting, so it accepts an 
+    # { into =>> $target_class } to say where we're exporting this to. This is
+    # used by our ::Custom modules to let people define their own versions
+    @_ = ( $class, { into => $target_class } );    # anything else and $import blows up
     goto $import;
 }
 

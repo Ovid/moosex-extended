@@ -1,11 +1,10 @@
 package My::Moose {
     use MooseX::Extended::Custom;
 
-    sub import {
-        my ( $class, %args ) = @_;
+    sub import ( $class, %args ) {
         MooseX::Extended::Custom->create(
-            excludes   => [qw/ StrictConstructor c3 /],
-            includes   => ['multi'],
+            excludes => [qw/ StrictConstructor c3 carp /],
+            includes => ['multi'],
             %args
         );
     }
