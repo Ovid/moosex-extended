@@ -41,7 +41,7 @@ our @EXPORT_OK = qw(
   _apply_optional_features
   _role_excludes
   _class_excludes
-  config_for
+  _config_for
 );
 
 sub _enabled_features  {qw/signatures postderef postderef_qq :5.20/}             # internal use only
@@ -51,7 +51,7 @@ sub _disabled_warnings {qw/experimental::signatures experimental::postderef/}   
 # the MOP really doesn't support these edge cases.
 my %CONFIG_FOR;
 
-sub config_for ($package) {
+sub _config_for ($package) {
     return $CONFIG_FOR{$package};
 }
 

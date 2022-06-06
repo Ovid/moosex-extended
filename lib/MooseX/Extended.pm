@@ -21,7 +21,7 @@ use MooseX::Extended::Core qw(
   _disabled_warnings
   _apply_optional_features
   _our_import
-  config_for
+  _config_for
 );
 use feature _enabled_features();
 no warnings _disabled_warnings();
@@ -47,7 +47,7 @@ sub init_meta ( $class, %params ) {
     my $for_class = $params{for_class};
     Moose->init_meta(%params);
 
-    my $config = config_for($for_class);
+    my $config = _config_for($for_class);
 
     if ( $config->{debug} ) {
         $MooseX::Extended::Debug = $config->{debug};

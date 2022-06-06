@@ -16,7 +16,7 @@ use MooseX::Extended::Core qw(
   _apply_optional_features
   _role_excludes
   _our_import
-  config_for
+  _config_for
 );
 use MooseX::Role::WarnOnConflict ();
 use Moose::Role;
@@ -46,7 +46,7 @@ sub import {
 sub init_meta ( $class, %params ) {
     my $for_class = $params{for_class};
 
-    my $config = config_for($for_class);
+    my $config = _config_for($for_class);
 
     if ( $config->{debug} ) {
         $MooseX::Extended::Debug = $config->{debug};
