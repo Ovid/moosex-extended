@@ -59,9 +59,9 @@ sub _our_import {
 
     # don't use signatures for this import because we need @_ later. @_ is
     # intended to be removed for subs with signature
-    my ($class, $import, %args) = @_;
+    my ( $class, $import, %args ) = @_;
     $args{call_level} //= 0;
-    my ( $package, $filename, $line ) = caller( $args{call_level} +1 );
+    my ( $package, $filename, $line ) = caller( $args{call_level} + 1 );
     my $target_class = $args{for_class} // $package;
 
     state $check = {
@@ -104,7 +104,7 @@ END
 
     $CONFIG_FOR{$target_class} = \%args;
 
-    # Moose::Exporter uses Sub::Exporter to handle exporting, so it accepts an 
+    # Moose::Exporter uses Sub::Exporter to handle exporting, so it accepts an
     # { into =>> $target_class } to say where we're exporting this to. This is
     # used by our ::Custom modules to let people define their own versions
     @_ = ( $class, { into => $target_class } );    # anything else and $import blows up

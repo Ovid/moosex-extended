@@ -10,9 +10,10 @@ use MooseX::Extended::Core qw(
   _enabled_features
   _disabled_warnings
 );
+use MooseX::Extended::Role ();
 use namespace::autoclean;
 
-use MooseX::Extended::Role ();
+our $VERSION = '0.11';
 
 sub import {
     my $custom_moose = caller;    # this is our custom Moose definition
