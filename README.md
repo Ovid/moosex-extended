@@ -444,10 +444,6 @@ behavioral differences you should be aware of.
 Some of this may just be wishful thinking. Some of this would be interesting if
 others would like to collaborate.
 
-## Tests
-
-Tests! Many more tests! Volunteers welcome :)
-
 ## Configurable Types
 
 We provide `MooseX::Extended::Types` for convenience, along with the `declare` 
