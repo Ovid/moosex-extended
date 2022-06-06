@@ -10,11 +10,9 @@ use MooseX::Extended::Core qw(
   field
   param
   _debug
-  _default_import_list
   _enabled_features
   _disabled_warnings
   _apply_optional_features
-  _role_excludes
   _our_import
   _config_for
 );
