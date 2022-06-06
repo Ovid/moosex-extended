@@ -527,10 +527,6 @@ C<MooseX::Extended>, but for roles.
 Some of this may just be wishful thinking. Some of this would be interesting if
 others would like to collaborate.
 
-=head2 Tests
-
-Tests! Many more tests! Volunteers welcome :)
-
 =head2 Configurable Types
 
 We provide C<MooseX::Extended::Types> for convenience, along with the C<declare> 
