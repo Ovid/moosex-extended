@@ -21,6 +21,7 @@ use MooseX::Extended::Core qw(
   _disabled_warnings
   _apply_optional_features
   _our_import
+  _our_init_meta
   _config_for
 );
 use feature _enabled_features();
@@ -43,29 +44,15 @@ sub import {
 
 # Internal method setting up exports. No public
 # documentation by design
-sub init_meta ( $class, %params ) {
-    my $for_class = $params{for_class};
+sub init_meta ($class, %params) {
     Moose->init_meta(%params);
-
-    my $config = _config_for($for_class);
-
-    if ( $config->{debug} ) {
-        $MooseX::Extended::Debug = $config->{debug};
-    }
-
-    foreach my $feature (qw/includes excludes/) {
-        if ( exists $config->{$feature} ) {
-            foreach my $category ( sort keys $config->{$feature}->%* ) {
-                _debug("$for_class $feature '$category'");
-            }
-        }
-    }
-
-    _apply_default_features( $config, $for_class );
-    _apply_optional_features( $config, $for_class );
+    _our_init_meta($class, \&_apply_default_features, %params);
 }
 
-sub _apply_default_features ( $config, $for_class ) {
+# XXX we don't actually use the $params here, even though we need it for
+# MooseX::Extended::Role. But we need to declare it in the signature to make
+# this code work
+sub _apply_default_features ( $config, $for_class, $params = undef ) {
     if ( my $types = $config->{types} ) {
         _debug("$for_class: importing types '@$types'");
         MooseX::Extended::Types->import::into( $for_class, @$types );

@@ -31,17 +31,18 @@ use Carp 'croak';
 our $VERSION = '0.11';
 
 our @EXPORT_OK = qw(
-  field
-  param
-  _our_import
-  _debug
-  _enabled_features
-  _disabled_warnings
-  _default_import_list
   _apply_optional_features
-  _role_excludes
   _class_excludes
   _config_for
+  _debug
+  _default_import_list
+  _disabled_warnings
+  _enabled_features
+  _our_import
+  _our_init_meta
+  _role_excludes
+  field
+  param
 );
 
 sub _enabled_features  {qw/signatures postderef postderef_qq :5.20/}             # internal use only
@@ -109,6 +110,26 @@ END
     # used by our ::Custom modules to let people define their own versions
     @_ = ( $class, { into => $target_class } );    # anything else and $import blows up
     goto $import;
+}
+
+sub _our_init_meta ( $class, $apply_default_features, %params ) {
+    my $for_class = $params{for_class};
+    my $config    = $CONFIG_FOR{$for_class};
+
+    if ( $config->{debug} ) {
+        $MooseX::Extended::Debug = $config->{debug};
+    }
+
+    foreach my $feature (qw/includes excludes/) {
+        if ( exists $config->{$feature} ) {
+            foreach my $category ( sort keys $config->{$feature}->%* ) {
+                _debug("$for_class $feature '$category'");
+            }
+        }
+    }
+
+    $apply_default_features->( $config, $for_class, \%params );
+    _apply_optional_features( $config, $for_class );
 }
 
 sub _class_setup_import_methods () {

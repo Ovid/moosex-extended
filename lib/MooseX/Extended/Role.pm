@@ -14,6 +14,7 @@ use MooseX::Extended::Core qw(
   _disabled_warnings
   _apply_optional_features
   _our_import
+  _our_init_meta
   _config_for
 );
 use MooseX::Role::WarnOnConflict ();
@@ -43,23 +44,7 @@ sub import {
 
 sub init_meta ( $class, %params ) {
     my $for_class = $params{for_class};
-
-    my $config = _config_for($for_class);
-
-    if ( $config->{debug} ) {
-        $MooseX::Extended::Debug = $config->{debug};
-    }
-
-    foreach my $feature (qw/includes excludes/) {
-        if ( exists $config->{$feature} ) {
-            foreach my $category ( sort keys $config->{$feature}->%* ) {
-                _debug("$for_class $feature '$category'");
-            }
-        }
-    }
-
-    _apply_default_features( $config, $for_class, \%params );
-    _apply_optional_features( $config, $for_class );
+    _our_init_meta( $class, \&_apply_default_features, %params );
     return $for_class->meta;
 }
 
