@@ -14,6 +14,9 @@ use MooseX::Extended::Core qw(
   _enabled_features
   _disabled_warnings
   _apply_optional_features
+  _role_excludes
+  _our_import
+  config_for
 );
 use MooseX::Role::WarnOnConflict ();
 use Moose::Role;
@@ -32,79 +35,18 @@ our $VERSION = '0.11';
 my %CONFIG_FOR;
 
 sub import {
-
-    # don't use signatures for this import because we need @_ later. @_ is
-    # intended to be removed for singatures subs.
     my ( $class, %args ) = @_;
-    my ( $package, $filename, $line ) = caller;
-    my $target_class = $args{for_class} // $package;
-
-    state $check = compile_named(
-        _default_import_list(),
-        excludes => Optional [
-            ArrayRef [
-                Enum [
-                    qw/
-                      WarnOnConflict
-                      autoclean
-                      carp
-                      true
-                      /
-                ]
-            ]
-        ],
-    );
-    eval {
-        $check->(%args);
-        1;
-    } or do {
-
-        # Not sure what's happening, but if we don't use the eval to trap the
-        # error, it gets swallowed and we simply get:
-        #
-        # BEGIN failed--compilation aborted at ...
-        #
-        # Also, don't use $target_class here because if it's different from
-        # $package, the filename and line number won't match
-        my $error = $@;
-        Carp::carp(<<"END");
-Error:    Invalid import list to MooseX::Extended::Role.
-Package:  $package
-Filename: $filename
-Line:     $line
-Details:  $error
-END
-        throw_exception(
-            'InvalidImportList',
-            class_name           => $package,
-            moosex_extended_type => __PACKAGE__,
-            line_number          => $line,
-            messsage             => $error,
-        );
-    };
-
-    # remap the arrays to hashes for easy lookup
-    foreach my $features (qw/includes excludes/) {
-        $args{$features} = { map { $_ => 1 } $args{$features}->@* };
-    }
-
-    $CONFIG_FOR{$target_class} = \%args;
-
-    my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
+    $args{_import_type} = 'role';
+    my ( $import, undef, undef ) = Moose::Exporter->setup_import_methods(
         with_meta => [ 'field', 'param' ],
     );
-
-    # Moose::Exporter uses Sub::Exporter to handle exporting, so it accepts an 
-    # { into =>> $target_class } to say where we're exporting this to. This is
-    # used by our ::Custom modules to let people define their own versions
-    @_ = ( $class, { into => $target_class } );    # anything else and $import blows up
-    goto $import;
+    _our_import( $class, $import, %args );
 }
 
 sub init_meta ( $class, %params ) {
     my $for_class = $params{for_class};
 
-    my $config = $CONFIG_FOR{$for_class};
+    my $config = config_for($for_class);
 
     if ( $config->{debug} ) {
         $MooseX::Extended::Debug = $config->{debug};

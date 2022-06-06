@@ -17,10 +17,11 @@ use MooseX::Extended::Core qw(
   field
   param
   _debug
-  _default_import_list
   _enabled_features
   _disabled_warnings
   _apply_optional_features
+  _our_import
+  config_for
 );
 use feature _enabled_features();
 no warnings _disabled_warnings();
@@ -29,82 +30,15 @@ use Import::Into;
 
 our $VERSION = '0.11';
 
-# Should this be in the metaclass? It feels like it should, but
-# the MOP really doesn't support these edge cases.
-my %CONFIG_FOR;
-
 sub import {
-
-    # don't use signatures for this import because we need @_ later. @_ is
-    # intended to be removed for subs with signature
     my ( $class, %args ) = @_;
-    my ( $package, $filename, $line ) = caller( $args{call_level} // 0 );
-    my $target_class = $args{for_class} // $package;
-
-    state $check = compile_named(
-        _default_import_list(),
-        excludes => Optional [
-            ArrayRef [
-                Enum [
-                    qw/
-                      StrictConstructor
-                      autoclean
-                      c3
-                      carp
-                      immutable
-                      true
-                      /
-                ]
-            ]
-        ],
-    );
-    eval {
-        $check->(%args);
-        1;
-    } or do {
-
-        # Not sure what's happening, but if we don't use the eval to trap the
-        # error, it gets swallowed and we simply get:
-        #
-        # BEGIN failed--compilation aborted at ...
-        #
-        # Also, don't use $target_class here because if it's different from
-        # $package, the filename and line number won't match
-        my $error = $@;
-        Carp::carp(<<"END");
-Error:    Invalid import list to MooseX::Extended.
-Package:  $package
-Filename: $filename
-Line:     $line
-Details:  $error
-END
-        throw_exception(
-            'InvalidImportList',
-            class_name           => $package,
-            moosex_extended_type => __PACKAGE__,
-            line_number          => $line,
-            messsage             => $error,
-        );
-    };
-
-    # remap the arrays to hashes for easy lookup
-    foreach my $features (qw/includes excludes/) {
-        $args{$features} = { map { $_ => 1 } $args{$features}->@* };
-    }
-
-    $CONFIG_FOR{$target_class} = \%args;
-
+    $args{_import_type} = 'class';
     my ( $import, undef, undef ) = Moose::Exporter->setup_import_methods(
         with_meta => [ 'field', 'param' ],
         install   => [qw/unimport/],
         also      => ['Moose'],
     );
-
-    # Moose::Exporter uses Sub::Exporter to handle exporting, so it accepts an 
-    # { into =>> $target_class } to say where we're exporting this to. This is
-    # used by our ::Custom modules to let people define their own versions
-    @_ = ( $class, { into => $target_class } );    # anything else and $import blows up
-    goto $import;
+    _our_import( $class, $import, %args );
 }
 
 # Internal method setting up exports. No public
@@ -113,7 +47,7 @@ sub init_meta ( $class, %params ) {
     my $for_class = $params{for_class};
     Moose->init_meta(%params);
 
-    my $config = $CONFIG_FOR{$for_class};
+    my $config = config_for($for_class);
 
     if ( $config->{debug} ) {
         $MooseX::Extended::Debug = $config->{debug};
