@@ -2,6 +2,7 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Add MooseX::Extended::Custom (create your own Moose)
           - Add optional async/await support
           - Linux CI now includes v.5.36.0
           - Add optional multimethod support
