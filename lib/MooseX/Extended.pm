@@ -44,9 +44,9 @@ sub import {
 
 # Internal method setting up exports. No public
 # documentation by design
-sub init_meta ($class, %params) {
+sub init_meta ( $class, %params ) {
     Moose->init_meta(%params);
-    _our_init_meta($class, \&_apply_default_features, %params);
+    _our_init_meta( $class, \&_apply_default_features, %params );
 }
 
 # XXX we don't actually use the $params here, even though we need it for
