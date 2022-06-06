@@ -4,7 +4,6 @@ package My::Moose {
     sub import ( $class, %args ) {
         MooseX::Extended::Custom->create(
             excludes => [qw/ StrictConstructor c3 carp /],
-            includes => ['multi'],
             %args
         );
     }
