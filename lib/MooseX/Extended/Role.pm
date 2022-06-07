@@ -13,10 +13,8 @@ use MooseX::Extended::Core qw(
   _assert_import_list_is_valid
   _enabled_features
   _disabled_warnings
-  _apply_optional_features
   _our_import
   _our_init_meta
-  _config_for
 );
 use MooseX::Role::WarnOnConflict ();
 use Moose::Role;
@@ -38,8 +36,12 @@ sub import {
     my ( $class, %args ) = @_;
     $args{_import_type} = 'role';
     my $target_class = _assert_import_list_is_valid( $class, \%args );
+    my @with_meta    = grep { not $args{excludes}{$_} } qw(field param);
+    if (@with_meta) {
+        @with_meta = ( with_meta => [@with_meta] );
+    }
     my ( $import, undef, undef ) = Moose::Exporter->setup_import_methods(
-        with_meta => [ 'field', 'param' ],
+        @with_meta,
     );
     _our_import( $class, $import, $target_class );
 }
@@ -138,9 +140,21 @@ Excluding this will no longer import C<Carp::croak> and C<Carp::carp>.
 
 =item * C<true>
 
-    use MooseX::Extended::Role excludes => ['carp'];
+    use MooseX::Extended::Role excludes => ['true'];
 
 Excluding this will require your module to end in a true value.
+
+=item C<param>
+
+    use MooseX::Extended::Role excludes => ['param'];
+
+Excluding this will make the C<param> function unavailable.
+
+=item C<field>
+
+    use MooseX::Extended::Role excludes => ['field'];
+
+Excluding this will make the C<field> function unavailable.
 
 =back
 
@@ -227,7 +241,7 @@ To silence the warning, just be explicit about your intent:
         sub name {'Bob'}
     }
 
-Alternately, you can exlude this feature. We don't recommend this, but it
+Alternately, you can exclude this feature. We don't recommend this, but it
 might be useful if you're refactoring a legacy Moose system.
 
     use MooseX::Extended::Role excludes => [qw/WarnOnConflict/];
@@ -245,4 +259,3 @@ And you keep typing that over and over. We've removed a lot of boilerplate,
 but we've added different boilerplate. Instead, just create
 C<My::Custom::Moose::Role> and C<use My::Custom::Moose::Role;>. See
 L<MooseX::Extended::Role::Custom> for details.
-

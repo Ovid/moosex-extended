@@ -2,6 +2,7 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - You can now exclude the "field" and "param" functions
           - Add MooseX::Extended::Role::Custom (create your own Moose::Role)
           - Add MooseX::Extended::Custom (create your own Moose)
           - Add optional async/await support

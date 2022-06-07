@@ -31,17 +31,12 @@ use Carp 'croak';
 our $VERSION = '0.11';
 
 our @EXPORT_OK = qw(
-  _apply_optional_features
   _assert_import_list_is_valid
-  _class_excludes
-  _config_for
   _debug
-  _default_import_list
   _disabled_warnings
   _enabled_features
   _our_import
   _our_init_meta
-  _role_excludes
   field
   param
 );
@@ -70,6 +65,9 @@ sub _our_import {
     goto $import;
 }
 
+# asserts the import list is valid, rewrites the excludes and includes from
+# arrays to hashes (if ( $args{excludes}{$feature} ) ...) and returns the
+# target package that this code will be applied to. Yeah, it does too much.
 sub _assert_import_list_is_valid {
     my ( $class, $args ) = @_;
 
@@ -163,6 +161,8 @@ sub _role_excludes () {
                       autoclean
                       carp
                       true
+                      field
+                      param
                       /
                 ]
             ]
@@ -182,6 +182,8 @@ sub _class_excludes () {
                       carp
                       immutable
                       true
+                      field
+                      param
                       /
                 ]
             ]

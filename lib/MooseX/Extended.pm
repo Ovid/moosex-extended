@@ -14,16 +14,14 @@ use namespace::autoclean      ();
 use Moose::Util 'throw_exception';
 use Module::Load 'load';
 use MooseX::Extended::Core qw(
-  field
-  param
-  _debug
   _assert_import_list_is_valid
-  _enabled_features
+  _debug
   _disabled_warnings
-  _apply_optional_features
+  _enabled_features
   _our_import
   _our_init_meta
-  _config_for
+  field
+  param
 );
 use feature _enabled_features();
 no warnings _disabled_warnings();
@@ -36,10 +34,14 @@ sub import {
     my ( $class, %args ) = @_;
     $args{_import_type} = 'class';
     my $target_class = _assert_import_list_is_valid( $class, \%args );
+    my @with_meta    = grep { not $args{excludes}{$_} } qw(field param);
+    if (@with_meta) {
+        @with_meta = ( with_meta => [@with_meta] );
+    }
     my ( $import, undef, undef ) = Moose::Exporter->setup_import_methods(
-        with_meta => [ 'field', 'param' ],
-        install   => [qw/unimport/],
-        also      => ['Moose'],
+        @with_meta,
+        install => [qw/unimport/],
+        also    => ['Moose'],
     );
     _our_import( $class, $import, $target_class );
 }
@@ -276,9 +278,21 @@ Excluding this will no longer make your class immutable.
 
 =item * C<true>
 
-    use MooseX::Extended::Role excludes => ['carp'];
+    use MooseX::Extended::Role excludes => ['true'];
 
 Excluding this will require your module to end in a true value.
+
+=item C<param>
+
+    use MooseX::Extended::Role excludes => ['param'];
+
+Excluding this will make the C<param> function unavailable.
+
+=item C<field>
+
+    use MooseX::Extended::Role excludes => ['field'];
+
+Excluding this will make the C<field> function unavailable.
 
 =back
 
