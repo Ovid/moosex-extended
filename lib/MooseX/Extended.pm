@@ -282,13 +282,13 @@ Excluding this will no longer make your class immutable.
 
 Excluding this will require your module to end in a true value.
 
-=item C<param>
+=item * C<param>
 
     use MooseX::Extended::Role excludes => ['param'];
 
 Excluding this will make the C<param> function unavailable.
 
-=item C<field>
+=item * C<field>
 
     use MooseX::Extended::Role excludes => ['field'];
 
