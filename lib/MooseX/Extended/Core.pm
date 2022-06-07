@@ -80,7 +80,7 @@ sub _assert_import_list_is_valid {
         role  => compile_named( _default_import_list(), _role_excludes() )
     };
     eval {
-        $check->{ $args->{_import_type} }->($args->%*);
+        $check->{ $args->{_import_type} }->( $args->%* );
         1;
     } or do {
 
