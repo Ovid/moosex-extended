@@ -4,7 +4,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
-version 0.11
+version 0.20
 
 # SYNOPSIS
 
