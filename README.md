@@ -546,15 +546,3 @@ This is free software, licensed under:
 ```
 The Artistic License 2.0 (GPL Compatible)
 ```
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 179:
-
-    Expected '=item \*'
-
-- Around line 185:
-
-    Expected '=item \*'
