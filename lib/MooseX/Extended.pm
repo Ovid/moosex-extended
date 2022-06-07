@@ -328,6 +328,19 @@ Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
 
 =back
 
+=head1 REDUCING BOILERPLATE
+
+Let's say you've settled on the following feature set:
+
+    use MooseX::Extended
+        excludes => [qw/StrictConstructor carp/],
+        includes => [qw/multi/];
+
+And you keep typing that over and over. We've removed a lot of boilerplate,
+but we've added different boilerplate. Instead, just create
+C<My::Custom::Moose> and C<use My::Custom::Moose;>. See
+L<MooseX::Extended::Custom> for details.
+
 =head1 IMMUTABILITY
 
 =head2 Making Your Class Immutable
@@ -567,8 +580,20 @@ repository is L<https://github.com/Ovid/moosex-extreme/>.
 
 =over 4
 
+=item * L<Corinna|https://github.com/Ovid/Cor>
+
+The RFC of the new version of OOP planned for the Perl core.
+
 =item * L<MooseX::Modern|https://metacpan.org/pod/MooseX::Modern>
 
-=item * L<Corinna|https://github.com/Ovid/Cor>
+MooseX::Modern - Precision classes for Modern Perl
+
+=item * L<Zydeco|https://metacpan.org/pod/Zydeco>
+
+Zydeco - Jazz up your Perl
+
+=item * L<Dios|https://metacpan.org/pod/Dios>
+
+Dios - Declarative Inside-Out Syntax
 
 =back

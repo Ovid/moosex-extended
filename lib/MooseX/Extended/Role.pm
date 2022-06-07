@@ -224,3 +224,23 @@ To silence the warning, just be explicit about your intent:
         with 'My::Role' => { -excludes => ['name'] };
         sub name {'Bob'}
     }
+
+Alternately, you can exlude this feature. We don't recommend this, but it
+might be useful if you're refactoring a legacy Moose system.
+
+    use MooseX::Extended::Role excludes => [qw/WarnOnConflict/];
+
+
+=head1 REDUCING BOILERPLATE
+
+Let's say you've settled on the following feature set:
+
+    use MooseX::Extended::Role
+        excludes => [qw/WarnOnConflict carp/],
+        includes => [qw/multi/];
+
+And you keep typing that over and over. We've removed a lot of boilerplate,
+but we've added different boilerplate. Instead, just create
+C<My::Custom::Moose::Role> and C<use My::Custom::Moose::Role;>. See
+L<MooseX::Extended::Role::Custom> for details.
+
