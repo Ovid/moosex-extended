@@ -10,10 +10,11 @@ use MooseX::Extended::Core qw(
   field
   param
   _debug
-  _default_import_list
+  _assert_import_list_is_valid
   _enabled_features
   _disabled_warnings
-  _apply_optional_features
+  _our_import
+  _our_init_meta
 );
 use MooseX::Role::WarnOnConflict ();
 use Moose::Role;
@@ -27,91 +28,27 @@ no warnings _disabled_warnings();
 
 our $VERSION = '0.11';
 
-my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
-    with_meta => [ 'field', 'param' ],
-);
-
 # Should this be in the metaclass? It feels like it should, but
 # the MOP really doesn't support these edge cases.
 my %CONFIG_FOR;
 
 sub import {
-
-    # don' use signatures for this import because we need @_ later. @_ is
-    # intended to be removed for singatures subs.
     my ( $class, %args ) = @_;
-    my ( $package, $filename, $line ) = caller;
-    state $check = compile_named(
-        _default_import_list(),
-        excludes => Optional [
-            ArrayRef [
-                Enum [
-                    qw/
-                      WarnOnConflict
-                      autoclean
-                      carp
-                      true
-                      /
-                ]
-            ]
-        ],
-    );
-    eval {
-        $check->(%args);
-        1;
-    } or do {
-
-        # Not sure what's happening, but if we don't use the eval to trap the
-        # error, it gets swallowed and we simply get:
-        #
-        # BEGIN failed--compilation aborted at ...
-        my $error = $@;
-        Carp::carp(<<"END");
-Error:    Invalid import list to MooseX::Extended::Role.
-Package:  $package
-Filename: $filename
-Line:     $line
-Details:  $error
-END
-        throw_exception(
-            'InvalidImportList',
-            class_name           => $package,
-            moosex_extended_type => __PACKAGE__,
-            line_number          => $line,
-            messsage             => $error,
-        );
-    };
-
-    # remap the arrays to hashes for easy lookup
-    foreach my $features (qw/includes excludes/) {
-        $args{$features} = { map { $_ => 1 } $args{$features}->@* };
+    $args{_import_type} = 'role';
+    my $target_class = _assert_import_list_is_valid( $class, \%args );
+    my @with_meta    = grep { not $args{excludes}{$_} } qw(field param);
+    if (@with_meta) {
+        @with_meta = ( with_meta => [@with_meta] );
     }
-
-    $CONFIG_FOR{$package} = \%args;
-
-    @_ = $class;    # anything else and $import blows up
-    goto $import;
+    my ( $import, undef, undef ) = Moose::Exporter->setup_import_methods(
+        @with_meta,
+    );
+    _our_import( $class, $import, $target_class );
 }
 
 sub init_meta ( $class, %params ) {
     my $for_class = $params{for_class};
-
-    my $config = $CONFIG_FOR{$for_class};
-
-    if ( $config->{debug} ) {
-        $MooseX::Extended::Debug = $config->{debug};
-    }
-
-    foreach my $feature (qw/includes excludes/) {
-        if ( exists $config->{$feature} ) {
-            foreach my $category ( sort keys $config->{$feature}->%* ) {
-                _debug("$for_class $feature '$category'");
-            }
-        }
-    }
-
-    _apply_default_features( $config, $for_class, \%params );
-    _apply_optional_features( $config, $for_class );
+    _our_init_meta( $class, \&_apply_default_features, %params );
     return $for_class->meta;
 }
 
@@ -203,9 +140,21 @@ Excluding this will no longer import C<Carp::croak> and C<Carp::carp>.
 
 =item * C<true>
 
-    use MooseX::Extended::Role excludes => ['carp'];
+    use MooseX::Extended::Role excludes => ['true'];
 
 Excluding this will require your module to end in a true value.
+
+=item * C<param>
+
+    use MooseX::Extended::Role excludes => ['param'];
+
+Excluding this will make the C<param> function unavailable.
+
+=item * C<field>
+
+    use MooseX::Extended::Role excludes => ['field'];
+
+Excluding this will make the C<field> function unavailable.
 
 =back
 
@@ -291,3 +240,22 @@ To silence the warning, just be explicit about your intent:
         with 'My::Role' => { -excludes => ['name'] };
         sub name {'Bob'}
     }
+
+Alternately, you can exclude this feature. We don't recommend this, but it
+might be useful if you're refactoring a legacy Moose system.
+
+    use MooseX::Extended::Role excludes => [qw/WarnOnConflict/];
+
+
+=head1 REDUCING BOILERPLATE
+
+Let's say you've settled on the following feature set:
+
+    use MooseX::Extended::Role
+        excludes => [qw/WarnOnConflict carp/],
+        includes => [qw/multi/];
+
+And you keep typing that over and over. We've removed a lot of boilerplate,
+but we've added different boilerplate. Instead, just create
+C<My::Custom::Moose::Role> and C<use My::Custom::Moose::Role;>. See
+L<MooseX::Extended::Role::Custom> for details.

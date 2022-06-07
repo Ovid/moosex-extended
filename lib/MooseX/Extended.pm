@@ -14,118 +14,49 @@ use namespace::autoclean      ();
 use Moose::Util 'throw_exception';
 use Module::Load 'load';
 use MooseX::Extended::Core qw(
+  _assert_import_list_is_valid
+  _debug
+  _disabled_warnings
+  _enabled_features
+  _our_import
+  _our_init_meta
   field
   param
-  _debug
-  _default_import_list
-  _enabled_features
-  _disabled_warnings
-  _apply_optional_features
 );
 use feature _enabled_features();
 no warnings _disabled_warnings();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
-no warnings _disabled_warnings();
-
 our $VERSION = '0.11';
 
-my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
-    with_meta => [ 'field', 'param' ],
-    install   => [qw/unimport/],
-    also      => ['Moose'],
-);
-
-# Should this be in the metaclass? It feels like it should, but
-# the MOP really doesn't support these edge cases.
-my %CONFIG_FOR;
-
 sub import {
-
-    # don' use signatures for this import because we need @_ later. @_ is
-    # intended to be removed for subs with signature
     my ( $class, %args ) = @_;
-    my ( $package, $filename, $line ) = caller;
-    state $check = compile_named(
-        _default_import_list(),
-        excludes => Optional [
-            ArrayRef [
-                Enum [
-                    qw/
-                      StrictConstructor
-                      autoclean
-                      c3
-                      carp
-                      immutable
-                      true
-                      /
-                ]
-            ]
-        ],
-    );
-    eval {
-        $check->(%args);
-        1;
-    } or do {
-
-        # Not sure what's happening, but if we don't use the eval to trap the
-        # error, it gets swallowed and we simply get:
-        #
-        # BEGIN failed--compilation aborted at ...
-        my $error = $@;
-        Carp::carp(<<"END");
-Error:    Invalid import list to MooseX::Extended.
-Package:  $package
-Filename: $filename
-Line:     $line
-Details:  $error
-END
-        throw_exception(
-            'InvalidImportList',
-            class_name           => $package,
-            moosex_extended_type => __PACKAGE__,
-            line_number          => $line,
-            messsage             => $error,
-        );
-    };
-
-    # remap the arrays to hashes for easy lookup
-    foreach my $features (qw/includes excludes/) {
-        $args{$features} = { map { $_ => 1 } $args{$features}->@* };
+    $args{_import_type} = 'class';
+    my $target_class = _assert_import_list_is_valid( $class, \%args );
+    my @with_meta    = grep { not $args{excludes}{$_} } qw(field param);
+    if (@with_meta) {
+        @with_meta = ( with_meta => [@with_meta] );
     }
-
-    $CONFIG_FOR{$package} = \%args;
-
-    @_ = $class;    # anything else and $import blows up
-    goto $import;
+    my ( $import, undef, undef ) = Moose::Exporter->setup_import_methods(
+        @with_meta,
+        install => [qw/unimport/],
+        also    => ['Moose'],
+    );
+    _our_import( $class, $import, $target_class );
 }
 
 # Internal method setting up exports. No public
 # documentation by design
 sub init_meta ( $class, %params ) {
-    my $for_class = $params{for_class};
     Moose->init_meta(%params);
-
-    my $config = $CONFIG_FOR{$for_class};
-
-    if ( $config->{debug} ) {
-        $MooseX::Extended::Debug = $config->{debug};
-    }
-
-    foreach my $feature (qw/includes excludes/) {
-        if ( exists $config->{$feature} ) {
-            foreach my $category ( sort keys $config->{$feature}->%* ) {
-                _debug("$for_class $feature '$category'");
-            }
-        }
-    }
-
-    _apply_default_features( $config, $for_class );
-    _apply_optional_features( $config, $for_class );
+    _our_init_meta( $class, \&_apply_default_features, %params );
 }
 
-sub _apply_default_features ( $config, $for_class ) {
+# XXX we don't actually use the $params here, even though we need it for
+# MooseX::Extended::Role. But we need to declare it in the signature to make
+# this code work
+sub _apply_default_features ( $config, $for_class, $params = undef ) {
     if ( my $types = $config->{types} ) {
         _debug("$for_class: importing types '@$types'");
         MooseX::Extended::Types->import::into( $for_class, @$types );
@@ -165,7 +96,7 @@ sub _apply_default_features ( $config, $for_class ) {
     unless ( $config->{excludes}{true} ) {
         eval {
             load true;
-            true->import;    # no need for `1` at the end of the module
+            true->import::into($for_class);    # no need for `1` at the end of the module
             1;
         } or do {
             my $error = $@;
@@ -180,7 +111,6 @@ sub _apply_default_features ( $config, $for_class ) {
 
     feature->import( _enabled_features() );
     warnings->unimport(_disabled_warnings);
-
 }
 1;
 
@@ -348,9 +278,21 @@ Excluding this will no longer make your class immutable.
 
 =item * C<true>
 
-    use MooseX::Extended::Role excludes => ['carp'];
+    use MooseX::Extended::Role excludes => ['true'];
 
 Excluding this will require your module to end in a true value.
+
+=item * C<param>
+
+    use MooseX::Extended::Role excludes => ['param'];
+
+Excluding this will make the C<param> function unavailable.
+
+=item * C<field>
+
+    use MooseX::Extended::Role excludes => ['field'];
+
+Excluding this will make the C<field> function unavailable.
 
 =back
 
@@ -401,6 +343,19 @@ Allows you to write asynchronous code with C<async> and C<await>.
 Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
 
 =back
+
+=head1 REDUCING BOILERPLATE
+
+Let's say you've settled on the following feature set:
+
+    use MooseX::Extended
+        excludes => [qw/StrictConstructor carp/],
+        includes => [qw/multi/];
+
+And you keep typing that over and over. We've removed a lot of boilerplate,
+but we've added different boilerplate. Instead, just create
+C<My::Custom::Moose> and C<use My::Custom::Moose;>. See
+L<MooseX::Extended::Custom> for details.
 
 =head1 IMMUTABILITY
 
@@ -601,10 +556,6 @@ C<MooseX::Extended>, but for roles.
 Some of this may just be wishful thinking. Some of this would be interesting if
 others would like to collaborate.
 
-=head2 Tests
-
-Tests! Many more tests! Volunteers welcome :)
-
 =head2 Configurable Types
 
 We provide C<MooseX::Extended::Types> for convenience, along with the C<declare> 
@@ -645,8 +596,20 @@ repository is L<https://github.com/Ovid/moosex-extreme/>.
 
 =over 4
 
+=item * L<Corinna|https://github.com/Ovid/Cor>
+
+The RFC of the new version of OOP planned for the Perl core.
+
 =item * L<MooseX::Modern|https://metacpan.org/pod/MooseX::Modern>
 
-=item * L<Corinna|https://github.com/Ovid/Cor>
+MooseX::Modern - Precision classes for Modern Perl
+
+=item * L<Zydeco|https://metacpan.org/pod/Zydeco>
+
+Zydeco - Jazz up your Perl
+
+=item * L<Dios|https://metacpan.org/pod/Dios>
+
+Dios - Declarative Inside-Out Syntax
 
 =back

@@ -6,6 +6,7 @@ package MooseX::Extended::Tests {
     use Test::Builder;
     use Test::Most ();
     use Import::Into;
+    use Capture::Tiny ();
     use Ref::Util 'is_plain_arrayref';
     use feature 'postderef';
     no warnings 'experimental::postderef';
@@ -24,24 +25,25 @@ package MooseX::Extended::Tests {
         }
 
         if ( my $module = $arg_for{module} ) {
+            my ( $package, $version )
+              = is_plain_arrayref $module
+              ? $module->@*
+              : ( $module, 0 );
             eval {
-                my ( $package, $version )
-                  = is_plain_arrayref $module
-                  ? $module->@*
-                  : ( $module, 0 );
                 load $package;
                 my $package_version = $package->VERSION;
                 if ( $version && $package_version < $version ) {
-                    croak("$module required version $version, but we loaded $package_version");
+                    croak("$package required version $version, but we loaded $package_version");
                 }
                 1;
             } or do {
                 my $error = $@ // '<unknown error>';
-                $builder->plan( skip_all => "Could not load $module: $error" );
+                $builder->plan( skip_all => "Could not load $package: $error" );
             }
         }
 
         Test::Most->import::into($package);
+        Capture::Tiny->import::into( $package, ':all' );
     }
 }
 

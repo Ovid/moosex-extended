@@ -10,6 +10,7 @@ use Moose::Util qw(
   throw_exception
 );
 use MooseX::Extended::Types qw(
+  compile_named
   ArrayRef
   Bool
   Enum
@@ -30,23 +31,174 @@ use Carp 'croak';
 our $VERSION = '0.11';
 
 our @EXPORT_OK = qw(
+  _assert_import_list_is_valid
+  _debug
+  _disabled_warnings
+  _enabled_features
+  _our_import
+  _our_init_meta
   field
   param
-  _debug
-  _enabled_features
-  _disabled_warnings
-  _default_import_list
-  _apply_optional_features
 );
 
 sub _enabled_features  {qw/signatures postderef postderef_qq :5.20/}             # internal use only
 sub _disabled_warnings {qw/experimental::signatures experimental::postderef/}    # internal use only
 
+# Should this be in the metaclass? It feels like it should, but
+# the MOP really doesn't support these edge cases.
+my %CONFIG_FOR;
+
+sub _config_for ($package) {
+    return $CONFIG_FOR{$package};
+}
+
+sub _our_import {
+
+    # don't use signatures for this import because we need @_ later. @_ is
+    # intended to be removed for subs with signature
+    my ( $class, $import, $target_class ) = @_;
+
+    # Moose::Exporter uses Sub::Exporter to handle exporting, so it accepts an
+    # { into =>> $target_class } to say where we're exporting this to. This is
+    # used by our ::Custom modules to let people define their own versions
+    @_ = ( $class, { into => $target_class } );    # anything else and $import blows up
+    goto $import;
+}
+
+# asserts the import list is valid, rewrites the excludes and includes from
+# arrays to hashes (if ( $args{excludes}{$feature} ) ...) and returns the
+# target package that this code will be applied to. Yeah, it does too much.
+sub _assert_import_list_is_valid {
+    my ( $class, $args ) = @_;
+
+    $args->{call_level} //= 0;
+    my ( $package, $filename, $line ) = caller( $args->{call_level} + 1 );
+    my $target_class = $args->{for_class} // $package;
+
+    state $check = {
+        class => compile_named( _default_import_list(), _class_excludes() ),
+        role  => compile_named( _default_import_list(), _role_excludes() )
+    };
+    eval {
+        $check->{ $args->{_import_type} }->( $args->%* );
+        1;
+    } or do {
+
+        # Not sure what's happening, but if we don't use the eval to trap the
+        # error, it gets swallowed and we simply get:
+        #
+        # BEGIN failed--compilation aborted at ...
+        #
+        # Also, don't use $target_class here because if it's different from
+        # $package, the filename and line number won't match
+        my $error = $@;
+        Carp::carp(<<"END");
+Error:    Invalid import list to $class.
+Package:  $package
+Filename: $filename
+Line:     $line
+Details:  $error
+END
+        throw_exception(
+            'InvalidImportList',
+            class_name           => $package,
+            moosex_extended_type => __PACKAGE__,
+            line_number          => $line,
+            messsage             => $error,
+        );
+    };
+
+    # remap the arrays to hashes for easy lookup
+    foreach my $features (qw/includes excludes/) {
+        $args->{$features} = { map { $_ => 1 } $args->{$features}->@* };
+    }
+
+    $CONFIG_FOR{$target_class} = $args;
+    return $target_class;
+}
+
+sub _our_init_meta ( $class, $apply_default_features, %params ) {
+    my $for_class = $params{for_class};
+    my $config    = $CONFIG_FOR{$for_class};
+
+    if ( $config->{debug} ) {
+        $MooseX::Extended::Debug = $config->{debug};
+    }
+
+    foreach my $feature (qw/includes excludes/) {
+        if ( exists $config->{$feature} ) {
+            foreach my $category ( sort keys $config->{$feature}->%* ) {
+                _debug("$for_class $feature '$category'");
+            }
+        }
+    }
+
+    $apply_default_features->( $config, $for_class, \%params );
+    _apply_optional_features( $config, $for_class );
+}
+
+sub _class_setup_import_methods () {
+    return (
+        with_meta => [ 'field', 'param' ],
+        install   => [qw/unimport/],
+        also      => ['Moose'],
+    );
+}
+
+sub _role_setup_import_methods () {
+    return (
+        with_meta => [ 'field', 'param' ],
+    );
+}
+
+sub _role_excludes () {
+    return (
+        excludes => Optional [
+            ArrayRef [
+                Enum [
+                    qw/
+                      WarnOnConflict
+                      autoclean
+                      carp
+                      true
+                      field
+                      param
+                      /
+                ]
+            ]
+        ]
+    );
+}
+
+sub _class_excludes () {
+    return (
+        excludes => Optional [
+            ArrayRef [
+                Enum [
+                    qw/
+                      StrictConstructor
+                      autoclean
+                      c3
+                      carp
+                      immutable
+                      true
+                      field
+                      param
+                      /
+                ]
+            ]
+        ]
+    );
+}
+
 sub _default_import_list () {
     return (
-        debug    => Optional [Bool],
-        types    => Optional [ ArrayRef [NonEmptyStr] ],
-        includes => Optional [
+        call_level   => Optional [ Enum [ 1, 0 ] ],
+        debug        => Optional [Bool],
+        for_class    => Optional [NonEmptyStr],
+        types        => Optional [ ArrayRef [NonEmptyStr] ],
+        _import_type => Enum [qw/class role/],
+        includes     => Optional [
             ArrayRef [
                 Enum [
                     qw/

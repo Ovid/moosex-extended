@@ -191,10 +191,26 @@ problem. You can exclude the following:
 - `true`
 
     ```perl
-    use MooseX::Extended::Role excludes => ['carp'];
+    use MooseX::Extended::Role excludes => ['true'];
     ```
 
     Excluding this will require your module to end in a true value.
+
+- `param`
+
+    ```perl
+    use MooseX::Extended::Role excludes => ['param'];
+    ```
+
+    Excluding this will make the `param` function unavailable.
+
+- `field`
+
+    ```perl
+    use MooseX::Extended::Role excludes => ['field'];
+    ```
+
+    Excluding this will make the `field` function unavailable.
 
 ## `includes`
 
@@ -245,6 +261,21 @@ Some experimental features are useful, but might not be quite what you want.
     Allows you to write asynchronous code with `async` and `await`.
 
     Only available on Perl v5.26.0 or higher. Requires [Future::AsyncAwait](https://metacpan.org/pod/Future%3A%3AAsyncAwait).
+
+# REDUCING BOILERPLATE
+
+Let's say you've settled on the following feature set:
+
+```perl
+use MooseX::Extended
+    excludes => [qw/StrictConstructor carp/],
+    includes => [qw/multi/];
+```
+
+And you keep typing that over and over. We've removed a lot of boilerplate,
+but we've added different boilerplate. Instead, just create
+`My::Custom::Moose` and `use My::Custom::Moose;`. See
+[MooseX::Extended::Custom](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3ACustom) for details.
 
 # IMMUTABILITY
 
@@ -444,10 +475,6 @@ behavioral differences you should be aware of.
 Some of this may just be wishful thinking. Some of this would be interesting if
 others would like to collaborate.
 
-## Tests
-
-Tests! Many more tests! Volunteers welcome :)
-
 ## Configurable Types
 
 We provide `MooseX::Extended::Types` for convenience, along with the `declare` 
@@ -490,8 +517,21 @@ repository is [https://github.com/Ovid/moosex-extreme/](https://github.com/Ovid/
 
 # SEE ALSO
 
-- [MooseX::Modern](https://metacpan.org/pod/MooseX::Modern)
 - [Corinna](https://github.com/Ovid/Cor)
+
+    The RFC of the new version of OOP planned for the Perl core.
+
+- [MooseX::Modern](https://metacpan.org/pod/MooseX::Modern)
+
+    MooseX::Modern - Precision classes for Modern Perl
+
+- [Zydeco](https://metacpan.org/pod/Zydeco)
+
+    Zydeco - Jazz up your Perl
+
+- [Dios](https://metacpan.org/pod/Dios)
+
+    Dios - Declarative Inside-Out Syntax
 
 # AUTHOR
 
