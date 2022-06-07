@@ -10,6 +10,7 @@ use MooseX::Extended::Core qw(
   field
   param
   _debug
+  _assert_import_list_is_valid
   _enabled_features
   _disabled_warnings
   _apply_optional_features
@@ -36,10 +37,11 @@ my %CONFIG_FOR;
 sub import {
     my ( $class, %args ) = @_;
     $args{_import_type} = 'role';
+    my $target_class = _assert_import_list_is_valid( $class, \%args );
     my ( $import, undef, undef ) = Moose::Exporter->setup_import_methods(
         with_meta => [ 'field', 'param' ],
     );
-    _our_import( $class, $import, %args );
+    _our_import( $class, $import, $target_class );
 }
 
 sub init_meta ( $class, %params ) {

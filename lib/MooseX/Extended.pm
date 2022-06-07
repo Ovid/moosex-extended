@@ -17,6 +17,7 @@ use MooseX::Extended::Core qw(
   field
   param
   _debug
+  _assert_import_list_is_valid
   _enabled_features
   _disabled_warnings
   _apply_optional_features
@@ -34,12 +35,13 @@ our $VERSION = '0.11';
 sub import {
     my ( $class, %args ) = @_;
     $args{_import_type} = 'class';
+    my $target_class = _assert_import_list_is_valid( $class, \%args );
     my ( $import, undef, undef ) = Moose::Exporter->setup_import_methods(
         with_meta => [ 'field', 'param' ],
         install   => [qw/unimport/],
         also      => ['Moose'],
     );
-    _our_import( $class, $import, %args );
+    _our_import( $class, $import, $target_class );
 }
 
 # Internal method setting up exports. No public

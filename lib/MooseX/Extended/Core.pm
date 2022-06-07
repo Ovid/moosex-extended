@@ -32,6 +32,7 @@ our $VERSION = '0.11';
 
 our @EXPORT_OK = qw(
   _apply_optional_features
+  _assert_import_list_is_valid
   _class_excludes
   _config_for
   _debug
@@ -60,17 +61,28 @@ sub _our_import {
 
     # don't use signatures for this import because we need @_ later. @_ is
     # intended to be removed for subs with signature
-    my ( $class, $import, %args ) = @_;
-    $args{call_level} //= 0;
-    my ( $package, $filename, $line ) = caller( $args{call_level} + 1 );
-    my $target_class = $args{for_class} // $package;
+    my ( $class, $import, $target_class ) = @_;
+
+    # Moose::Exporter uses Sub::Exporter to handle exporting, so it accepts an
+    # { into =>> $target_class } to say where we're exporting this to. This is
+    # used by our ::Custom modules to let people define their own versions
+    @_ = ( $class, { into => $target_class } );    # anything else and $import blows up
+    goto $import;
+}
+
+sub _assert_import_list_is_valid {
+    my ( $class, $args ) = @_;
+
+    $args->{call_level} //= 0;
+    my ( $package, $filename, $line ) = caller( $args->{call_level} + 1 );
+    my $target_class = $args->{for_class} // $package;
 
     state $check = {
         class => compile_named( _default_import_list(), _class_excludes() ),
         role  => compile_named( _default_import_list(), _role_excludes() )
     };
     eval {
-        $check->{ $args{_import_type} }->(%args);
+        $check->{ $args->{_import_type} }->($args->%*);
         1;
     } or do {
 
@@ -100,16 +112,11 @@ END
 
     # remap the arrays to hashes for easy lookup
     foreach my $features (qw/includes excludes/) {
-        $args{$features} = { map { $_ => 1 } $args{$features}->@* };
+        $args->{$features} = { map { $_ => 1 } $args->{$features}->@* };
     }
 
-    $CONFIG_FOR{$target_class} = \%args;
-
-    # Moose::Exporter uses Sub::Exporter to handle exporting, so it accepts an
-    # { into =>> $target_class } to say where we're exporting this to. This is
-    # used by our ::Custom modules to let people define their own versions
-    @_ = ( $class, { into => $target_class } );    # anything else and $import blows up
-    goto $import;
+    $CONFIG_FOR{$target_class} = $args;
+    return $target_class;
 }
 
 sub _our_init_meta ( $class, $apply_default_features, %params ) {
