@@ -4,7 +4,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
-version 0.20
+version 0.21
 
 # SYNOPSIS
 
@@ -216,6 +216,10 @@ problem. You can exclude the following:
 
 Some experimental features are useful, but might not be quite what you want.
 
+By default, [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) tries to be relatively conservative. However,
+you might want to turn it up to 11. There are optional, **EXPERIMENTAL**
+features you can use for this. They're turned by the `includes` flag.
+
 - `multi`
 
     ```perl
@@ -233,6 +237,23 @@ Some experimental features are useful, but might not be quite what you want.
     multi sub foo ($self, @x) { ... }
     multi sub foo ($self, $x) { ... } # will never be called
     ```
+
+    It's quite possible to define multi subs that are ambiguous:
+
+    ```perl
+    package Foo {
+        use MooseX::Extended includes => [qw/multi/];
+
+        multi sub foo ($self, @bar) { return '@bar' }
+        multi sub foo ($self, $bar) { return '$bar' }
+    }
+
+    say +Foo->new->foo(1);
+    say +Foo->new->foo(1,2,3);
+    ```
+
+    Both of the above will print the string `@bar`. The second definition of
+    `foo` is effectively lost.
 
     Only available on Perl v5.26.0 or higher. Requires [Syntax::Keyword::MultiSub](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3AMultiSub).
 
@@ -383,50 +404,6 @@ This also applies to various attributes which allow method names, such as
 `clone`, `builder`, `clearer`, `writer`, `reader`, and `predicate`.
 
 Trying to pass a defined `init_arg` to `field` will also this exception.
-
-# OPTIONAL FEATURES
-
-By default, [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) tries to be relatively conservative. However,
-you might want to turn it up to 11. There are optional features you can use
-for this. They're turned by the `includes` flag:
-
-## `multi`
-
-```perl
-package My::Multi::Role {
-    use MooseX::Extended::Role includes => [qw/multi/];
-
-    multi sub point ( $self, $x, $y ) {
-        return My::Point->new( x => $x, y => $y );
-    }
-    multi sub point ( $self, $x, $y, $z ) {
-        return My::Point::3D->new( x => $x, y => $y, z => $z );
-    }
-}
-```
-
-`multi` allows you to provide multiple method (or subroutine) bodies with the
-same name. We use [Syntax::Keyword::MultiSub](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3AMultiSub) to implement this, so see that module
-for caveats.
-
-It's quite possible to define multi subs that are ambiguous:
-
-```perl
-package Foo {
-    use MooseX::Extended includes => [qw/multi/];
-
-    multi sub foo ($self, @bar) { return '@bar' }
-    multi sub foo ($self, $bar) { return '$bar' }
-}
-
-say +Foo->new->foo(1);
-say +Foo->new->foo(1,2,3);
-```
-
-Both of the above will print the string `@bar`. The second definition of
-`foo` is effectively lost.
-
-`multi` is available for Perl versions 5.26 or higher.
 
 # DEBUGGER SUPPORT
 
