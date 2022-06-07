@@ -191,7 +191,7 @@ problem. You can exclude the following:
 - `true`
 
     ```perl
-    use MooseX::Extended::Role excludes => ['carp'];
+    use MooseX::Extended::Role excludes => ['true'];
     ```
 
     Excluding this will require your module to end in a true value.
