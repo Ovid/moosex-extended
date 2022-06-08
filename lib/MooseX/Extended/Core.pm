@@ -261,8 +261,10 @@ sub field ( $meta, $name, %opt_for ) {
                 messsage       => "A defined 'field.init_arg' must begin with an underscore: '$init_arg'",
             );
         }
-        $options{init_arg} //= undef;
-        $options{lazy}     //= 1;
+
+        if ( $options{builder} || $options{default} ) {
+            $options{lazy} //= 1;
+        }
 
         _add_attribute( 'field', $meta, $attr, %options );
     }
