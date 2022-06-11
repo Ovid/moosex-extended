@@ -189,7 +189,7 @@ It also exports two functions which are similar to Moose C<has>: C<param> and
 C<field>.
 
 A C<param> is a required parameter (defaults may be used). A C<field> is not
-allowed to be passed to the constructor.
+intended to be passed to the constructor.
 
 Note that the C<has> function is still available, even if it's not needed.
 
@@ -407,7 +407,7 @@ and C<field> attributes, both of which are C<< is => 'ro' >> by default.
 The C<param> is I<required>, whether by passing it to the constructor, or using
 C<default> or C<builder>.
 
-The C<field> is I<forbidden> in the constructor and lazy by default.
+The C<field> defaults to being I<forbidden> in the constructor and lazy.
 
 Here's a short example:
 
@@ -473,7 +473,9 @@ if it encounters an illegal method name for an attribute.
 This also applies to various attributes which allow method names, such as
 C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
 
-Trying to pass a defined C<init_arg> to C<field> will also this exception.
+Trying to pass a defined C<init_arg> to C<field> will also throw this
+exception, unless the init_arg begins with an underscore. (It is sometimes
+useful to be able to define an init_arg for unit testing.)
 
 =head1 DEBUGGER SUPPORT
 
