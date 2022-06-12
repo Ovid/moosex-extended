@@ -11,7 +11,6 @@ use Moose                     ();
 use MooseX::StrictConstructor ();
 use mro                       ();
 use namespace::autoclean      ();
-use Moose::Util 'throw_exception';
 use Module::Load 'load';
 use MooseX::Extended::Core qw(
   _assert_import_list_is_valid
