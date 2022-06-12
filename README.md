@@ -331,7 +331,9 @@ and `field` attributes, both of which are `is => 'ro'` by default.
 The `param` is _required_, whether by passing it to the constructor, or using
 `default` or `builder`.
 
-The `field` defaults to being _forbidden_ in the constructor and lazy.
+The `field` is _forbidden_ in the constructor and is lazy if it has a
+builder, because that builder is often dependent on attributes set in the
+constructor (and why call it if it's not used?).
 
 Here's a short example:
 
