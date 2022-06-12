@@ -262,6 +262,7 @@ sub field ( $meta, $name, %opt_for ) {
             );
         }
 
+        $options{init_arg} //= undef;
         if ( $options{builder} || $options{default} ) {
             $options{lazy} //= 1;
         }
