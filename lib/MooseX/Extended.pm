@@ -406,7 +406,9 @@ and C<field> attributes, both of which are C<< is => 'ro' >> by default.
 The C<param> is I<required>, whether by passing it to the constructor, or using
 C<default> or C<builder>.
 
-The C<field> defaults to being I<forbidden> in the constructor and lazy.
+The C<field> is I<forbidden> in the constructor and is lazy if it has a
+builder, because that builder is often dependent on attributes set in the
+constructor (and why call it if it's not used?).
 
 Here's a short example:
 
