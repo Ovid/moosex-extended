@@ -4,7 +4,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
-version 0.21
+version 0.22
 
 # SYNOPSIS
 
@@ -85,7 +85,7 @@ It also exports two functions which are similar to Moose `has`: `param` and
 `field`.
 
 A `param` is a required parameter (defaults may be used). A `field` is not
-allowed to be passed to the constructor.
+intended to be passed to the constructor.
 
 Note that the `has` function is still available, even if it's not needed.
 
@@ -331,7 +331,7 @@ and `field` attributes, both of which are `is => 'ro'` by default.
 The `param` is _required_, whether by passing it to the constructor, or using
 `default` or `builder`.
 
-The `field` is _forbidden_ in the constructor and lazy by default.
+The `field` defaults to being _forbidden_ in the constructor and lazy.
 
 Here's a short example:
 
@@ -403,7 +403,9 @@ if it encounters an illegal method name for an attribute.
 This also applies to various attributes which allow method names, such as
 `clone`, `builder`, `clearer`, `writer`, `reader`, and `predicate`.
 
-Trying to pass a defined `init_arg` to `field` will also this exception.
+Trying to pass a defined `init_arg` to `field` will also throw this
+exception, unless the init\_arg begins with an underscore. (It is sometimes
+useful to be able to define an `init_arg` for unit testing.)
 
 # DEBUGGER SUPPORT
 

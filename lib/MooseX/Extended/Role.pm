@@ -19,7 +19,6 @@ use MooseX::Extended::Core qw(
 use MooseX::Role::WarnOnConflict ();
 use Moose::Role;
 use Moose::Meta::Role;
-use Moose::Util 'throw_exception';
 use namespace::autoclean ();
 use Import::Into;
 use true;

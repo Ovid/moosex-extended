@@ -254,15 +254,15 @@ sub field ( $meta, $name, %opt_for ) {
     foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
         my %options = %opt_for;    # copy each time to avoid overwriting
         if ( defined( my $init_arg = $options{init_arg} ) ) {
-            throw_exception(
+            $init_arg =~ /\A_/ or throw_exception(
                 'InvalidAttributeDefinition',
                 attribute_name => $name,
                 class_name     => $meta->name,
-                messsage       => "The 'field.init_arg' must be absent or undef, not '$init_arg'",
+                messsage       => "A defined 'field.init_arg' must begin with an underscore: '$init_arg'",
             );
         }
-        $options{init_arg} = undef;
-        $options{lazy} //= 1;
+        $options{init_arg} //= undef;
+        $options{lazy}     //= 1;
 
         _add_attribute( 'field', $meta, $attr, %options );
     }
