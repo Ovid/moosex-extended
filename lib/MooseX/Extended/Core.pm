@@ -258,7 +258,7 @@ sub field ( $meta, $name, %opt_for ) {
                 'InvalidAttributeDefinition',
                 attribute_name => $name,
                 class_name     => $meta->name,
-                messsage       => "The 'field.init_arg' must be absent or undef, not '$init_arg'",
+                messsage       => "A defined 'field.init_arg' must begin with an underscore: '$init_arg'",
             );
         }
         $options{init_arg} //= undef;

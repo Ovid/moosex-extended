@@ -474,7 +474,7 @@ C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
 
 Trying to pass a defined C<init_arg> to C<field> will also throw this
 exception, unless the init_arg begins with an underscore. (It is sometimes
-useful to be able to define an init_arg for unit testing.)
+useful to be able to define an C<init_arg> for unit testing.)
 
 =head1 DEBUGGER SUPPORT
 
