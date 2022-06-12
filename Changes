@@ -2,12 +2,12 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - A field's `init_arg` can now begin with an underscore. (thanks,
+            tobyink!)
           - `field` is now only lazy if there's a builder or default.
 
 0.21      2022-06-07 19:17:30 CEST
 
-          - A field's `init_arg` can now begin with an underscore. (thanks,
-            tobyink!)
           - Remove some duplicate POD and make it easier to follow.
 
 0.20      2022-06-07 18:40:47 CEST
