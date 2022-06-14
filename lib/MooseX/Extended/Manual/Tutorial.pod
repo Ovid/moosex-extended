@@ -10,13 +10,13 @@ it's become clear that there are some problematic design choices. Further,
 Corinna is not yet in core as we write this (though the Perl Steering
 Committee has accepted it), so for now, let's see how far we can push the
 envelope. Interestingly, in some respects, L<MooseX::Extended> offers more
-than the initial versions of Corinna (those this won't last).
+than the initial versions of Corinna (though this won't last).
 
 =head1 BEST PRACTICES
 
 L<MooseX::Extended> has the philosophy of I<providing> best practices, but not
 enforcing them. We try to make many best practices the default, but you can
-opt out of them. For more background, see the article, L<Common Problems in
+opt out of them. For more background, see the article L<Common Problems in
 Object-Oriented
 Code|https://ovid.github.io/articles/common-problems-in-object-oriented-code.html>.
 That's what lead to the creation of L<MooseX::Extended>.
@@ -581,16 +581,16 @@ this. A brute-force approach to handling this could be the following:
             my ( $class, %args ) = @_;
             MooseX::Extended::Custom->create(
                 excludes => [qw/
-					StrictConstructor autoclean 
-					c3                carp
-					immutable         true
-					field             param
+                    StrictConstructor autoclean 
+                    c3                carp
+                    immutable         true
+                    field             param
                 /],
                 %args    # you need this to pass your own import list
             );
         }
     }
-	# no need for a true value
+    # no need for a true value
 
 With the above, you've excluded almost everything except signatures and
 postderef features (we will work on getting around that limitation). From
