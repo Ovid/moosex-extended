@@ -4,7 +4,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
-version 0.22
+version 0.23
 
 # SYNOPSIS
 
@@ -43,6 +43,9 @@ package My::Names {
 
 This module is **BETA** code. It's feature-complete for release and has no
 known bugs.
+
+This is a quick overview. See [MooseX::Extended::Manual::Tutorial](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3ATutorial) for more
+information.
 
 This class attempts to create a safer version of Moose that defaults to
 read-only attributes and is easier to read and write.
@@ -151,7 +154,7 @@ problem. You can exclude the following:
 - `StrictConstructor`
 
     ```perl
-    use MooseX::Extended::Role excludes => ['StrictConstructor'];
+    use MooseX::Extended excludes => ['StrictConstructor'];
     ```
 
     Excluding this will no longer import `MooseX::StrictConstructor`.
@@ -159,7 +162,7 @@ problem. You can exclude the following:
 - `autoclean`
 
     ```perl
-    use MooseX::Extended::Role excludes => ['autoclean'];
+    use MooseX::Extended excludes => ['autoclean'];
     ```
 
     Excluding this will no longer import `namespace::autoclean`.
@@ -167,7 +170,7 @@ problem. You can exclude the following:
 - `c3`
 
     ```perl
-    use MooseX::Extended::Role excludes => ['c3'];
+    use MooseX::Extended excludes => ['c3'];
     ```
 
     Excluding this will no longer apply the C3 mro.
@@ -175,7 +178,7 @@ problem. You can exclude the following:
 - `carp`
 
     ```perl
-    use MooseX::Extended::Role excludes => ['carp'];
+    use MooseX::Extended excludes => ['carp'];
     ```
 
     Excluding this will no longer import `Carp::croak` and `Carp::carp`.
@@ -183,7 +186,7 @@ problem. You can exclude the following:
 - `immutable`
 
     ```perl
-    use MooseX::Extended::Role excludes => ['immutable'];
+    use MooseX::Extended excludes => ['immutable'];
     ```
 
     Excluding this will no longer make your class immutable.
@@ -191,7 +194,7 @@ problem. You can exclude the following:
 - `true`
 
     ```perl
-    use MooseX::Extended::Role excludes => ['true'];
+    use MooseX::Extended excludes => ['true'];
     ```
 
     Excluding this will require your module to end in a true value.
@@ -199,7 +202,7 @@ problem. You can exclude the following:
 - `param`
 
     ```perl
-    use MooseX::Extended::Role excludes => ['param'];
+    use MooseX::Extended excludes => ['param'];
     ```
 
     Excluding this will make the `param` function unavailable.
@@ -207,7 +210,7 @@ problem. You can exclude the following:
 - `field`
 
     ```perl
-    use MooseX::Extended::Role excludes => ['field'];
+    use MooseX::Extended excludes => ['field'];
     ```
 
     Excluding this will make the `field` function unavailable.

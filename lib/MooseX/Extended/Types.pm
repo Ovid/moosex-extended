@@ -66,10 +66,10 @@ L<Type::Tiny>. Using these is preferred to using using strings due to runtime
 versus compile-time failures. For example:
 
     # fails at runtime, if ->name is set
-    param name => ( isa => 'StR' );
+    param name => ( isa => 'str' );
 
     # fails at compile-time
-    param name => ( isa => StR );
+    param name => ( isa => str );
 
 =head1 TYPE LIBRARIES
 
