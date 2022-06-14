@@ -42,7 +42,7 @@ package My::Names {
 # DESCRIPTION
 
 This module is **BETA** code. It's feature-complete for release and has no
-known bugs.
+known bugs. We believe it's ready for production, but make no promises.
 
 This is a quick overview. See [MooseX::Extended::Manual::Tutorial](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3ATutorial) for more
 information.

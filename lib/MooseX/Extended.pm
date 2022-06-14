@@ -149,7 +149,7 @@ __END__
 =head1 DESCRIPTION
 
 This module is B<BETA> code. It's feature-complete for release and has no
-known bugs.
+known bugs. We believe it's ready for production, but make no promises.
 
 This is a quick overview. See L<MooseX::Extended::Manual::Tutorial> for more
 information.
