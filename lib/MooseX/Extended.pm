@@ -151,6 +151,9 @@ __END__
 This module is B<BETA> code. It's feature-complete for release and has no
 known bugs.
 
+This is a quick overview. See L<MooseX::Extended::Manual::Tutorial> for more
+information.
+
 This class attempts to create a safer version of Moose that defaults to
 read-only attributes and is easier to read and write.
 

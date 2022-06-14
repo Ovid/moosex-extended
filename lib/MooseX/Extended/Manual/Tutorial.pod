@@ -602,3 +602,9 @@ C<excludes> until your tests fail and address them one-by-one.
 
 Moose and C<MooseX::Extended> should be 100% interoperable. L<Let us know if
 it's not|https://github.com/Ovid/moosex-extreme/issues>.
+
+=head1 VERSION COMPATIBILITY
+
+We use L<GitHub Actions|https://github.com/features/actions> to run full
+continuous integration tests on versions of Perl from v.5.20.0 and up. We do
+not release any code that fails any of those tests.
