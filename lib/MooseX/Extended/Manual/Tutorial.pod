@@ -25,6 +25,9 @@ In particular, it's designed to make large-scale OOP systems written in Moose
 easier to maintain by removing many common failure modes, while still allowing 
 you full control over what features you do and do not want.
 
+What follows is a fairly decent overview of L<MooseX::Extended>. See the
+documentation of individual modules for more information.
+
 =head2 What's the Point.pm?
 
 Let's take a look at a simple C<Point> class in Moose. We want it to have x/y
@@ -395,3 +398,207 @@ shortcuts:
 
 These should be self-explanatory, but see
 L<MooseX::Extended::Manual::Shortcuts> for a full explanation.
+
+=head1 EXCLUDING FEATURES
+
+You may find some features to be annoying, or even cause potential bugs (e.g.,
+if you have a C<croak> method, our importing of C<Carp::croak> will be a
+problem.
+
+For example, if you wish to eliminate L<MooseX::StrictConstructor> and the
+C<carp> and C<croak> behavior:
+
+    use MooseX::Extended excludes => [qw/StrictConstructor carp/];
+
+You can exclude the following:
+
+=over 4
+
+=item * C<StrictConstructor>
+
+    use MooseX::Extended::Role excludes => ['StrictConstructor'];
+
+Excluding this will no longer import C<MooseX::StrictConstructor>.
+
+=item * C<autoclean>
+
+    use MooseX::Extended::Role excludes => ['autoclean'];
+
+Excluding this will no longer import C<namespace::autoclean>.
+
+=item * C<c3>
+
+    use MooseX::Extended::Role excludes => ['c3'];
+
+Excluding this will no longer apply the C3 mro.
+
+=item * C<carp>
+
+    use MooseX::Extended::Role excludes => ['carp'];
+
+Excluding this will no longer import C<Carp::croak> and C<Carp::carp>.
+
+=item * C<immutable>
+
+    use MooseX::Extended::Role excludes => ['immutable'];
+
+Excluding this will no longer make your class immutable.
+
+=item * C<true>
+
+    use MooseX::Extended::Role excludes => ['true'];
+
+Excluding this will require your module to end in a true value.
+
+=item * C<param>
+
+    use MooseX::Extended::Role excludes => ['param'];
+
+Excluding this will make the C<param> function unavailable.
+
+=item * C<field>
+
+    use MooseX::Extended::Role excludes => ['field'];
+
+Excluding this will make the C<field> function unavailable.
+
+=back
+
+=head1 TYPES
+
+We bundle L<MooseX::Extended::Types> to make it easier to have compile-time
+type checks, along with type checks in functions. Here's a silly example:
+
+    package Not::Corinna {
+        use MooseX::Extended types => [qw(compile Num NonEmptyStr ArrayRef)];
+        use List::Util ();
+
+        # these default to 'ro' (but you can override that) and are required
+        param _name => ( isa => NonEmptyStr, init_arg => 'name' );
+        param title => ( isa => NonEmptyStr, required => 0 );
+
+        # fields must never be passed to the constructor
+        # note that ->title and ->name are guaranteed to be set before
+        # this because fields are lazy by default
+        field name => (
+            isa     => NonEmptyStr,
+            default => sub ($self) {
+                my $title = $self->title;
+                my $name  = $self->_name;
+                return $title ? "$title $name" : $name;
+            },
+        );
+
+        sub add ( $self, $args ) {
+            state $check = compile( ArrayRef [ Num, 1 ] );
+            ($args) = $check->($args);
+            return List;:Util::sum( $args->@* );
+        }
+    }
+
+See L<MooseX::Extended::Types> for more information.
+
+=head1 ASSEMBLING YOUR OWN MOOSE
+
+After you get used to C<MooseX::Extended>, you might get tired of exchanging
+the old boilerplate for new boilerplate. So don't do that. Instead, create
+your own.
+
+Define your own version of L<MooseX::Extended>:
+
+    package My::Moose::Role {
+        use MooseX::Extended::Role::Custom;
+
+        sub import {
+            my ( $class, %args ) = @_;
+            MooseX::Extended::Role::Custom->create(
+                excludes => [qw/ carp /],
+                includes => ['multi'],
+                %args    # you need this to allow customization of your customization
+            );
+        }
+    }
+
+    # no need for a true value
+
+And then use it:
+
+    package Some::Class::Role {
+        use My::Moose::Role types => [qw/ArrayRef Num/];
+
+        param numbers => ( isa => ArrayRef[Num] );
+
+        multi sub foo ($self)       { ... }
+        multi sub foo ($self, $bar) { ... }
+    }
+
+See L<MooseX::Extended::Custom> for more information.
+
+=head1 ROLES
+
+Of course we support roles. Here's a simple role to add a C<created> field to
+your class:
+
+    package Not::Corinna::Role::Created {
+        use MooseX::Extended::Role types => ['PositiveInt'];
+
+        # mark it as non-lazy to ensure it's run at construction time
+        field created => ( isa => PositiveInt, lazy => 0, default => sub {time} );
+    }
+
+And then consume like you would any other role:
+
+    package My::Class {
+        use MooseX::Extended types => [qw(compile Num NonEmptyStr Str PositiveInt ArrayRef)];
+
+        with qw(
+        Not::Corinna::Role::Created
+        );
+
+        ...
+    }
+
+See L<MooseX::Extended::Role> for information about what features it provides
+and how to adjust its behavior.
+
+=head1 MIGRATING FROM MOOSE
+
+For a clean Moose hierarchy, switching to L<MooseX::Extended> is often as
+simple at replacing Moose with MooseX::Extended and running your tests. Then
+you can start deleting various bits of boilerplate in your code (such as the
+C<make_immutable> call).
+
+Unfortunately, many Moose hierarchies are not clean. You might fail on the
+C<StrictConstructor>, of find that you use multiple inheritance and rely on
+dfs (depth-first search) instead of the C3 mro, or maybe (horrors!), you have
+classes that aren't declared as immutable and you have code that relies on
+this. A brute-force approach to handling this could be the following:
+
+    package My::Moose {
+        use MooseX::Extended::Custom;
+
+        sub import {
+            my ( $class, %args ) = @_;
+            MooseX::Extended::Custom->create(
+                excludes => [qw/
+					StrictConstructor autoclean 
+					c3                carp
+					immutable         true
+					field             param
+                /],
+                %args    # you need this to pass your own import list
+            );
+        }
+    }
+	# no need for a true value
+
+With the above, you've excluded almost everything except signatures and
+postderef features (we will work on getting around that limitation). From
+there, you can replace Moose with C<My::Moose> (and do something similar with
+roles) and it should just work. Then, start slowing deleting the items from
+C<excludes> until your tests fail and address them one-by-one.
+
+=head1 MOOSE INTEROPERABILITY
+
+Moose and C<MooseX::Extended> should be 100% interoperable. L<Let us know if
+it's not|https://github.com/Ovid/moosex-extreme/issues>.

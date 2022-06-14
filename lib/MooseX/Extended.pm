@@ -247,49 +247,49 @@ problem. You can exclude the following:
 
 =item * C<StrictConstructor>
 
-    use MooseX::Extended::Role excludes => ['StrictConstructor'];
+    use MooseX::Extended excludes => ['StrictConstructor'];
 
 Excluding this will no longer import C<MooseX::StrictConstructor>.
 
 =item * C<autoclean>
 
-    use MooseX::Extended::Role excludes => ['autoclean'];
+    use MooseX::Extended excludes => ['autoclean'];
 
 Excluding this will no longer import C<namespace::autoclean>.
 
 =item * C<c3>
 
-    use MooseX::Extended::Role excludes => ['c3'];
+    use MooseX::Extended excludes => ['c3'];
 
 Excluding this will no longer apply the C3 mro.
 
 =item * C<carp>
 
-    use MooseX::Extended::Role excludes => ['carp'];
+    use MooseX::Extended excludes => ['carp'];
 
 Excluding this will no longer import C<Carp::croak> and C<Carp::carp>.
 
 =item * C<immutable>
 
-    use MooseX::Extended::Role excludes => ['immutable'];
+    use MooseX::Extended excludes => ['immutable'];
 
 Excluding this will no longer make your class immutable.
 
 =item * C<true>
 
-    use MooseX::Extended::Role excludes => ['true'];
+    use MooseX::Extended excludes => ['true'];
 
 Excluding this will require your module to end in a true value.
 
 =item * C<param>
 
-    use MooseX::Extended::Role excludes => ['param'];
+    use MooseX::Extended excludes => ['param'];
 
 Excluding this will make the C<param> function unavailable.
 
 =item * C<field>
 
-    use MooseX::Extended::Role excludes => ['field'];
+    use MooseX::Extended excludes => ['field'];
 
 Excluding this will make the C<field> function unavailable.
 
