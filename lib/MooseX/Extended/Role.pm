@@ -33,7 +33,9 @@ my %CONFIG_FOR;
 
 sub import {
     my ( $class, %args ) = @_;
+    my @caller = caller(0);
     $args{_import_type} = 'role';
+    $args{_caller_eval} = ( $caller[1] =~ /^\(eval/ );
     my $target_class = _assert_import_list_is_valid( $class, \%args );
     my @with_meta    = grep { not $args{excludes}{$_} } qw(field param);
     if (@with_meta) {
@@ -60,7 +62,7 @@ sub _apply_default_features ( $config, $for_class, $params ) {
 
     Carp->import::into($for_class)                         unless $config->{excludes}{carp};
     namespace::autoclean->import::into($for_class)         unless $config->{excludes}{autoclean};
-    true->import                                           unless $config->{excludes}{true};
+    true->import                                           unless $config->{excludes}{true} || $config->{_caller_eval};
     MooseX::Role::WarnOnConflict->import::into($for_class) unless $config->{excludes}{WarnOnConflict};
 
     feature->import( _enabled_features() );

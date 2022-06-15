@@ -31,7 +31,9 @@ our $VERSION = '0.25';
 
 sub import {
     my ( $class, %args ) = @_;
+    my @caller = caller(0);
     $args{_import_type} = 'class';
+    $args{_caller_eval} = ( $caller[1] =~ /^\(eval/ );
     my $target_class = _assert_import_list_is_valid( $class, \%args );
     my @with_meta    = grep { not $args{excludes}{$_} } qw(field param);
     if (@with_meta) {
@@ -70,7 +72,7 @@ sub _apply_default_features ( $config, $for_class, $params = undef ) {
         say STDERR "We are running under the debugger or using code that uses debugger code (e.g., Devel::Cover). $for_class is not immutable";
     }
     else {
-        unless ( $config->{excludes}{immutable} ) {
+        unless ( $config->{excludes}{immutable} or $config->{_caller_eval} ) {
 
             # after_runtime is loaded too late under the debugger
             eval {
@@ -92,7 +94,7 @@ sub _apply_default_features ( $config, $for_class, $params = undef ) {
             };
         }
     }
-    unless ( $config->{excludes}{true} ) {
+    unless ( $config->{excludes}{true} or $config->{_caller_eval} ) {
         eval {
             load true;
             true->import::into($for_class);    # no need for `1` at the end of the module

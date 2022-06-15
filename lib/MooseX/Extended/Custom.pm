@@ -16,8 +16,9 @@ use namespace::autoclean;
 our $VERSION = '0.25';
 
 sub import {
-    my $custom_moose = caller;    # this is our custom Moose definition
-    true->import::into($custom_moose);
+    my @caller = caller(0);
+    my $custom_moose = $caller[0]; # this is our custom Moose definition
+    true->import::into($custom_moose) unless $caller[1] =~ /^\(eval/;
     strict->import::into($custom_moose);
     warnings->import::into($custom_moose);
     namespace::autoclean->import::into($custom_moose);
