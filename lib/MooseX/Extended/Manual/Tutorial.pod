@@ -177,9 +177,8 @@ you.
     package My::Point {
         use MooseX::Extended types => [qw/Num Int/];
 
-        has [ 'x', 'y' ] => ( is => 'rw', isa => Num, writer => 1 );
-
-        field 'created' => ( isa => Int, lazy => 0, default => sub {time} );
+        param [ 'x', 'y' ] => ( is => 'rw', isa => Num, writer => 1 );
+        field 'created'    => ( isa => Int, lazy => 0, default => sub {time} );
 
         sub invert ($self) {
             my ( $x, $y ) = ( $self->x, $self->y );
@@ -551,9 +550,7 @@ And then consume like you would any other role:
     package My::Class {
         use MooseX::Extended types => [qw(compile Num NonEmptyStr Str PositiveInt ArrayRef)];
 
-        with qw(
-        Not::Corinna::Role::Created
-        );
+        with qw(Not::Corinna::Role::Created);
 
         ...
     }
