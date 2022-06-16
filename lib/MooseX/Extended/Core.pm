@@ -297,7 +297,7 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
         my $builder_name = $shortcut_for->{builder}->($name);
         if ( _is_valid_method_name($builder_name) ) {
             $meta->add_method( $builder_name => $builder_code );
-            $opt_for{builder} = 1;
+            $opt_for{builder} = $builder_name;
         }
     }
 
