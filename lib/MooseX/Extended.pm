@@ -404,9 +404,10 @@ See the L<MooseX::Extended::Manual::Cloning> documentation.
 
 =head1 OBJECT CONSTRUCTION
 
-Objection construction for L<MooseX::Extended> is like Moose, so no
-changes are needed.  However, in addition to C<has>, we also provide C<param>
-and C<field> attributes, both of which are C<< is => 'ro' >> by default.
+Object construction for L<MooseX::Extended> is identical to Moose because
+MooseX::Extended I<is> Moose, so no changes are needed.  However, in addition
+to C<has>, we also provide C<param> and C<field> attributes, both of which are
+C<< is => 'ro' >> by default.
 
 The C<param> is I<required>, whether by passing it to the constructor, or using
 C<default> or C<builder>.
