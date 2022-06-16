@@ -60,16 +60,16 @@ sub _apply_default_features ( $config, $for_class, $params ) {
         MooseX::Extended::Types->import::into( $for_class, @$types );
     }
 
-    Carp->import::into($for_class)                         unless $config->{excludes}{carp};
-    namespace::autoclean->import::into($for_class)         unless $config->{excludes}{autoclean};
-    true->import                                           unless $config->{excludes}{true} || $config->{_caller_eval};
+    Carp->import::into($for_class)                 unless $config->{excludes}{carp};
+    namespace::autoclean->import::into($for_class) unless $config->{excludes}{autoclean};
+    true->import                                   unless $config->{excludes}{true} || $config->{_caller_eval}; # https://github.com/Ovid/moosex-extreme/pull/34
     MooseX::Role::WarnOnConflict->import::into($for_class) unless $config->{excludes}{WarnOnConflict};
 
     feature->import( _enabled_features() );
     warnings->unimport(_disabled_warnings);
 
-    Moose::Role->init_meta(    ##
-        %$params,              ##
+    Moose::Role->init_meta(                                                                                     ##
+        %$params,                                                                                               ##
         metaclass => 'Moose::Meta::Role'
     );
 }
@@ -247,6 +247,13 @@ might be useful if you're refactoring a legacy Moose system.
 
     use MooseX::Extended::Role excludes => [qw/WarnOnConflict/];
 
+=head1 BUGS AND LIMITATIONS
+
+If the MooseX::Extended::Role is loaded via I<stringy> eval, C<true> is not
+loaded, This is because there were intermittant errors (maybe 1 out of 5
+times) being thrown. Removing this feature under stringy eval solves this. See
+L<this github ticket for more
+infomration|https://github.com/Ovid/moosex-extreme/pull/34>.
 
 =head1 REDUCING BOILERPLATE
 

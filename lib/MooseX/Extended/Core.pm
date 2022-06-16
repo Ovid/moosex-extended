@@ -198,7 +198,7 @@ sub _default_import_list () {
         for_class    => Optional [NonEmptyStr],
         types        => Optional [ ArrayRef [NonEmptyStr] ],
         _import_type => Enum [qw/class role/],
-        _caller_eval => Bool,
+        _caller_eval => Bool,                                  # https://github.com/Ovid/moosex-extreme/pull/34
         includes     => Optional [
             ArrayRef [
                 Enum [

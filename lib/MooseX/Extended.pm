@@ -33,7 +33,7 @@ sub import {
     my ( $class, %args ) = @_;
     my @caller = caller(0);
     $args{_import_type} = 'class';
-    $args{_caller_eval} = ( $caller[1] =~ /^\(eval/ );
+    $args{_caller_eval} = ( $caller[1] =~ /^\(eval/ );    # https://github.com/Ovid/moosex-extreme/pull/34
     my $target_class = _assert_import_list_is_valid( $class, \%args );
     my @with_meta    = grep { not $args{excludes}{$_} } qw(field param);
     if (@with_meta) {
@@ -72,7 +72,7 @@ sub _apply_default_features ( $config, $for_class, $params = undef ) {
         say STDERR "We are running under the debugger or using code that uses debugger code (e.g., Devel::Cover). $for_class is not immutable";
     }
     else {
-        unless ( $config->{excludes}{immutable} or $config->{_caller_eval} ) {
+        unless ( $config->{excludes}{immutable} or $config->{_caller_eval} ) {    # https://github.com/Ovid/moosex-extreme/pull/34
 
             # after_runtime is loaded too late under the debugger
             eval {
@@ -94,10 +94,10 @@ sub _apply_default_features ( $config, $for_class, $params = undef ) {
             };
         }
     }
-    unless ( $config->{excludes}{true} or $config->{_caller_eval} ) {
+    unless ( $config->{excludes}{true} or $config->{_caller_eval} ) {    # https://github.com/Ovid/moosex-extreme/pull/34
         eval {
             load true;
-            true->import::into($for_class);    # no need for `1` at the end of the module
+            true->import::into($for_class);                              # no need for `1` at the end of the module
             1;
         } or do {
             my $error = $@;
@@ -497,6 +497,8 @@ relies on L<B::Hooks::AtRuntime>'s C<after_runtime> function. However, that
 runs too late under the debugger and dies. Thus, we disable this feature under
 the debugger. Your classes may run a bit slower, but hey, it's the debugger!
 
+There is L<a PR against B::Hooks::AtRuntime which will fix this issue|https://github.com/mauzo/B-Hooks-AtRuntime/pull/1>.
+
 =item * C<namespace::autoclean> will frustrate you
 
 It's very frustrating when running under the debugger and doing this:
@@ -509,6 +511,14 @@ We had removed C<namespace::autoclean> when running under the debugger, but
 backed that out: L<https://github.com/Ovid/moosex-extreme/issues/11>.
 
 =back
+
+=head1 BUGS AND LIMITATIONS
+
+If the MooseX::Extended classes are loaded via I<stringy> eval, C<true> is not
+loaded, nor is your class made immutable. This is because there were
+intermittant errors (maybe 1 out of 5 times) being thrown. Removing these
+features under stringy eval solves this. See L<this github ticket for more
+infomration|https://github.com/Ovid/moosex-extreme/pull/34>.
 
 =head1 MANUAL
 
