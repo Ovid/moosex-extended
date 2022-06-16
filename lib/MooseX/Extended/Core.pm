@@ -292,6 +292,15 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
         reader    => sub ($value) {"get_$value"},
     };
 
+    if ( is_coderef( $opt_for{builder} ) ) {
+        my $builder_code = $opt_for{builder};
+        my $builder_name = $shortcut_for->{builder}->($name);
+        if ( _is_valid_method_name($builder_name) ) {
+            $meta->add_method( $builder_name => $builder_code );
+            $opt_for{builder} = $builder_name;
+        }
+    }
+
     OPTION: foreach my $option ( keys $shortcut_for->%* ) {
         next unless exists $opt_for{$option};
         no warnings 'numeric';    ## no critic (TestingAndDebugging::ProhibitNoWarning)

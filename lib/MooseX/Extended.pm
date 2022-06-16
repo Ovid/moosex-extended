@@ -456,6 +456,16 @@ When using C<field> or C<param>, we have some attribute shortcuts:
         ...
     }
 
+You can also do this:
+
+    param name ( isa => NonEmptyStr, builder => sub {...} );
+
+That's the same as:
+
+    param name ( isa => NonEmptyStr, builder => '_build_name' );
+
+    sub _build_name {...}
+
 See L<MooseX::Extended::Manual::Shortcuts> for a full explanation.
 
 =head1 INVALID ATTRIBUTE DEFINITIONS

@@ -157,3 +157,16 @@ Is the same as this:
 Obviously, a "private" attribute, such as C<_auth_token> would get a build named
 C<_build__auth_token> (note the two underscores between "build" and "auth_token").
 
+=head1 STEALING FROM MOO
+
+You may also pass a coderef to `builder`:
+
+    field created => (
+        isa     => PositiveInt,
+        lazy    => 0,
+        builder => sub {time},
+    );
+
+This is different from C<< default => sub {...} >> because it will install a
+C<_build_created> method for you. This is useful if you with to allow a
+subclass to override this method.
