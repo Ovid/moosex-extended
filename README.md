@@ -327,9 +327,10 @@ See the [MooseX::Extended::Manual::Cloning](https://metacpan.org/pod/MooseX%3A%3
 
 # OBJECT CONSTRUCTION
 
-Objection construction for [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) is like Moose, so no
-changes are needed.  However, in addition to `has`, we also provide `param`
-and `field` attributes, both of which are `is => 'ro'` by default.
+Object construction for [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) is identical to Moose because
+MooseX::Extended _is_ Moose, so no changes are needed.  However, in addition
+to `has`, we also provide `param` and `field` attributes, both of which are
+`is => 'ro'` by default.
 
 The `param` is _required_, whether by passing it to the constructor, or using
 `default` or `builder`.
