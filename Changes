@@ -2,6 +2,9 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Disable true/make_immutable when loaded via stringy eval (thanks,
+            tobyink)
+
 0.24      2022-06-14 19:15:53 CEST
 
           - Of *course* we found some important typos :)

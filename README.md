@@ -424,6 +424,8 @@ behavioral differences you should be aware of.
     runs too late under the debugger and dies. Thus, we disable this feature under
     the debugger. Your classes may run a bit slower, but hey, it's the debugger!
 
+    There is [a PR against B::Hooks::AtRuntime which will fix this issue](https://github.com/mauzo/B-Hooks-AtRuntime/pull/1).
+
 - `namespace::autoclean` will frustrate you
 
     It's very frustrating when running under the debugger and doing this:
@@ -436,6 +438,14 @@ behavioral differences you should be aware of.
 
     We had removed `namespace::autoclean` when running under the debugger, but
     backed that out: [https://github.com/Ovid/moosex-extreme/issues/11](https://github.com/Ovid/moosex-extreme/issues/11).
+
+# BUGS AND LIMITATIONS
+
+If the MooseX::Extended classes are loaded via _stringy_ eval, `true` is not
+loaded, nor is your class made immutable. This is because there were
+intermittant errors (maybe 1 out of 5 times) being thrown. Removing these
+features under stringy eval solves this. See [this github ticket for more
+infomration](https://github.com/Ovid/moosex-extreme/pull/34).
 
 # MANUAL
 
