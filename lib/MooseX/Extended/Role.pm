@@ -247,6 +247,11 @@ might be useful if you're refactoring a legacy Moose system.
 
     use MooseX::Extended::Role excludes => [qw/WarnOnConflict/];
 
+=head1 ATTRIBUTE SHORTCUTS
+
+C<param> and C<field> in roles allow the same L<attribute
+shortcuts|MooseX::Extended::Manual::Shortcuts> as L<MooseX::Extended>.
+
 =head1 BUGS AND LIMITATIONS
 
 If the MooseX::Extended::Role is loaded via I<stringy> eval, C<true> is not

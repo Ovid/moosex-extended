@@ -383,6 +383,20 @@ sub _build_name ($self) {
 }
 ```
 
+You can also do this:
+
+```perl
+param name ( isa => NonEmptyStr, builder => sub {...} );
+```
+
+That's the same as:
+
+```perl
+param name ( isa => NonEmptyStr, builder => '_build_name' );
+
+sub _build_name {...}
+```
+
 See [MooseX::Extended::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AShortcuts) for a full explanation.
 
 # INVALID ATTRIBUTE DEFINITIONS
