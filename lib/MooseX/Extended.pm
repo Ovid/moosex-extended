@@ -27,7 +27,7 @@ no warnings _disabled_warnings();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 sub import {
     my ( $class, %args ) = @_;
