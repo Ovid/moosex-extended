@@ -463,6 +463,7 @@ infomration](https://github.com/Ovid/moosex-extreme/pull/34).
 
 # MANUAL
 
+- [MooseX::Extended::Manual::Tutorial](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3ATutorial)
 - [MooseX::Extended::Manual::Overview](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AOverview)
 - [MooseX::Extended::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AConstruction)
 - [MooseX::Extended::Manual::Shortcuts](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AShortcuts)

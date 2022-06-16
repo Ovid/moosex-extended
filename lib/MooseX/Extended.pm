@@ -534,6 +534,8 @@ infomration|https://github.com/Ovid/moosex-extreme/pull/34>.
 
 =over 4
 
+=item * L<MooseX::Extended::Manual::Tutorial>
+
 =item * L<MooseX::Extended::Manual::Overview>
 
 =item * L<MooseX::Extended::Manual::Construction>
