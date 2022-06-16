@@ -2,6 +2,8 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+0.25      2022-06-16 16:02:05 CEST
+
           - `builder` can now accept a coderef (stolen from Moo). (thanks,
             tobyink)
           - Disable true/make_immutable when loaded via stringy eval (thanks,
