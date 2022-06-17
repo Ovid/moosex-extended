@@ -36,6 +36,7 @@ my %WriteMakefileArgs = (
     "Perl::Critic::Policy::Moose::RequireMakeImmutable" => 0,
     "Ref::Util" => 0,
     "Storable" => 0,
+    "Syntax::Keyword::MultiSub" => 0,
     "Type::Library" => 0,
     "Type::Params" => 0,
     "Type::Tiny" => "1.012004",
