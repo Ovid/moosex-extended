@@ -2,12 +2,13 @@
 name: windows
 
 on:
-  #push:
-  #  branches:
-  #    - '*'
+  push:
+    branches:
+      - '*'
   #  tags-ignore:
   #    - '*'
   pull_request:
+        branches: '*'
 jobs:
   perl:
     runs-on: windows-latest
@@ -22,8 +23,7 @@ jobs:
           - '5.28'
           - '5.30'
           - '5.32'
-            # - '5.34'
-            # - 'latest'
+            # - '5.34' # as of June 20, 2022, still remains at "Error: unable to get latest version"
     steps:
       - name: Setup perl
         uses: shogo82148/actions-setup-perl@v1
