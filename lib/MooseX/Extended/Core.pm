@@ -318,6 +318,10 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
         }
     }
 
+    if ( 'rwp' eq $opt_for{is} ) {
+        $opt_for{writer} = "_set_$name";
+    }
+
     if ( exists $opt_for{writer} && defined $opt_for{writer} ) {
         $opt_for{is} = 'rw';
     }
