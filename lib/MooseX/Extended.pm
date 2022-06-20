@@ -318,7 +318,7 @@ arrays or hashes will take precedence over scalars:
     multi sub foo ($self, @x) { ... }
     multi sub foo ($self, $x) { ... } # will never be called
 
-It's quite possible to define multi subs that are ambiguous:
+Thus, the following probably doesn't do what you want.
 
     package Foo {
         use MooseX::Extended includes => [qw/multi/];
@@ -586,5 +586,9 @@ Zydeco - Jazz up your Perl
 =item * L<Dios|https://metacpan.org/pod/Dios>
 
 Dios - Declarative Inside-Out Syntax
+
+=item * L<MooseX::AttributeShortcuts|https://metacpan.org/pod/MooseX::AttributeShortcuts>
+
+MooseX::AttributeShortcuts - Shorthand for common attribute options
 
 =back

@@ -2,6 +2,7 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - `is => 'rwp'` is now supported
           - Use new version of B::Hooks::AtRuntime. Classes now remain
             immutable under the debugging. Thanks to haarg and Ben Morrow for
             following up on that.

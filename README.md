@@ -241,7 +241,7 @@ features you can use for this. They're turned by the `includes` flag.
     multi sub foo ($self, $x) { ... } # will never be called
     ```
 
-    It's quite possible to define multi subs that are ambiguous:
+    Thus, the following probably doesn't do what you want.
 
     ```perl
     package Foo {
@@ -515,6 +515,10 @@ repository is [https://github.com/Ovid/moosex-extreme/](https://github.com/Ovid/
 - [Dios](https://metacpan.org/pod/Dios)
 
     Dios - Declarative Inside-Out Syntax
+
+- [MooseX::AttributeShortcuts](https://metacpan.org/pod/MooseX::AttributeShortcuts)
+
+    MooseX::AttributeShortcuts - Shorthand for common attribute options
 
 # AUTHOR
 
