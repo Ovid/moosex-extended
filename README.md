@@ -4,7 +4,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
-version 0.25
+version 0.26
 
 # SYNOPSIS
 
@@ -426,33 +426,6 @@ This also applies to various attributes which allow method names, such as
 Trying to pass a defined `init_arg` to `field` will also throw this
 exception, unless the init\_arg begins with an underscore. (It is sometimes
 useful to be able to define an `init_arg` for unit testing.)
-
-# DEBUGGER SUPPORT
-
-When running [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) under the debugger, there are some
-behavioral differences you should be aware of.
-
-- Your classes won't be immutable
-
-    Ordinarily, we call `__PACKAGE__->meta->make_immutable` for you. This
-    relies on [B::Hooks::AtRuntime](https://metacpan.org/pod/B%3A%3AHooks%3A%3AAtRuntime)'s `after_runtime` function. However, that
-    runs too late under the debugger and dies. Thus, we disable this feature under
-    the debugger. Your classes may run a bit slower, but hey, it's the debugger!
-
-    There is [a PR against B::Hooks::AtRuntime which will fix this issue](https://github.com/mauzo/B-Hooks-AtRuntime/pull/1).
-
-- `namespace::autoclean` will frustrate you
-
-    It's very frustrating when running under the debugger and doing this:
-
-    ```perl
-        13==>       my $total = sum(3,4,5);
-        DB<4>
-        Undefined subroutine &main::sum called at (eval 423) ...
-    ```
-
-    We had removed `namespace::autoclean` when running under the debugger, but
-    backed that out: [https://github.com/Ovid/moosex-extreme/issues/11](https://github.com/Ovid/moosex-extreme/issues/11).
 
 # BUGS AND LIMITATIONS
 

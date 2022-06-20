@@ -2,6 +2,10 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Use new version of B::Hooks::AtRuntime. Classes now remain
+            immutable under the debugging. Thanks to haarg and Ben Morrow for
+            following up on that.
+
 0.25      2022-06-16 16:02:05 CEST
 
           - `builder` can now accept a coderef (stolen from Moo). (thanks,
