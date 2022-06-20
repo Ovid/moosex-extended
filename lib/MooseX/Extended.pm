@@ -85,7 +85,7 @@ sub _apply_default_features ( $config, $for_class, $params = undef ) {
         } or do {
             my $error = $@;
             warn
-                "Could not load 'B::Hooks::AtRuntime': $error. You class is not immutable. You can `use MooseX::Extended excludes => ['immutable'];` to suppress this warning.";
+              "Could not load 'B::Hooks::AtRuntime': $error. You class is not immutable. You can `use MooseX::Extended excludes => ['immutable'];` to suppress this warning.";
         };
     }
     unless ( $config->{excludes}{true} or $config->{_caller_eval} ) {    # https://github.com/Ovid/moosex-extreme/pull/34
