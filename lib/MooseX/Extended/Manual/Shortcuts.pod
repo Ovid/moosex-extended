@@ -178,3 +178,5 @@ with no C<init_arg> and no default or builder, will result in a warning.
 If you wish to disable this warning you can.
 
   no warnings 'MooseX::Extended::naked_fields';
+
+This warning is only available on Perl >= 5.028.
