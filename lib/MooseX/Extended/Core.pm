@@ -332,12 +332,12 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
 
     %opt_for = _maybe_add_cloning_method( $meta, $name, %opt_for );
 
-    if (    !exists $opt_for{accessor}
-        and !exists $opt_for{writer}
-        and !exists $opt_for{default}
-        and !exists $opt_for{builder}
-        and !defined $opt_for{init_arg}
-        and ( $opt_for{is} // 'ro' ) eq 'ro' )
+    if (    not exists $opt_for{accessor}
+        and not exists $opt_for{writer}
+        and not exists $opt_for{default}
+        and not exists $opt_for{builder}
+        and not defined $opt_for{init_arg}
+        and ( not defined $opt_for{is} or $opt_for{is} eq 'ro' ) )
     {
 
         my $call_level = 2;    # XXX: better way than hard-coding?
