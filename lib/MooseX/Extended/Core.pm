@@ -343,7 +343,8 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
         my $call_level = 2;    # XXX: better way than hard-coding?
         my ( $package, $filename, $line ) = caller($call_level);
         Carp::carp("$attr_type '$name' is read-only and has no init_arg or default, defined at $filename line $line\n")
-          if warnings::enabled_at_level( 'MooseX::Extended::naked_fields', $call_level );
+          if $] ge '5.028'
+          and warnings::enabled_at_level( 'MooseX::Extended::naked_fields', $call_level );
     }
 
     _debug( "Setting $attr_type, '$name'", \%opt_for );
