@@ -333,7 +333,7 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
         and not exists $opt_for{default}
         and not exists $opt_for{builder}
         and not defined $opt_for{init_arg}
-        and ( not defined $opt_for{is} or $opt_for{is} eq 'ro' ) )
+        and $opt_for{is} eq 'ro' )
     {
 
         my $call_level = 2;    # XXX: better way than hard-coding?
