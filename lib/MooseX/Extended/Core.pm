@@ -44,6 +44,10 @@ our @EXPORT_OK = qw(
 sub _enabled_features  {qw/signatures postderef postderef_qq :5.20/}             # internal use only
 sub _disabled_warnings {qw/experimental::signatures experimental::postderef/}    # internal use only
 
+warnings::register_categories(
+    'MooseX::Extended::naked_fields',
+);
+
 # Should this be in the metaclass? It feels like it should, but
 # the MOP really doesn't support these edge cases.
 my %CONFIG_FOR;
@@ -234,8 +238,9 @@ sub _apply_optional_features ( $config, $for_class ) {
 }
 
 sub param ( $meta, $name, %opt_for ) {
-    $opt_for{is}       //= 'ro';
-    $opt_for{required} //= 1;
+    $opt_for{is}          //= 'ro';
+    $opt_for{required}    //= 1;
+    $opt_for{_call_level} //= 1;
 
     # "has [@attributes]" versus "has $attribute"
     foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
@@ -249,7 +254,8 @@ sub param ( $meta, $name, %opt_for ) {
 }
 
 sub field ( $meta, $name, %opt_for ) {
-    $opt_for{is} //= 'ro';
+    $opt_for{is}          //= 'ro';
+    $opt_for{_call_level} //= 1;
 
     # "has [@attributes]" versus "has $attribute"
     foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
@@ -328,6 +334,22 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
 
     %opt_for = _maybe_add_cloning_method( $meta, $name, %opt_for );
 
+    if (    not exists $opt_for{accessor}
+        and not exists $opt_for{writer}
+        and not exists $opt_for{default}
+        and not exists $opt_for{builder}
+        and not defined $opt_for{init_arg}
+        and $opt_for{is} eq 'ro' )
+    {
+
+        my $call_level = 1 + $opt_for{_call_level};
+        my ( $package, $filename, $line ) = caller($call_level);
+        Carp::carp("$attr_type '$name' is read-only and has no init_arg or default, defined at $filename line $line\n")
+          if $] ge '5.028'
+          and warnings::enabled_at_level( 'MooseX::Extended::naked_fields', $call_level );
+    }
+
+    delete $opt_for{_call_level};
     _debug( "Setting $attr_type, '$name'", \%opt_for );
     $meta->add_attribute( $name, %opt_for );
 }

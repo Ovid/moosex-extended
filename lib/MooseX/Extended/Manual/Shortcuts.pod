@@ -191,3 +191,13 @@ You may also pass a coderef to `builder`:
 This is different from C<< default => sub {...} >> because it will install a
 C<_build_created> method for you. This is useful if you with to allow a
 subclass to override this method.
+
+=head1 DIAGNOSTICS
+
+Attributes defined using C<param> or C<field> which are read-only
+with no C<init_arg> and no default or builder, will result in a warning.
+If you wish to disable this warning you can.
+
+  no warnings 'MooseX::Extended::naked_fields';
+
+This warning is only available on Perl >= 5.028.
