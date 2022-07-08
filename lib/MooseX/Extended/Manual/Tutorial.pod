@@ -576,7 +576,7 @@ you can start deleting various bits of boilerplate in your code (such as the
 C<make_immutable> call).
 
 Unfortunately, many Moose hierarchies are not clean. You might fail on the
-C<StrictConstructor>, of find that you use multiple inheritance and rely on
+C<StrictConstructor>, or find that you use multiple inheritance and rely on
 dfs (depth-first search) instead of the C3 mro, or maybe (horrors!), you have
 classes that aren't declared as immutable and you have code that relies on
 this. A brute-force approach to handling this could be the following:
