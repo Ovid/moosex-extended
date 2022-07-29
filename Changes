@@ -8,6 +8,8 @@ Revision history for MooseX-Extended
           - Use new version of B::Hooks::AtRuntime. Classes now remain
             immutable under the debugger. Thanks to haarg and Ben Morrow for
             following up on that.
+          - Move perl critic deps to test dependencies and update
+            dist.ini in the process.
 
 0.25      2022-06-16 16:02:05 CEST
 
