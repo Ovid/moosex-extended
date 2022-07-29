@@ -9,7 +9,7 @@ Revision history for MooseX-Extended
             immutable under the debugger. Thanks to haarg and Ben Morrow for
             following up on that.
           - Move perl critic deps to test dependencies and update
-            dist.ini in the process.
+            dist.ini in the process. (thanks, waterkip!)
 
 0.25      2022-06-16 16:02:05 CEST
 
