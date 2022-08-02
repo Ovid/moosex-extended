@@ -27,10 +27,6 @@ package My::Try {
             return 1 / $num;
         }
         catch {
-            # this was a croak(), but by returning the error message (bad
-            # practice, this is just for debugging), I could guarantee that
-            # I'm not throwing an error and thus see if the catch was working.
-            # Currently, the exception is not trapped.
             croak "Could not calculate reciprocal of $num: $@";
         }
     }
@@ -44,10 +40,6 @@ package My::Try::Role {
             return 1 / $num;
         }
         catch {
-            # this was a croak(), but by returning the error message (bad
-            # practice, this is just for debugging), I could guarantee that
-            # I'm not throwing an error and thus see if the catch was working.
-            # Currently, the exception is not trapped.
             croak "Could not calculate reciprocal of $num: $@";
         }
     }
