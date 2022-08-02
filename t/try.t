@@ -8,7 +8,7 @@ BEGIN {
     # the code won't even compile if we don't have Syntax::Keyword::Try
     # installed.
     if ( $^V && $^V lt v5.24.0 ) {
-        plan skip_all => 'Version v5.24.0 or greater required for multimethod support';
+        plan skip_all => 'Version v5.24.0 or greater required for try/catch support';
     }
     eval {
         load Syntax::Keyword::Try;
@@ -31,7 +31,7 @@ package My::Try {
             # practice, this is just for debugging), I could guarantee that
             # I'm not throwing an error and thus see if the catch was working.
             # Currently, the exception is not trapped.
-            return "Could not calculate reciprocal of $num: $@";
+            croak "Could not calculate reciprocal of $num: $@";
         }
     }
 }
@@ -48,7 +48,7 @@ package My::Try::Role {
             # practice, this is just for debugging), I could guarantee that
             # I'm not throwing an error and thus see if the catch was working.
             # Currently, the exception is not trapped.
-            return "Could not calculate reciprocal of $num: $@";
+            croak "Could not calculate reciprocal of $num: $@";
         }
     }
 }

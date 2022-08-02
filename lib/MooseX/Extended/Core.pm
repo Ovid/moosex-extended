@@ -236,7 +236,7 @@ sub _apply_optional_features ( $config, $for_class ) {
         load Future::AsyncAwait;
         Future::AsyncAwait->import::into($for_class);
     }
-    if ( $config->{includes}{multi} ) {
+    if ( $config->{includes}{try} ) {
         if ( $^V && $^V lt v5.24.0 ) {
             croak("try/catch not supported in Perl version less than v5.24.0. You have $^V");
         }
