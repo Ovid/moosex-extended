@@ -34,7 +34,7 @@ requires "true" => "v1.0.2";
 requires "warnings" => "0";
 suggests "Future::AsyncAwait" => "0.58";
 suggests "Syntax::Keyword::MultiSub" => "0.02";
-suggests "Syntax::Keyword::Try" => "0.026";
+suggests "Syntax::Keyword::Try" => "0.027";
 
 on 'test' => sub {
   requires "Capture::Tiny" => "0";
