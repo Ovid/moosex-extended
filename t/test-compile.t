@@ -46,6 +46,5 @@ package My::Test::Compile {
 }
 
 my $test = My::Test::Compile->new();
-$DB::single = 1;
 $test->all_pl_files_ok(qw/lib t/);
 $test->done_testing();
