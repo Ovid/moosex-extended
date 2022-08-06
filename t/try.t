@@ -1,23 +1,10 @@
 #!/usr/bin/env perl
 
-use Test::Most;
-use Module::Load 'load';
-
-BEGIN {
-    # do this in a BEGIN  block to exit early. Otherwise, the rest of
-    # the code won't even compile if we don't have Syntax::Keyword::Try
-    # installed.
-    if ( $^V && $^V lt v5.24.0 ) {
-        plan skip_all => 'Version v5.24.0 or greater required for try/catch support';
-    }
-    eval {
-        load Syntax::Keyword::Try;
-        1;
-    } or do {
-        my $error = $@ || "<unknown error>";
-        plan skip_all => "Could not load Syntax::Keyword::Try $error";
-    };
-}
+use lib 't/lib';
+use MooseX::Extended::Tests
+  name    => 'try/catch',
+  module  => 'Syntax::Keyword::Try',
+  version => v5.24.0;
 
 package My::Try {
     use MooseX::Extended includes => [qw/try/];
