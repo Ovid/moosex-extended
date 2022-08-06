@@ -286,6 +286,27 @@ features you can use for this. They're turned by the `includes` flag.
 
     Only available on Perl v5.26.0 or higher. Requires [Future::AsyncAwait](https://metacpan.org/pod/Future%3A%3AAsyncAwait).
 
+- `try`
+
+    ```perl
+    package My::Try {
+        use MooseX::Extended includes => [qw/try/];
+
+        sub reciprocal ( $self, $num ) {
+            try {
+                return 1 / $num;
+            }
+            catch {
+                croak "Could not calculate reciprocal of $num: $@";
+            }
+        }
+    }
+    ```
+
+    Allows you to use try/catch blocks, via [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3ATry).
+
+    Only available on Perl v5.24.0 or higher. Requires [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3ATry).
+
 # REDUCING BOILERPLATE
 
 Let's say you've settled on the following feature set:

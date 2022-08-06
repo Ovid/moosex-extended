@@ -2,6 +2,7 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Optional Syntax::Keyword::Try support
           - Rename repo from moosex-extreme to moosex-extended
 
 0.26      2022-07-29 08:28:21 CEST

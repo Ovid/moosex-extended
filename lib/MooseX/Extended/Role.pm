@@ -205,6 +205,25 @@ Allows you to write asynchronous code with C<async> and C<await>.
 
 Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
 
+=item * C<try>
+
+    package My::Try {
+        use MooseX::Extended includes => [qw/try/];
+
+        sub reciprocal ( $self, $num ) {
+            try {
+                return 1 / $num;
+            }
+            catch {
+                croak "Could not calculate reciprocal of $num: $@";
+            }
+        }
+    }
+
+Allows you to use try/catch blocks, via L<Syntax::Keyword::Try>.
+
+Only available on Perl v5.24.0 or higher. Requires L<Syntax::Keyword::Try>.
+
 =back
 
 =head1 IDENTICAL METHOD NAMES IN CLASSES AND ROLES

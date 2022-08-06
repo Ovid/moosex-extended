@@ -209,6 +209,7 @@ sub _default_import_list () {
                     qw/
                       multi
                       async
+                      try
                       /
                 ]
             ]
@@ -234,6 +235,15 @@ sub _apply_optional_features ( $config, $for_class ) {
         # don't trap the error. Let it bubble up.
         load Future::AsyncAwait;
         Future::AsyncAwait->import::into($for_class);
+    }
+    if ( $config->{includes}{try} ) {
+        if ( $^V && $^V lt v5.24.0 ) {
+            croak("try/catch not supported in Perl version less than v5.24.0. You have $^V");
+        }
+
+        # don't trap the error. Let it bubble up.
+        load Syntax::Keyword::Try;
+        Syntax::Keyword::Try->import::into($for_class);
     }
 }
 
