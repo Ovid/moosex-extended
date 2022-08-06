@@ -478,8 +478,9 @@ name is clearly invalid.
     my $object = Some::Class->new( name => 'WhoAmI' );
     say $object->name;
 
-C<MooseX::Extended> will throw a L<Moose::Exception::InvalidAttributeDefinition> exception
-if it encounters an illegal method name for an attribute.
+C<MooseX::Extended> will throw a
+L<Moose::Exception::InvalidAttributeDefinition> exception if it encounters an
+illegal method name for an attribute.
 
 This also applies to various attributes which allow method names, such as
 C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
@@ -490,11 +491,20 @@ useful to be able to define an C<init_arg> for unit testing.)
 
 =head1 BUGS AND LIMITATIONS
 
-If the MooseX::Extended classes are loaded via I<stringy> eval, C<true> is not
-loaded, nor is your class made immutable. This is because there were
-intermittant errors (maybe 1 out of 5 times) being thrown. Removing these
-features under stringy eval solves this. See L<this github ticket for more
-infomration|https://github.com/Ovid/moosex-extended/pull/34>.
+When using L<Test::Compile>, there are intermittent segfaults with
+L<MooseX::Extended> unless you use C<< exclude => ['immutable'] >>. We are
+still trying to figure out wy this is happening. We are not aware of any
+production code affected by this.
+
+See also:
+
+=over 4
+
+=item * L<The github issue|https://github.com/Ovid/moosex-extreme/issues/41>
+
+=item * L<Perlmonks discussion|https://perlmonks.org/?node_id=11145964>
+
+=back
 
 =head1 MANUAL
 
