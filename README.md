@@ -4,7 +4,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
-version 0.26
+version 0.27
 
 # SYNOPSIS
 
@@ -417,8 +417,9 @@ my $object = Some::Class->new( name => 'WhoAmI' );
 say $object->name;
 ```
 
-`MooseX::Extended` will throw a [Moose::Exception::InvalidAttributeDefinition](https://metacpan.org/pod/Moose%3A%3AException%3A%3AInvalidAttributeDefinition) exception
-if it encounters an illegal method name for an attribute.
+`MooseX::Extended` will throw a
+[Moose::Exception::InvalidAttributeDefinition](https://metacpan.org/pod/Moose%3A%3AException%3A%3AInvalidAttributeDefinition) exception if it encounters an
+illegal method name for an attribute.
 
 This also applies to various attributes which allow method names, such as
 `clone`, `builder`, `clearer`, `writer`, `reader`, and `predicate`.
@@ -429,11 +430,15 @@ useful to be able to define an `init_arg` for unit testing.)
 
 # BUGS AND LIMITATIONS
 
-If the MooseX::Extended classes are loaded via _stringy_ eval, `true` is not
-loaded, nor is your class made immutable. This is because there were
-intermittant errors (maybe 1 out of 5 times) being thrown. Removing these
-features under stringy eval solves this. See [this github ticket for more
-infomration](https://github.com/Ovid/moosex-extreme/pull/34).
+When using [Test::Compile](https://metacpan.org/pod/Test%3A%3ACompile), there are intermittent segfaults with
+[MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) unless you use `exclude => ['immutable']`. We are
+still trying to figure out wy this is happening. We are not aware of any
+production code affected by this.
+
+See also:
+
+- [The github issue](https://github.com/Ovid/moosex-extreme/issues/41)
+- [Perlmonks discussion](https://perlmonks.org/?node_id=11145964)
 
 # MANUAL
 
@@ -493,10 +498,6 @@ evaluating it.
 Most of this is written with bog-standard [Moose](https://metacpan.org/pod/Moose), so there's nothing
 terribly weird inside, but you may wish to note that we use
 [B::Hooks::AtRuntime](https://metacpan.org/pod/B%3A%3AHooks%3A%3AAtRuntime) and [true](https://metacpan.org/pod/true). They seem sane, but _caveat emptor_.
-
-This module was originally released on github as `MooseX::Extreme`, but
-enough people pointed out that it was not extreme at all. That's why the
-repository is [https://github.com/Ovid/moosex-extreme/](https://github.com/Ovid/moosex-extreme/).
 
 # SEE ALSO
 
