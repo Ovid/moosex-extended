@@ -141,13 +141,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Ovid/moosex-extreme/issues"
+         "web" : "https://github.com/Ovid/moosex-extended/issues"
       },
-      "homepage" : "https://github.com/Ovid/moosex-extreme",
+      "homepage" : "https://github.com/Ovid/moosex-extended",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/Ovid/moosex-extreme.git",
-         "web" : "https://github.com/Ovid/moosex-extreme"
+         "url" : "https://github.com/Ovid/moosex-extended.git",
+         "web" : "https://github.com/Ovid/moosex-extended"
       }
    },
    "version" : "0.26",

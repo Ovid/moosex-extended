@@ -433,7 +433,7 @@ If the MooseX::Extended classes are loaded via _stringy_ eval, `true` is not
 loaded, nor is your class made immutable. This is because there were
 intermittant errors (maybe 1 out of 5 times) being thrown. Removing these
 features under stringy eval solves this. See [this github ticket for more
-infomration](https://github.com/Ovid/moosex-extreme/pull/34).
+infomration](https://github.com/Ovid/moosex-extended/pull/34).
 
 # MANUAL
 
@@ -493,10 +493,6 @@ evaluating it.
 Most of this is written with bog-standard [Moose](https://metacpan.org/pod/Moose), so there's nothing
 terribly weird inside, but you may wish to note that we use
 [B::Hooks::AtRuntime](https://metacpan.org/pod/B%3A%3AHooks%3A%3AAtRuntime) and [true](https://metacpan.org/pod/true). They seem sane, but _caveat emptor_.
-
-This module was originally released on github as `MooseX::Extreme`, but
-enough people pointed out that it was not extreme at all. That's why the
-repository is [https://github.com/Ovid/moosex-extreme/](https://github.com/Ovid/moosex-extreme/).
 
 # SEE ALSO
 
