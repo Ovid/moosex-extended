@@ -4,6 +4,8 @@ Revision history for MooseX-Extended
 
           - Optional Syntax::Keyword::Try support
           - Rename repo from moosex-extreme to moosex-extended
+          - Add a compilation test to try to expose an intermittent
+            but with Test::Compile. So far, we cannot reproduce
 
 0.26      2022-07-29 08:28:21 CEST
 
