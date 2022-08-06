@@ -2,6 +2,8 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Rename repo from moosex-extreme to moosex-extended
+
 0.26      2022-07-29 08:28:21 CEST
 
           - "naked" fields (those no writer, default, or builder) that cannot
