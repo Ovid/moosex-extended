@@ -11,7 +11,7 @@ use Types::Standard qw(
   slurpy
 );
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 our @EXPORT_OK;
 
 BEGIN {

@@ -28,7 +28,7 @@ use Ref::Util qw(
 );
 use Carp 'croak';
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 our @EXPORT_OK = qw(
   _assert_import_list_is_valid
