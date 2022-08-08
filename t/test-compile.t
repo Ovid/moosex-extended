@@ -2,7 +2,7 @@
 
 use lib 't/lib';
 use MooseX::Extended::Tests module => 'Test::Compile';
-use Test::Compile;    # not needed directly, but make sure various cpan clients pick it up
+use Test::Compile v3.1.0;    # not needed directly, but make sure various cpan clients pick it up
 use Test::Compile::Internal;
 
 explain <<'END';
