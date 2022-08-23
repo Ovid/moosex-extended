@@ -13,7 +13,7 @@ use MooseX::Extended::Core qw(
 use MooseX::Extended ();
 use namespace::autoclean;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 sub import {
     my @caller       = caller(0);
