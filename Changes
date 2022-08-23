@@ -2,6 +2,8 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+0.29      2022-08-23 09:05:52 CEST
+
           - Bump minimum version of B::Hooks::AtRuntime to avoid a sporadic
             segfault.
 
