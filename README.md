@@ -4,7 +4,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
-version 0.28
+version 0.29
 
 # SYNOPSIS
 
@@ -451,15 +451,28 @@ useful to be able to define an `init_arg` for unit testing.)
 
 # BUGS AND LIMITATIONS
 
-When using [Test::Compile](https://metacpan.org/pod/Test%3A%3ACompile), there are intermittent segfaults with
-[MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) unless you use `exclude => ['immutable']`. We are
-still trying to figure out wy this is happening. We are not aware of any
-production code affected by this.
+You cannot (at this time) use `multi` subs with the debugger. This is due to
+a bug in [Syntax::Keyword::MultiSub](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3AMultiSub) that should be fixed in the next release
+of that module.
+
+If you must have multisubs and the debugger, the follow patch to
+[Syntax::Keyword::MultiSub](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3AMultiSub) fixes the issue:
+
+```
+--- old/lib/Syntax/Keyword/MultiSub.xs  2021-12-16 10:59:30 +0000
++++ new/lib/Syntax/Keyword/MultiSub.xs  2022-08-12 10:23:06 +0000
+@@ -129,6 +129,7 @@
+ redo:
+     switch(o->op_type) {
+       case OP_NEXTSTATE:
++      case OP_DBSTATE:
+         o = o->op_next;
+         goto redo;
+```
 
 See also:
 
-- [The github issue](https://github.com/Ovid/moosex-extreme/issues/41)
-- [Perlmonks discussion](https://perlmonks.org/?node_id=11145964)
+- [The github issue](https://github.com/Ovid/moosex-extended/issues/45)
 
 # MANUAL
 
