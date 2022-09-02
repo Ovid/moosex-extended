@@ -13,7 +13,9 @@ use MooseX::Extended::Types qw(
   compile_named
   ArrayRef
   Bool
+  CodeRef
   Enum
+  HashRef
   NonEmptyStr
   Optional
 );
@@ -24,6 +26,7 @@ no warnings qw(experimental::signatures experimental::postderef);
 use Storable 'dclone';
 use Ref::Util qw(
   is_plain_arrayref
+  is_plain_hashref
   is_coderef
 );
 use Carp 'croak';
@@ -116,6 +119,7 @@ END
     foreach my $features (qw/includes excludes/) {
         $args->{$features} = { map { $_ => 1 } $args->{$features}->@* };
     }
+    $args->{style} //= 'get_set';
 
     $CONFIG_FOR{$target_class} = $args;
     return $target_class;
@@ -213,7 +217,8 @@ sub _default_import_list () {
                       /
                 ]
             ]
-        ]
+        ],
+        style => Optional [ Enum [ 'get_set', 'set', HashRef [CodeRef] ] ],
     );
 }
 
@@ -288,6 +293,43 @@ sub field ( $meta, $name, %opt_for ) {
     }
 }
 
+sub _get_shortcut_style ($meta) {
+    my $config     = _config_for( $meta->name );
+    my $style_name = $config->{style} || 'get_set';
+
+    state $style_for = {
+        get_set => {
+            predicate => sub ($value) {"has_$value"},
+            clearer   => sub ($value) {"clear_$value"},
+            builder   => sub ($value) {"_build_$value"},
+            writer    => sub ($value) {"set_$value"},
+            reader    => sub ($value) {"get_$value"},
+        },
+        set => {
+            predicate => sub ($value) {"has_$value"},
+            clearer   => sub ($value) {"clear_$value"},
+            builder   => sub ($value) {"_build_$value"},
+            writer    => sub ($value) {"set_$value"},
+            reader    => sub ($value) {$value},
+        },
+    };
+    if ( !ref $style_name ) {
+
+        # the croak() should never happen because 'get_set' and 'set' are
+        # defined in "style" for _default_import_list()
+        my $style = $style_for->{$style_name}
+          or croak( "PANIC: unknown style '$style_name' passed to _get_shortcut_style for class " . $meta->name );
+        return $style;
+    }
+    elsif ( is_plain_hashref($style_name) ) {
+        return $style_name;
+    }
+    else {
+        # again, should not be possbile
+        croak("PANIC: Do not know how to fetch attribute option style for $style_name");
+    }
+}
+
 sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
     _debug("Finalizing options for '$attr_type $name'");
 
@@ -300,13 +342,7 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
         );
     }
 
-    state $shortcut_for = {
-        predicate => sub ($value) {"has_$value"},
-        clearer   => sub ($value) {"clear_$value"},
-        builder   => sub ($value) {"_build_$value"},
-        writer    => sub ($value) {"set_$value"},
-        reader    => sub ($value) {"get_$value"},
-    };
+    my $shortcut_for = _get_shortcut_style($meta);
 
     if ( is_coderef( $opt_for{builder} ) ) {
         my $builder_code = $opt_for{builder};
@@ -353,7 +389,7 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
     {
 
         my $call_level = 1 + $opt_for{_call_level};
-        my ( $package, $filename, $line ) = caller($call_level);
+        my ( undef, $filename, $line ) = caller($call_level);
         Carp::carp("$attr_type '$name' is read-only and has no init_arg or default, defined at $filename line $line\n")
           if $] ge '5.028'
           and warnings::enabled_at_level( 'MooseX::Extended::naked_fields', $call_level );
