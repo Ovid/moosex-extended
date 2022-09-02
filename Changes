@@ -1,6 +1,10 @@
 Revision history for MooseX-Extended
 
 {{$NEXT}}
+          - Add attribute "styles" to allow greater customization of how
+            attribute methods are created.
+          - Remove a test file that didn't actually test the bug we were
+            looking for.
 
 0.29      2022-08-23 09:05:52 CEST
 

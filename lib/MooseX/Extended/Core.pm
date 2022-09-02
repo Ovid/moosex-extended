@@ -14,8 +14,8 @@ use MooseX::Extended::Types qw(
   ArrayRef
   Bool
   CodeRef
+  Dict
   Enum
-  HashRef
   NonEmptyStr
   Optional
 );
@@ -219,7 +219,17 @@ sub _default_import_list () {
                 ]
             ]
         ],
-        style => Optional [ Enum [ 'get_set', 'set', ] | HashRef [CodeRef] ],
+        style => Optional [
+            Enum [ 'get_set', 'set', ] # get_set or set
+            |                          #
+            Dict [                     # or a dict of optional choices
+                predicate => CodeRef,
+                clearer   => CodeRef,
+                builder   => CodeRef,
+                writer    => CodeRef,
+                reader    => CodeRef,
+            ]
+        ],
     );
 }
 
