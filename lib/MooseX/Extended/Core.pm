@@ -119,6 +119,7 @@ END
     foreach my $features (qw/includes excludes/) {
         $args->{$features} = { map { $_ => 1 } $args->{$features}->@* };
     }
+
     $args->{style} //= 'get_set';
 
     $CONFIG_FOR{$target_class} = $args;
@@ -218,7 +219,7 @@ sub _default_import_list () {
                 ]
             ]
         ],
-        style => Optional [ Enum [ 'get_set', 'set', HashRef [CodeRef] ] ],
+        style => Optional [ Enum [ 'get_set', 'set', ] | HashRef [CodeRef] ],
     );
 }
 
@@ -295,6 +296,9 @@ sub field ( $meta, $name, %opt_for ) {
 
 sub _get_shortcut_style ($meta) {
     my $config     = _config_for( $meta->name );
+
+    # in theory, we don't need to have a default set here for the style name,
+    # but some of our tests skip the code that creates the default
     my $style_name = $config->{style} || 'get_set';
 
     state $style_for = {
