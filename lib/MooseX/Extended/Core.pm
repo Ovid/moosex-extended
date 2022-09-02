@@ -220,15 +220,15 @@ sub _default_import_list () {
             ]
         ],
         style => Optional [
-            Enum [ 'get_set', 'set', ] # get_set or set
-            |                          #
-            Dict [                     # or a dict of optional choices
+            Enum [ 'get_set', 'set', ]    # get_set or set
+              |                           #
+              Dict [                      # or a dict of optional choices
                 predicate => CodeRef,
                 clearer   => CodeRef,
                 builder   => CodeRef,
                 writer    => CodeRef,
                 reader    => CodeRef,
-            ]
+              ]
         ],
     );
 }
@@ -305,7 +305,7 @@ sub field ( $meta, $name, %opt_for ) {
 }
 
 sub _get_shortcut_style ($meta) {
-    my $config     = _config_for( $meta->name );
+    my $config = _config_for( $meta->name );
 
     # in theory, we don't need to have a default set here for the style name,
     # but some of our tests skip the code that creates the default
