@@ -384,6 +384,12 @@ package Class::Name {
 }
 ```
 
+Note, there is an exception to the default of `ro` for attributes. If you use
+the `accessor` attribute, the attribute will default to `rw` (read-write).
+
+See [https://metacpan.org/pod/Class::MOP::Attribute#Creation](https://metacpan.org/pod/Class::MOP::Attribute#Creation) for details of
+`accessor` if you're not familiar with it.
+
 See [MooseX::Extended::Manual::Construction](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AConstruction) for a full explanation.
 
 # ATTRIBUTE SHORTCUTS
