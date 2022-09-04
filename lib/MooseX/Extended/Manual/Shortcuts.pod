@@ -8,12 +8,13 @@ our $VERSION = '0.01';
 When using C<field> or C<param>, we have some attribute shortcuts:
 
     param name => (
-        isa       => NonEmptyStr,
-        writer    => 1,   # set_name
-        reader    => 1,   # get_name
-        predicate => 1,   # has_name
-        clearer   => 1,   # clear_name
-        builder   => 1,   # _build_name
+        isa         => NonEmptyStr,
+        writer      => 1,             # set_name
+        reader      => 1,             # get_name
+        predicate   => 1,             # has_name
+        clearer     => 1,             # clear_name
+        builder     => 1,             # _build_name
+        initializer => 1,             # _initialize_name
     );
 
     sub _build_name ($self) {
@@ -50,8 +51,8 @@ is unchanged. These shortcuts will not work.
 
 =head2 C<writer>
 
-If an attribute has C<writer> is set to C<1> (the number one), a method
-named C<set_$attribute_name> is created.
+If an attribute has C<writer> is set to C<1> (the number one), it will refer
+to a method named C<set_$attribute_name> is created.
 
 This:
 
@@ -79,8 +80,8 @@ You can always change this:
 
 However, if you want to change the reader name
 
-If an attribute has C<reader> is set to C<1> (the number one), a method
-named C<get_$attribute_name> is created.
+If an attribute has C<reader> is set to C<1> (the number one), it will refer
+to a method named C<get_$attribute_name> is created.
 
 This:
 
@@ -101,8 +102,8 @@ Is the same as this:
 
 =head2 C<predicate>
 
-If an attribute has C<predicate> is set to C<1> (the number one), a method
-named C<has_$attribute_name> is created.
+If an attribute has C<predicate> is set to C<1> (the number one), it will
+refer to a method named C<has_$attribute_name> is created.
 
 This:
 
@@ -123,8 +124,8 @@ Is the same as this:
 
 =head2 C<clearer>
 
-If an attribute has C<clearer> is set to C<1> (the number one), a method
-named C<clear_$attribute_name> is created.
+If an attribute has C<clearer> is set to C<1> (the number one), it will refer
+to a method named C<clear_$attribute_name> is created.
 
 This:
 
@@ -145,8 +146,8 @@ Is the same as this:
 
 =head2 C<builder>
 
-If an attribute has C<builder> is set to C<1> (the number one), a method
-named C<_build_$attribute_name>.
+If an attribute has C<builder> is set to C<1> (the number one), it will refer
+to a method named C<_build_$attribute_name>.
 
 This:
 
@@ -165,6 +166,26 @@ Is the same as this:
 
 Obviously, a "private" attribute, such as C<_auth_token> would get a build named
 C<_build__auth_token> (note the two underscores between "build" and "auth_token").
+
+=head2 C<initializer>
+
+If an attribute has C<initializer> is set to C<1> (the number one), it will
+refer to a method named C<_initialize_$attribute_name>.
+
+This:
+
+    param title => (
+        isa         => NonEmptyStr,
+        initializer => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is          => 'ro',
+        isa         => NonEmptyStr,
+        initializer => '_iinitialize_title',
+    );
 
 =head1 STEALING FROM MOO
 
