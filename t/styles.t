@@ -127,7 +127,7 @@ subtest 'custom accessor' => sub {
 
     package Style::CustomAccessor {
         use MooseX::Extended style => {
-            accessor    => sub { "attr_$_[0]" },
+            accessor => sub {"attr_$_[0]"},
         };
 
         param name => ( accessor => 1 );
@@ -137,6 +137,37 @@ subtest 'custom accessor' => sub {
     is $style->attr_name, 'Ovid', '"attr_" should be the default for reading via "accessor"';
     ok $style->attr_name('Bob'), '"attr_" should be the default for writing via "accessor"';
     is $style->attr_name, 'Bob', '... and it should work as expected';
+};
+
+subtest 'inferred styles' => sub {
+
+    package Style::InferredRO {
+        use MooseX::Extended style => 'get_set', inferred_style => 1;
+        param 'name';
+    }
+
+    my $style = Style::InferredRO->new( name => 'Ovid' );
+    is $style->get_name, 'Ovid', 'We should be able to infer our style';
+
+    package Style::InferredRW {
+        use MooseX::Extended style => 'set', inferred_style => 1;
+        param 'name' => ( is => 'rw' );
+    }
+
+    $style = Style::InferredRW->new( name => 'Ovid' );
+    is $style->name, 'Ovid', 'We should be able to infer our style';
+    ok $style->set_name('Bob'), '"set_" should be the inferred';
+    is $style->name, 'Bob', '... and it should work as expected';
+
+    package Style::InferredRWP {
+        use MooseX::Extended style => 'set', inferred_style => 1;
+        param 'name' => ( is => 'rwp' );
+    }
+
+    $style = Style::InferredRWP->new( name => 'Ovid' );
+    is $style->name, 'Ovid', 'We should be able to infer our style';
+    ok $style->_set_name('Bob'), '"_set_" should be the inferred';
+    is $style->name, 'Bob', '... and it should work as expected';
 };
 
 done_testing;

@@ -1,6 +1,7 @@
 Revision history for MooseX-Extended
 
 {{$NEXT}}
+          - Add support for inferring style from 'is => $value' option
           - More exceptions if we have invalid attribute definitions
           - Add support for an 'accessor' shortcut
           - Add support for an 'initializer' shortcut

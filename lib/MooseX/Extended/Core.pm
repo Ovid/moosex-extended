@@ -449,28 +449,33 @@ sub _add_inferred_attribute_options ( $attr_type, $meta, $name, $opt_for ) {
     my $is = $opt_for->{is};
 
     if ( $is eq 'ro' ) {
+        _debug("Setting inferred style for 'ro'");
         $opt_for->{reader} //= 1;
     }
     elsif ( $is eq 'rw' ) {
+        _debug("Setting inferred style for 'rw'");
         $opt_for->{reader} //= 1;
         $opt_for->{writer} //= 1;
     }
     elsif ( $is eq 'rwp' ) {
+        _debug("Setting inferred style for 'rwp'");
         $opt_for->{reader} //= 1;
         $opt_for->{writer} = "_set_$name";
     }
     elsif ( $is eq 'bare' ) {
+        _debug("Ignoring inferred styles for 'bare'");
 
         # do nothing
     }
 }
 
 sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
+    my $config = _config_for( $meta->name );
     _debug("Finalizing options for '$attr_type $name'");
 
     _assert_valid_options( $attr_type, $meta, $name, %opt_for );
 
-    if ( $opt_for{inferred_style} ) {
+    if ( $config->{inferred_style} ) {
         _add_inferred_attribute_options( $attr_type, $meta, $name, \%opt_for );
     }
 
