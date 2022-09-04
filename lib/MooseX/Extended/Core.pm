@@ -235,11 +235,12 @@ sub _default_import_list () {
             Enum [ 'get_set', 'set', ]    # get_set or set
               |                           #
               Dict [                      # or a dict of optional choices
-                predicate => Optional [CodeRef],
-                clearer   => Optional [CodeRef],
-                builder   => Optional [CodeRef],
-                writer    => Optional [CodeRef],
-                reader    => Optional [CodeRef],
+                initializer => Optional [CodeRef],
+                predicate   => Optional [CodeRef],
+                clearer     => Optional [CodeRef],
+                builder     => Optional [CodeRef],
+                writer      => Optional [CodeRef],
+                reader      => Optional [CodeRef],
               ]
         ],
     );
@@ -306,6 +307,14 @@ sub field ( $meta, $name, %opt_for ) {
                 messsage       => "A defined 'field.init_arg' must begin with an underscore: '$init_arg'",
             );
         }
+        if ( exists $options{initializer} ) {
+            throw_exception(
+                'InvalidAttributeDefinition',
+                attribute_name => $name,
+                class_name     => $meta->name,
+                messsage       => "Field $name has an initializer, but that makes no sense.",
+            );
+        }
 
         $options{init_arg} //= undef;
         if ( $options{builder} || $options{default} ) {
@@ -318,11 +327,12 @@ sub field ( $meta, $name, %opt_for ) {
 
 sub _default_style () {
     return {
-        predicate => sub ($value) {"has_$value"},
-        clearer   => sub ($value) {"clear_$value"},
-        builder   => sub ($value) {"_build_$value"},
-        writer    => sub ($value) {"set_$value"},
-        reader    => sub ($value) {"get_$value"},
+        builder     => sub ($value) {"_build_$value"},
+        clearer     => sub ($value) {"clear_$value"},
+        initializer => sub ($value) {"_initialize_$value"},
+        predicate   => sub ($value) {"has_$value"},
+        reader      => sub ($value) {"get_$value"},
+        writer      => sub ($value) {"set_$value"},
     };
 }
 
@@ -336,11 +346,13 @@ sub _get_shortcut_style ($meta) {
     state $style_for = {
         get_set => _default_style(),
         set     => {
-            predicate => sub ($value) {"has_$value"},
-            clearer   => sub ($value) {"clear_$value"},
-            builder   => sub ($value) {"_build_$value"},
-            writer    => sub ($value) {"set_$value"},
-            reader    => sub ($value) {$value},
+            predicate   => sub ($value) {"has_$value"},
+            clearer     => sub ($value) {"clear_$value"},
+            initializer => sub ($value) {"_initialize_$value"},
+            predicate   => sub ($value) {"has_$value"},
+            builder     => sub ($value) {"_build_$value"},
+            writer      => sub ($value) {"set_$value"},
+            reader      => sub ($value) {$value},
         },
     };
     if ( !ref $style_name ) {

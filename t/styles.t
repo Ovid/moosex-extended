@@ -77,16 +77,22 @@ subtest 'custom' => sub {
             reader    => sub {"get_the_$_[0]"},
         };
 
-        param name => ( reader => 1, writer => 1 );
+        param name        => ( reader      => 1, writer => 1 );
+        param initialized => ( initializer => 1 );
         field created => ( reader => 1, writer => 1, builder => 1 );
 
+        sub _initialize_initialized ( $self, $value, $set, $attr ) {
+            $set->( $value * 2 );
+        }
         sub _do_created ($self) {'now'}
     }
 
-    my $style = Style::Custom->new( name => 'Ovid' );
+    my $style = Style::Custom->new( name => 'Ovid', initialized => 3 );
     is $style->get_the_name, 'Ovid', '"get_" should be the default for reader => 1';
     ok $style->set_the_name('Bob'), '"set_" should be the default for writer => 1';
     is $style->get_the_name, 'Bob', '... and it should work as expected';
+
+    is $style->initialized, 6, 'Our initializers fire as expected';
 
     is $style->get_the_created, 'now', 'fields readers should also work as expected';
     ok $style->set_the_created('later'), '... as should their writers';
