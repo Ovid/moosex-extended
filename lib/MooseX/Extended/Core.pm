@@ -235,6 +235,7 @@ sub _default_import_list () {
             Enum [ 'get_set', 'set', ]    # get_set or set
               |                           #
               Dict [                      # or a dict of optional choices
+                accessor    => Optional [CodeRef],
                 initializer => Optional [CodeRef],
                 predicate   => Optional [CodeRef],
                 clearer     => Optional [CodeRef],
@@ -277,7 +278,7 @@ sub _apply_optional_features ( $config, $for_class ) {
 }
 
 sub param ( $meta, $name, %opt_for ) {
-    $opt_for{is}          //= 'ro';
+    $opt_for{is} = _set_value_for_option_is( 'param', $name, $meta, %opt_for );
     $opt_for{required}    //= 1;
     $opt_for{_call_level} //= 1;
 
@@ -293,7 +294,7 @@ sub param ( $meta, $name, %opt_for ) {
 }
 
 sub field ( $meta, $name, %opt_for ) {
-    $opt_for{is}          //= 'ro';
+    $opt_for{is} = _set_value_for_option_is( 'field', $name, $meta, %opt_for );
     $opt_for{_call_level} //= 1;
 
     # "has [@attributes]" versus "has $attribute"
@@ -325,8 +326,35 @@ sub field ( $meta, $name, %opt_for ) {
     }
 }
 
+sub _set_value_for_option_is ( $type, $name, $meta, %opt_for ) {
+    if ( exists $opt_for{accessor} ) {
+        $opt_for{is} //= 'rw';
+        if ( $opt_for{is} ne 'rw' ) {
+            throw_exception(
+                'InvalidAttributeDefinition',
+                attribute_name => $name,
+                class_name     => $meta->name,
+                messsage       => "$type $name has an accessor and 'is' must be 'rw', not '$opt_for{is}'",
+            );
+        }
+        if ( exists $opt_for{reader} or exists $opt_for{writer} ) {
+            throw_exception(
+                'InvalidAttributeDefinition',
+                attribute_name => $name,
+                class_name     => $meta->name,
+                messsage       => "$type $name has an accessor and must not define a reader or writer",
+            );
+        }
+    }
+    else {
+        $opt_for{is} //= 'ro';
+    }
+    return $opt_for{is};
+}
+
 sub _default_style () {
     return {
+        accessor    => sub ($value) {$value},
         builder     => sub ($value) {"_build_$value"},
         clearer     => sub ($value) {"clear_$value"},
         initializer => sub ($value) {"_initialize_$value"},
@@ -346,6 +374,7 @@ sub _get_shortcut_style ($meta) {
     state $style_for = {
         get_set => _default_style(),
         set     => {
+            accessor    => sub ($value) {$value},
             predicate   => sub ($value) {"has_$value"},
             clearer     => sub ($value) {"clear_$value"},
             initializer => sub ($value) {"_initialize_$value"},

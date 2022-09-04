@@ -122,4 +122,21 @@ subtest 'custom with defaults' => sub {
     is $style->created, 'now', '... and we should get the value we expected';
     ok $style->has_created, '... and predicate methods work as expected';
 };
+
+subtest 'custom accessor' => sub {
+
+    package Style::CustomAccessor {
+        use MooseX::Extended style => {
+            accessor    => sub { "attr_$_[0]" },
+        };
+
+        param name => ( accessor => 1 );
+    }
+
+    my $style = Style::CustomAccessor->new( name => 'Ovid' );
+    is $style->attr_name, 'Ovid', '"attr_" should be the default for reading via "accessor"';
+    ok $style->attr_name('Bob'), '"attr_" should be the default for writing via "accessor"';
+    is $style->attr_name, 'Bob', '... and it should work as expected';
+};
+
 done_testing;

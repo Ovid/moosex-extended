@@ -451,6 +451,12 @@ Here's a short example:
         );
     }
 
+Note, there is an exception to the default of C<ro> for attributes. If you use
+the C<accessor> attribute, the attribute will default to C<rw> (read-write).
+
+See L<https://metacpan.org/pod/Class::MOP::Attribute#Creation> for details of
+C<accessor> if you're not familiar with it.
+
 See L<MooseX::Extended::Manual::Construction> for a full explanation.
 
 =head1 ATTRIBUTE SHORTCUTS

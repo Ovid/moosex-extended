@@ -23,6 +23,14 @@ throws_ok { field( $meta, 'created', init_arg => 'created' ) }
 'Moose::Exception::InvalidAttributeDefinition',
   'We should get a proper exception if we pass an init_arg to field';
 
+throws_ok { param( $meta, 'name', is => 'ro', accessor => 1 ) }
+'Moose::Exception::InvalidAttributeDefinition',
+  'We should get a proper exception if our attributes have are defined as read-only but also have an accessor';
+
+throws_ok { param( $meta, 'name', accessor => 1, writer => 'set_name' ) }
+'Moose::Exception::InvalidAttributeDefinition',
+  'We should get a proper exception if our attributes have an accessor with a reader or writer';
+
 explain 'capture_stderr will hide the carp(), but the exception is thrown before it can return STDERR';
 throws_ok {
     capture_stderr { MooseX::Extended->import( not => 'allowed' ) }
