@@ -244,6 +244,7 @@ sub _default_import_list () {
                 reader      => Optional [CodeRef],
               ]
         ],
+        inferred_style => Optional [Bool],
     );
 }
 
@@ -337,14 +338,6 @@ sub _set_value_for_option_is ( $type, $name, $meta, %opt_for ) {
                 messsage       => "$type $name has an accessor and 'is' must be 'rw', not '$opt_for{is}'",
             );
         }
-        if ( exists $opt_for{reader} or exists $opt_for{writer} ) {
-            throw_exception(
-                'InvalidAttributeDefinition',
-                attribute_name => $name,
-                class_name     => $meta->name,
-                messsage       => "$type $name has an accessor and must not define a reader or writer",
-            );
-        }
     }
     else {
         $opt_for{is} //= 'ro';
@@ -401,8 +394,35 @@ sub _get_shortcut_style ($meta) {
     }
 }
 
-sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
-    _debug("Finalizing options for '$attr_type $name'");
+sub _assert_valid_options ( $attr_type, $meta, $name, %opt_for ) {
+
+    # Not all options can be validated here because some must be checked in
+    # context with other attributes when we're munging our options
+    # (see "_set_value_for_option_is")
+    state $allowed_values_for_is = { map { $_ => 1 } qw/ro rw rwp bare/ };
+    unless ( $allowed_values_for_is->{ $opt_for{is} } ) {
+        throw_exception(
+            'InvalidAttributeDefinition',
+            attribute_name => $name,
+            class_name     => $meta->name,
+            messsage       => "Illegal value for 'is': $opt_for{is}",
+        );
+    }
+
+    if ($opt_for{is} eq 'bare'    # no attribute methods should be created
+        and
+
+        # these create methods for the attribute
+        ( exists $opt_for{reader} or exists $opt_for{writer} or exists $opt_for{accessor} )
+      )
+    {
+        throw_exception(
+            'InvalidAttributeDefinition',
+            attribute_name => $name,
+            class_name     => $meta->name,
+            messsage       => "$attr_type has a bare attribute and must not have reader, writer, or accessor",
+        );
+    }
 
     unless ( _is_valid_method_name($name) ) {
         throw_exception(
@@ -411,6 +431,47 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
             class_name     => $meta->name,
             messsage       => "Illegal attribute name, '$name'",
         );
+    }
+
+    if ( exists $opt_for{accessor} ) {
+        if ( exists $opt_for{reader} or exists $opt_for{writer} ) {
+            throw_exception(
+                'InvalidAttributeDefinition',
+                attribute_name => $name,
+                class_name     => $meta->name,
+                messsage       => "$attr_type $name has an accessor and must not define a reader or writer",
+            );
+        }
+    }
+}
+
+sub _add_inferred_attribute_options ( $attr_type, $meta, $name, $opt_for ) {
+    my $is = $opt_for->{is};
+
+    if ( $is eq 'ro' ) {
+        $opt_for->{reader} //= 1;
+    }
+    elsif ( $is eq 'rw' ) {
+        $opt_for->{reader} //= 1;
+        $opt_for->{writer} //= 1;
+    }
+    elsif ( $is eq 'rwp' ) {
+        $opt_for->{reader} //= 1;
+        $opt_for->{writer} = "_set_$name";
+    }
+    elsif ( $is eq 'bare' ) {
+
+        # do nothing
+    }
+}
+
+sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
+    _debug("Finalizing options for '$attr_type $name'");
+
+    _assert_valid_options( $attr_type, $meta, $name, %opt_for );
+
+    if ( $opt_for{inferred_style} ) {
+        _add_inferred_attribute_options( $attr_type, $meta, $name, \%opt_for );
     }
 
     my $shortcut_for = _get_shortcut_style($meta);

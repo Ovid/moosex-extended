@@ -1,6 +1,7 @@
 Revision history for MooseX-Extended
 
 {{$NEXT}}
+          - More exceptions if we have invalid attribute definitions
           - Add support for an 'accessor' shortcut
           - Add support for an 'initializer' shortcut
           - Add attribute "styles" to allow greater customization of how

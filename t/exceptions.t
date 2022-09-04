@@ -15,6 +15,10 @@ throws_ok { param( $meta, 'foo', isa => 'Str', writer => 'foo_Array(x1233)' ) }
 'Moose::Exception::InvalidAttributeDefinition',
   'We should get a proper exception if our attributes have invalid property names';
 
+throws_ok { param( $meta, 'foo', is => 'Str' ) }
+'Moose::Exception::InvalidAttributeDefinition',
+  'We should get a proper exception if our "is" argument is invalid';
+
 throws_ok { param( $meta, '42foo', isa => 'Str', writer => 'set_foo' ) }
 'Moose::Exception::InvalidAttributeDefinition',
   'We should get a proper exception if our attributes have attribute names';
@@ -43,5 +47,11 @@ throws_ok {
 }
 'Moose::Exception::InvalidImportList',
   'Passing an invalid import list to MooseX::Extended::Role should throw an exception';
+
+foreach my $option (qw/reader writer accessor/) {
+    throws_ok { param( $meta, 'name', is => 'bare', $option => 1 ) }
+    'Moose::Exception::InvalidAttributeDefinition',
+      "We should get a proper exception if a bare attribute has a $option";
+}
 
 done_testing;
