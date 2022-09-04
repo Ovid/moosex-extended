@@ -92,4 +92,28 @@ subtest 'custom' => sub {
     ok $style->set_the_created('later'), '... as should their writers';
     is $style->get_the_created, 'later', '... and we should get the value we expected';
 };
+
+subtest 'custom with defaults' => sub {
+
+    package Style::CustomWithDefaults {
+        use MooseX::Extended style => {
+            predicate => sub {"has_$_[0]"},
+            reader    => sub { $_[0] },
+        };
+
+        param name => ( reader => 1, writer => 1 );
+        field created => ( reader => 1, writer => 1, predicate => 1 );
+    }
+
+    my $style = Style::CustomWithDefaults->new( name => 'Ovid' );
+    is $style->name, 'Ovid', '"get_" should be the default for reader => 1';
+    ok $style->set_name('Bob'), '"set_" should be the default for writer => 1';
+    is $style->name, 'Bob', '... and it should work as expected';
+
+    ok !$style->has_created,       'We can override just the styles we want';
+    ok !defined $style->created,   'fields readers should also work as expected';
+    ok $style->set_created('now'), '... as should their writers';
+    is $style->created, 'now', '... and we should get the value we expected';
+    ok $style->has_created, '... and predicate methods work as expected';
+};
 done_testing;

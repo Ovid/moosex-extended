@@ -122,6 +122,18 @@ END
 
     $args->{style} //= 'get_set';
 
+    if ( is_plain_hashref( $args->{style} ) ) {
+
+        # if they don't supply all of they keys in their style, let's
+        # "inherit" any missing styles from the default style
+        my $default_style = _default_style();
+        foreach my $key ( keys $default_style->%* ) {
+            if ( not exists $args->{style}{$key} ) {
+                $args->{style}{$key} = $default_style->{$key};
+            }
+        }
+    }
+
     $CONFIG_FOR{$target_class} = $args;
     return $target_class;
 }
@@ -223,11 +235,11 @@ sub _default_import_list () {
             Enum [ 'get_set', 'set', ]    # get_set or set
               |                           #
               Dict [                      # or a dict of optional choices
-                predicate => CodeRef,
-                clearer   => CodeRef,
-                builder   => CodeRef,
-                writer    => CodeRef,
-                reader    => CodeRef,
+                predicate => Optional [CodeRef],
+                clearer   => Optional [CodeRef],
+                builder   => Optional [CodeRef],
+                writer    => Optional [CodeRef],
+                reader    => Optional [CodeRef],
               ]
         ],
     );
@@ -304,6 +316,16 @@ sub field ( $meta, $name, %opt_for ) {
     }
 }
 
+sub _default_style () {
+    return {
+        predicate => sub ($value) {"has_$value"},
+        clearer   => sub ($value) {"clear_$value"},
+        builder   => sub ($value) {"_build_$value"},
+        writer    => sub ($value) {"set_$value"},
+        reader    => sub ($value) {"get_$value"},
+    };
+}
+
 sub _get_shortcut_style ($meta) {
     my $config = _config_for( $meta->name );
 
@@ -312,14 +334,8 @@ sub _get_shortcut_style ($meta) {
     my $style_name = $config->{style} || 'get_set';
 
     state $style_for = {
-        get_set => {
-            predicate => sub ($value) {"has_$value"},
-            clearer   => sub ($value) {"clear_$value"},
-            builder   => sub ($value) {"_build_$value"},
-            writer    => sub ($value) {"set_$value"},
-            reader    => sub ($value) {"get_$value"},
-        },
-        set => {
+        get_set => _default_style(),
+        set     => {
             predicate => sub ($value) {"has_$value"},
             clearer   => sub ($value) {"clear_$value"},
             builder   => sub ($value) {"_build_$value"},
