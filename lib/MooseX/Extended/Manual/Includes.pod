@@ -11,36 +11,24 @@ By default, L<MooseX::Extended> tries to be relatively conservative. However,
 you might want to turn it up to 11. There are optional, B<EXPERIMENTAL>
 features you can use for this. They're turned by the C<includes> flag.
 
-=over 4
-
-=item * C<method>
+=head2 C<method>
 
     package My::Names {
-        use MooseX::Extended types => [qw(compile Num NonEmptyStr Str PositiveInt ArrayRef)],
+        use MooseX::Extended types => [qw(compile NonEmptyStr Str )],
           includes                 => ['method'];
-        use List::Util 'sum';
 
         param _name => ( isa => NonEmptyStr, init_arg => 'name' );
         param title => ( isa => Str, required => 0, predicate => 1 );
-        param extra => ( is  => 'rw', isa => Str, required => 0 );
-
-        field created => ( isa => PositiveInt, default => sub {time} );
-        field updated => ( is => 'rw', isa => PositiveInt, writer => 1, builder => sub {time} );
 
         method name() {
-            my $title = $self->title;
+            my $title = $self->title; # $self is injected for you
             my $name  = $self->_name;
             return $title ? "$title $name" : $name;
         }
-
-        method add($args) {
-            state $check = compile( ArrayRef [ Num, 1 ] );
-            ($args) = $check->($args);
-            return sum( $args->@* );
-        }
     }
 
-Adds a C<method> keyword and injects C<$self> into the method body. Requires L<Function::Parameters>.
+Adds a C<method> keyword and injects C<$self> into the method body. Requires
+L<Function::Parameters>.
 
 Note: this is equivalent to writing:
 
@@ -48,12 +36,14 @@ Note: this is equivalent to writing:
 
 The other features of L<Function::Parameters> are not available.
 
-This feature does not work with the optional C<multi> keyword. Thus, you
-should not do:
+This feature does not work with the optional C<multi> keyword. Thus,  if you
+do this:
 
     use MooseX::Extended includes => [qw/multi method/];
 
-=item * C<multi>
+You cannot do C<multi method>. You'll have to fall back to C<multi sub>.
+
+=head2 C<multi>
 
     use MooseX::Extended includes => [qw/multi/];
 
@@ -84,12 +74,14 @@ C<foo> is effectively lost.
 
 Only available on Perl v5.26.0 or higher. Requires L<Syntax::Keyword::MultiSub>.
 
-This feature does not work with the optional C<method> keyword. Thus, you
-should not do:
+This feature does not work with the optional C<method> keyword. Thus,  if you
+do this:
 
     use MooseX::Extended includes => [qw/multi method/];
 
-=item * C<async>
+You cannot do C<multi method>. You'll have to fall back to C<multi sub>.
+
+=head2 C<async>
 
     package My::Thing {
         use MooseX::Extended
@@ -113,7 +105,7 @@ Allows you to write asynchronous code with C<async> and C<await>.
 
 Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
 
-=item * C<try>
+=head2 C<try>
 
     package My::Try {
         use MooseX::Extended includes => [qw/try/];
@@ -131,5 +123,3 @@ Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
 Allows you to use try/catch blocks, via L<Syntax::Keyword::Try>.
 
 Only available on Perl v5.24.0 or higher. Requires L<Syntax::Keyword::Try>.
-
-=back

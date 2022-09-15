@@ -303,8 +303,6 @@ powerful. For example, to include try/catch and a C<method> keyword:
 
 See L<MooseX::Extended::Manual::Includes> for more information.
 
-=back
-
 =head1 REDUCING BOILERPLATE
 
 Let's say you've settled on the following feature set:
