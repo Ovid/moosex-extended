@@ -210,6 +210,7 @@ sub _default_import_list () {
                       multi
                       async
                       try
+                      method
                       /
                 ]
             ]
@@ -235,6 +236,10 @@ sub _apply_optional_features ( $config, $for_class ) {
         # don't trap the error. Let it bubble up.
         load Future::AsyncAwait;
         Future::AsyncAwait->import::into($for_class);
+    }
+    if ( $config->{includes}{method} ) {
+        load Function::Parameters;
+        Function::Parameters->import::into( $for_class, 'method' );
     }
     if ( $config->{includes}{try} ) {
         if ( $^V && $^V lt v5.24.0 ) {

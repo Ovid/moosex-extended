@@ -4,7 +4,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
-version 0.29
+version 0.30
 
 # SYNOPSIS
 
@@ -217,95 +217,14 @@ problem. You can exclude the following:
 
 ## `includes`
 
-Some experimental features are useful, but might not be quite what you want.
+Several _optional_ features of [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) make this module much more
+powerful. For example, to include try/catch and a `method` keyword:
 
-By default, [MooseX::Extended](https://metacpan.org/pod/MooseX%3A%3AExtended) tries to be relatively conservative. However,
-you might want to turn it up to 11. There are optional, **EXPERIMENTAL**
-features you can use for this. They're turned by the `includes` flag.
+```perl
+    use MooseX::Extended includes => [ 'method', 'try' ];
+```
 
-- `multi`
-
-    ```perl
-    use MooseX::Extended includes => [qw/multi/];
-
-    multi sub foo ($self, $x)      { ... }
-    multi sub foo ($self, $x, $y ) { ... }
-    ```
-
-    Allows you to redeclare a method (or subroutine) and the dispatch will use the number
-    of arguments to determine which subroutine to use. Note that "slurpy" arguments such as
-    arrays or hashes will take precedence over scalars:
-
-    ```perl
-    multi sub foo ($self, @x) { ... }
-    multi sub foo ($self, $x) { ... } # will never be called
-    ```
-
-    Thus, the following probably doesn't do what you want.
-
-    ```perl
-    package Foo {
-        use MooseX::Extended includes => [qw/multi/];
-
-        multi sub foo ($self, @bar) { return '@bar' }
-        multi sub foo ($self, $bar) { return '$bar' }
-    }
-
-    say +Foo->new->foo(1);
-    say +Foo->new->foo(1,2,3);
-    ```
-
-    Both of the above will print the string `@bar`. The second definition of
-    `foo` is effectively lost.
-
-    Only available on Perl v5.26.0 or higher. Requires [Syntax::Keyword::MultiSub](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3AMultiSub).
-
-- `async`
-
-    ```perl
-    package My::Thing {
-        use MooseX::Extended
-        types    => [qw/Str/],
-        includes => ['async'];
-        use IO::Async::Loop;
-
-        field output => ( is => 'rw', isa => Str, default => '' );
-
-        async sub doit ( $self, @list ) {
-            my $loop = IO::Async::Loop->new;
-            $self->output('> ');
-            foreach my $item (@list) {
-                await $loop->delay_future( after => 0.01 );
-                $self->output( $self->output . "$item " );
-            }
-        }
-    }
-    ```
-
-    Allows you to write asynchronous code with `async` and `await`.
-
-    Only available on Perl v5.26.0 or higher. Requires [Future::AsyncAwait](https://metacpan.org/pod/Future%3A%3AAsyncAwait).
-
-- `try`
-
-    ```perl
-    package My::Try {
-        use MooseX::Extended includes => [qw/try/];
-
-        sub reciprocal ( $self, $num ) {
-            try {
-                return 1 / $num;
-            }
-            catch {
-                croak "Could not calculate reciprocal of $num: $@";
-            }
-        }
-    }
-    ```
-
-    Allows you to use try/catch blocks, via [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3ATry).
-
-    Only available on Perl v5.24.0 or higher. Requires [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3ATry).
+See [MooseX::Extended::Manual::Includes](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AIncludes) for more information.
 
 # REDUCING BOILERPLATE
 
@@ -314,7 +233,7 @@ Let's say you've settled on the following feature set:
 ```perl
 use MooseX::Extended
     excludes => [qw/StrictConstructor carp/],
-    includes => [qw/multi/];
+    includes => [qw/method/];
 ```
 
 And you keep typing that over and over. We've removed a lot of boilerplate,
