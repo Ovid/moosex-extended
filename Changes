@@ -2,6 +2,8 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+0.30      2022-09-15 09:54:00 CEST
+
           - Add support for a `method` keyword via Function::Parameters.
           - Move "includes" docs to its own POD doc.
 
