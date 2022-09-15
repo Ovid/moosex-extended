@@ -1,7 +1,10 @@
 #!/usr/bin/env perl
 
 use lib 't/lib';
-use MooseX::Extended::Tests;
+use MooseX::Extended::Tests
+  name    => 'method',
+  version => v5.26.0,
+  module  => ['Function::Parameters'];
 
 package My::Names {
     use MooseX::Extended types => [qw(compile Num NonEmptyStr Str PositiveInt ArrayRef)],
