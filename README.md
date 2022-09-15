@@ -4,7 +4,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
-version 0.29
+version 0.30
 
 # SYNOPSIS
 
@@ -306,6 +306,45 @@ features you can use for this. They're turned by the `includes` flag.
     Allows you to use try/catch blocks, via [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3ATry).
 
     Only available on Perl v5.24.0 or higher. Requires [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3ATry).
+
+- `method`
+
+    ```perl
+    package My::Names {
+        use MooseX::Extended types => [qw(compile Num NonEmptyStr Str PositiveInt ArrayRef)],
+          includes                 => ['method'];
+        use List::Util 'sum';
+
+        param _name => ( isa => NonEmptyStr, init_arg => 'name' );
+        param title => ( isa => Str, required => 0, predicate => 1 );
+        param extra => ( is  => 'rw', isa => Str, required => 0 );
+
+        field created => ( isa => PositiveInt, default => sub {time} );
+        field updated => ( is => 'rw', isa => PositiveInt, writer => 1, builder => sub {time} );
+
+        method name() {
+            my $title = $self->title;
+            my $name  = $self->_name;
+            return $title ? "$title $name" : $name;
+        }
+
+        method add($args) {
+            state $check = compile( ArrayRef [ Num, 1 ] );
+            ($args) = $check->($args);
+            return sum( $args->@* );
+        }
+    }
+    ```
+
+    Adds a `method` keyword and injects `$self` into the method body. Requires [Function::Parameters](https://metacpan.org/pod/Function%3A%3AParameters).
+
+    Note: this is equivalent to writing:
+
+    ```perl
+    use Function::Parameters 'method';
+    ```
+
+    The other features of [Function::Parameters](https://metacpan.org/pod/Function%3A%3AParameters) are not available.
 
 # REDUCING BOILERPLATE
 

@@ -378,6 +378,41 @@ Allows you to use try/catch blocks, via L<Syntax::Keyword::Try>.
 
 Only available on Perl v5.24.0 or higher. Requires L<Syntax::Keyword::Try>.
 
+=item * C<method>
+
+    package My::Names {
+        use MooseX::Extended types => [qw(compile Num NonEmptyStr Str PositiveInt ArrayRef)],
+          includes                 => ['method'];
+        use List::Util 'sum';
+
+        param _name => ( isa => NonEmptyStr, init_arg => 'name' );
+        param title => ( isa => Str, required => 0, predicate => 1 );
+        param extra => ( is  => 'rw', isa => Str, required => 0 );
+
+        field created => ( isa => PositiveInt, default => sub {time} );
+        field updated => ( is => 'rw', isa => PositiveInt, writer => 1, builder => sub {time} );
+
+        method name() {
+            my $title = $self->title;
+            my $name  = $self->_name;
+            return $title ? "$title $name" : $name;
+        }
+
+        method add($args) {
+            state $check = compile( ArrayRef [ Num, 1 ] );
+            ($args) = $check->($args);
+            return sum( $args->@* );
+        }
+    }
+
+Adds a C<method> keyword and injects C<$self> into the method body. Requires L<Function::Parameters>.
+
+Note: this is equivalent to writing:
+
+    use Function::Parameters 'method';
+
+The other features of L<Function::Parameters> are not available.
+
 =back
 
 =head1 REDUCING BOILERPLATE
