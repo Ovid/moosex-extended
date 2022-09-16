@@ -1,6 +1,7 @@
 Revision history for MooseX-Extended
 
 {{$NEXT}}
+          - Lock down our version of Future.pm to avoid buggy 0.48_001.
 
 0.30      2022-09-15 09:54:00 CEST
 
