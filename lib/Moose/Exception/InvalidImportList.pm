@@ -5,7 +5,7 @@ package Moose::Exception::InvalidImportList;
 use Moose;
 extends 'Moose::Exception';
 use MooseX::Extended::Types qw(NonEmptyStr PositiveInt);
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 with 'Moose::Exception::Role::Class';
 
 has 'moosex_extended_type' => (
