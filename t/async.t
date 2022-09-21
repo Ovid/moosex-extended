@@ -19,8 +19,8 @@ BEGIN {
 
 package My::Thing {
     use MooseX::Extended
-      types    => [qw/Str/],
-      includes => ['async'];
+      types    => 'Str',
+      includes => 'async';
     use IO::Async::Loop;
 
     field output => ( is => 'rw', isa => Str );
@@ -37,8 +37,8 @@ package My::Thing {
 
 package My::Async::Role {
     use MooseX::Extended::Role
-      types    => [qw/Str/],
-      includes => ['async'];
+      types    => 'Str',
+      includes => 'async';
     use IO::Async::Loop;
 
     field output => ( is => 'rw', isa => Str );

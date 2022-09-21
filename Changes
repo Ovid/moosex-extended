@@ -2,6 +2,9 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - Single arguments to includes, excludes, or types may be simple
+            strings and no longer require an array reference.
+
 0.31      2022-09-16 18:19:09 CEST
           - Lock down our version of Future.pm to avoid buggy 0.48_001.
 
