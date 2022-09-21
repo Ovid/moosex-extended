@@ -481,6 +481,8 @@ See also:
 
 =item * L<MooseX::Extended::Manual::Construction>
 
+=item * L<MooseX::Extended::Manual::Includes>
+
 =item * L<MooseX::Extended::Manual::Shortcuts>
 
 =item * L<MooseX::Extended::Manual::Cloning>
