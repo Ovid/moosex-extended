@@ -250,7 +250,7 @@ Let's say you've settled on the following feature set:
 ```perl
 use MooseX::Extended
     excludes => [qw/StrictConstructor carp/],
-    includes => [qw/method/];
+    includes => 'method';
 ```
 
 And you keep typing that over and over. We've removed a lot of boilerplate,
