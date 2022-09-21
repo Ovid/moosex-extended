@@ -171,7 +171,7 @@ Is sort of the equivalent to:
         use v5.20.0;
         use Moose;
         use MooseX::StrictConstructor;
-        use feature qw( signatures postderef postderef_qq);
+        use feature qw( signatures postderef postderef_qq );
         no warnings qw( experimental::signatures experimental::postderef );
         use namespace::autoclean;
         use Carp;
@@ -189,7 +189,8 @@ C<field>.
 A C<param> is a required parameter (defaults may be used). A C<field> is not
 intended to be passed to the constructor.
 
-Note that the C<has> function is still available, even if it's not needed.
+B<Note>: the C<has> function is still available, even if it's not needed.
+Unlike C<param> and C<field>, it still requires an C<is> option.
 
 Also, while your author likes the postfix block syntax, it's not required. You
 can even safely inline multiple packages in the same file:
