@@ -4,7 +4,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 # VERSION
 
-version 0.31
+version 0.32
 
 # SYNOPSIS
 
@@ -97,7 +97,7 @@ can even safely inline multiple packages in the same file:
 
 ```perl
 package My::Point;
-use MooseX::Extended types => [qw/Num/];
+use MooseX::Extended types => 'Num';
 
 param [ 'x', 'y' ] => ( isa => Num );
 
@@ -149,12 +149,21 @@ use MooseX::Extended::Types qw( compile PositiveInt HashRef );
 
 You may find some features to be annoying, or even cause potential bugs (e.g.,
 if you have a `croak` method, our importing of `Carp::croak` will be a
-problem. You can exclude the following:
+problem.
+
+A single argument to `excludes` can be a string. Multiple `excludes` require
+an array reference:
+
+```perl
+    use MooseX::Extended excludes => [qw/StrictConstructor autoclean/];
+```
+
+You can exclude the following:
 
 - `StrictConstructor`
 
     ```perl
-    use MooseX::Extended excludes => ['StrictConstructor'];
+    use MooseX::Extended excludes => 'StrictConstructor';
     ```
 
     Excluding this will no longer import `MooseX::StrictConstructor`.
@@ -162,7 +171,7 @@ problem. You can exclude the following:
 - `autoclean`
 
     ```perl
-    use MooseX::Extended excludes => ['autoclean'];
+    use MooseX::Extended excludes => 'autoclean';
     ```
 
     Excluding this will no longer import `namespace::autoclean`.
@@ -170,7 +179,7 @@ problem. You can exclude the following:
 - `c3`
 
     ```perl
-    use MooseX::Extended excludes => ['c3'];
+    use MooseX::Extended excludes => 'c3';
     ```
 
     Excluding this will no longer apply the C3 mro.
@@ -178,7 +187,7 @@ problem. You can exclude the following:
 - `carp`
 
     ```perl
-    use MooseX::Extended excludes => ['carp'];
+    use MooseX::Extended excludes => 'carp';
     ```
 
     Excluding this will no longer import `Carp::croak` and `Carp::carp`.
@@ -186,7 +195,7 @@ problem. You can exclude the following:
 - `immutable`
 
     ```perl
-    use MooseX::Extended excludes => ['immutable'];
+    use MooseX::Extended excludes => 'immutable';
     ```
 
     Excluding this will no longer make your class immutable.
@@ -194,7 +203,7 @@ problem. You can exclude the following:
 - `true`
 
     ```perl
-    use MooseX::Extended excludes => ['true'];
+    use MooseX::Extended excludes => 'true';
     ```
 
     Excluding this will require your module to end in a true value.
@@ -202,7 +211,7 @@ problem. You can exclude the following:
 - `param`
 
     ```perl
-    use MooseX::Extended excludes => ['param'];
+    use MooseX::Extended excludes => 'param';
     ```
 
     Excluding this will make the `param` function unavailable.
@@ -210,7 +219,7 @@ problem. You can exclude the following:
 - `field`
 
     ```perl
-    use MooseX::Extended excludes => ['field'];
+    use MooseX::Extended excludes => 'field';
     ```
 
     Excluding this will make the `field` function unavailable.
@@ -222,6 +231,13 @@ powerful. For example, to include try/catch and a `method` keyword:
 
 ```perl
     use MooseX::Extended includes => [ 'method', 'try' ];
+```
+
+A single argument to `includes` can be a string. Multiple `includes` require
+an array reference:
+
+```perl
+    use MooseX::Extended includes => [qw/method try/];
 ```
 
 See [MooseX::Extended::Manual::Includes](https://metacpan.org/pod/MooseX%3A%3AExtended%3A%3AManual%3A%3AIncludes) for more information.

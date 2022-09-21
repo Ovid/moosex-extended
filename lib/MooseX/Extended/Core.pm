@@ -75,6 +75,12 @@ sub _our_import {
 sub _assert_import_list_is_valid {
     my ( $class, $args ) = @_;
 
+    foreach my $features (qw/types includes excludes/) {
+        if ( exists $args->{$features} && !ref $args->{$features} ) {
+            $args->{$features} = [ $args->{$features} ];
+        }
+    }
+
     $args->{call_level} //= 0;
     my ( $package, $filename, $line ) = caller( $args->{call_level} + 1 );
     my $target_class = $args->{for_class} // $package;

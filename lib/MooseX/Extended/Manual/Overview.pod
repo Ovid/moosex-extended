@@ -257,7 +257,7 @@ When using C<field> or C<param>, we have some attribute shortcuts:
 These can also be used when you pass an array reference to the function:
 
     package Point {
-        use MooseX::Extended types => [qw/Int/];
+        use MooseX::Extended types => 'Int';
 
         param [ 'x', 'y' ] => (
             isa     => Int,

@@ -195,7 +195,7 @@ Also, while your author likes the postfix block syntax, it's not required. You
 can even safely inline multiple packages in the same file:
 
     package My::Point;
-    use MooseX::Extended types => [qw/Num/];
+    use MooseX::Extended types => 'Num';
 
     param [ 'x', 'y' ] => ( isa => Num );
 
@@ -240,55 +240,62 @@ Is identical to this:
 
 You may find some features to be annoying, or even cause potential bugs (e.g.,
 if you have a C<croak> method, our importing of C<Carp::croak> will be a
-problem. You can exclude the following:
+problem.
+
+A single argument to C<excludes> can be a string. Multiple C<excludes> require
+an array reference:
+
+        use MooseX::Extended excludes => [qw/StrictConstructor autoclean/];
+
+You can exclude the following:
 
 =over 4
 
 =item * C<StrictConstructor>
 
-    use MooseX::Extended excludes => ['StrictConstructor'];
+    use MooseX::Extended excludes => 'StrictConstructor';
 
 Excluding this will no longer import C<MooseX::StrictConstructor>.
 
 =item * C<autoclean>
 
-    use MooseX::Extended excludes => ['autoclean'];
+    use MooseX::Extended excludes => 'autoclean';
 
 Excluding this will no longer import C<namespace::autoclean>.
 
 =item * C<c3>
 
-    use MooseX::Extended excludes => ['c3'];
+    use MooseX::Extended excludes => 'c3';
 
 Excluding this will no longer apply the C3 mro.
 
 =item * C<carp>
 
-    use MooseX::Extended excludes => ['carp'];
+    use MooseX::Extended excludes => 'carp';
 
 Excluding this will no longer import C<Carp::croak> and C<Carp::carp>.
 
 =item * C<immutable>
 
-    use MooseX::Extended excludes => ['immutable'];
+    use MooseX::Extended excludes => 'immutable';
 
 Excluding this will no longer make your class immutable.
 
 =item * C<true>
 
-    use MooseX::Extended excludes => ['true'];
+    use MooseX::Extended excludes => 'true';
 
 Excluding this will require your module to end in a true value.
 
 =item * C<param>
 
-    use MooseX::Extended excludes => ['param'];
+    use MooseX::Extended excludes => 'param';
 
 Excluding this will make the C<param> function unavailable.
 
 =item * C<field>
 
-    use MooseX::Extended excludes => ['field'];
+    use MooseX::Extended excludes => 'field';
 
 Excluding this will make the C<field> function unavailable.
 
@@ -300,6 +307,11 @@ Several I<optional> features of L<MooseX::Extended> make this module much more
 powerful. For example, to include try/catch and a C<method> keyword:
 
         use MooseX::Extended includes => [ 'method', 'try' ];
+
+A single argument to C<includes> can be a string. Multiple C<includes> require
+an array reference:
+
+        use MooseX::Extended includes => [qw/method try/];
 
 See L<MooseX::Extended::Manual::Includes> for more information.
 
