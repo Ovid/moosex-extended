@@ -2,6 +2,7 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+          - :Standard :String and :Numeric tags are now available for types
           - Single arguments to includes, excludes, or types may be simple
             strings and no longer require an array reference.
 
