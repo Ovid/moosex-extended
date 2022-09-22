@@ -3,6 +3,7 @@ Revision history for MooseX-Extended
 {{$NEXT}}
 
           - :Standard :String and :Numeric tags are now available for types
+          - Make sure all Type::Params utility functions are available
           - Single arguments to includes, excludes, or types may be simple
             strings and no longer require an array reference.
 

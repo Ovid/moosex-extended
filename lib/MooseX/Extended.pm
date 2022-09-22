@@ -6,7 +6,6 @@ use 5.20.0;
 use warnings;
 
 use Moose::Exporter;
-use MooseX::Extended::Types ':all';
 use Moose                     ();
 use MooseX::StrictConstructor ();
 use mro                       ();
@@ -321,8 +320,9 @@ See L<MooseX::Extended::Manual::Includes> for more information.
 Let's say you've settled on the following feature set:
 
     use MooseX::Extended
-        excludes => [qw/StrictConstructor carp/],
-        includes => 'method';
+      excludes => [qw/StrictConstructor carp/],
+      includes => 'method',
+      types    => ':Standard';
 
 And you keep typing that over and over. We've removed a lot of boilerplate,
 but we've added different boilerplate. Instead, just create
