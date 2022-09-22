@@ -36,7 +36,9 @@ BEGIN {
       Types::Common::String
     );
     push @EXPORT_OK => (
-        @Type::Params::EXPORT, @Type::Params::EXPORT_OK,
+        @Type::Params::EXPORT,
+        @Type::Params::EXPORT_OK,
+        @Types::Standard::EXPORT_OK,
     );
     our %EXPORT_TAGS = (
         all      => \@EXPORT_OK,
@@ -76,6 +78,12 @@ As a convenience, if you're using L<MooseX::Extended>, you can do this:
       Str
       compile
     )];
+
+If you're brave:
+
+    use MooseX::Extended types => ':all';
+
+But that exports I<everything> and it's easy to have surprising conflicts.
 
 =head1 DESCRIPTION
 
@@ -144,53 +152,39 @@ functions must be asked for by name.
 
 =head1 EXTRAS
 
-The following extra functions are exported on demand or if use the C<:all> export tag.
+The following extra functions are exported on demand or if using the C<:all>
+export tag (but you probably don't want to use that tag).
+
+=head2 L<Type::Params>
 
 =over
 
 =item * C<compile>
 
-See L<Type::Params>
-
 =item * C<compile_named>
-
-See L<Type::Params>
 
 =item * C<multisig>
 
-See L<Type::Params>
-
 =item * C<validate>
-
-See L<Type::Params>
 
 =item * C<validate_named>
 
-See L<Type::Params>
-
 =item * C<compile_named_oo>
-
-See L<Type::Params>
 
 =item * C<Invocant>
 
-See L<Type::Params>
-
 =item * C<wrap_subs>
-
-See L<Type::Params>
 
 =item * C<wrap_methods>
 
-See L<Type::Params>
-
 =item * C<ArgsObject>
 
-See L<Type::Params>
+=back
 
+=head2 L<Types::Standard>
+
+=over 4
 
 =item * C<slurpy>
-
-See L<Types::Standard>
 
 =back
