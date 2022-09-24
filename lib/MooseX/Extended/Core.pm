@@ -266,10 +266,10 @@ sub param ( $meta, $name, %opt_for ) {
     # "has [@attributes]" versus "has $attribute"
     foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
         my %options = %opt_for;    # copy each time to avoid overwriting
-        unless ( $options{init_arg} ) {
-            $attr =~ s/^\+//;      # in case they're overriding a parent class attribute
-            $options{init_arg} //= $attr;
-        }
+        $options{init_arg} //= $attr;
+
+        # in case they're inheriting an attribute
+        $options{init_arg} =~ s/\A\+//;
         _add_attribute( 'param', $meta, $attr, %options );
     }
 }
@@ -302,10 +302,17 @@ sub field ( $meta, $name, %opt_for ) {
 sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
     _debug("Finalizing options for '$attr_type $name'");
 
+    # we use the $name to generate the other methods names. However,
+    # $orig_name is used to set the actual field name. This is because
+    # Moose allows `has '+x' => ( writer => 'set_x' );` to inherit an
+    # attribute from a parent class and only change the desired attribute
+    # options.
+    my $orig_name = $name;
+    $name =~ s/\A\+//;
     unless ( _is_valid_method_name($name) ) {
         throw_exception(
             'InvalidAttributeDefinition',
-            attribute_name => $name,
+            attribute_name => $orig_name,
             class_name     => $meta->name,
             messsage       => "Illegal attribute name, '$name'",
         );
@@ -338,9 +345,9 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
         unless ( _is_valid_method_name( $opt_for{$option} ) ) {
             throw_exception(
                 'InvalidAttributeDefinition',
-                attribute_name => $name,
+                attribute_name => $orig_name,
                 class_name     => $meta->name,
-                messsage       => "Attribute '$name' has an invalid option name, $option => '$opt_for{$option}'",
+                messsage       => "Attribute '$orig_name' has an invalid option name, $option => '$opt_for{$option}'",
             );
         }
     }
@@ -371,8 +378,8 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
     }
 
     delete $opt_for{_call_level};
-    _debug( "Setting $attr_type, '$name'", \%opt_for );
-    $meta->add_attribute( $name, %opt_for );
+    _debug( "Setting $attr_type, '$orig_name'", \%opt_for );
+    $meta->add_attribute( $orig_name, %opt_for );
 }
 
 sub _is_valid_method_name ($name) {
