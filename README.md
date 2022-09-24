@@ -249,8 +249,9 @@ Let's say you've settled on the following feature set:
 
 ```perl
 use MooseX::Extended
-    excludes => [qw/StrictConstructor carp/],
-    includes => 'method';
+  excludes => [qw/StrictConstructor carp/],
+  includes => 'method',
+  types    => ':Standard';
 ```
 
 And you keep typing that over and over. We've removed a lot of boilerplate,

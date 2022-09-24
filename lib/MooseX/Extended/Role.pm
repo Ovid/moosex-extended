@@ -5,7 +5,6 @@ package MooseX::Extended::Role;
 use strict;
 use warnings;
 use Moose::Exporter;
-use MooseX::Extended::Types ':all';
 use MooseX::Extended::Core qw(
   field
   param
