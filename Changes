@@ -2,6 +2,8 @@ Revision history for MooseX-Extended
 
 {{$NEXT}}
 
+0.32      2022-09-24 17:06:38 CEST
+
           - Allow inherited attributes (has '+x' ...). Thanks to gmbow for
             spotting this bug.
           - :Standard :String and :Numeric tags are now available for types
