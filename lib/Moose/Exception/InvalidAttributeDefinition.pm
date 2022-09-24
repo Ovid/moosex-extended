@@ -4,7 +4,7 @@ package Moose::Exception::InvalidAttributeDefinition;
 
 use Moose;
 extends 'Moose::Exception';
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 with 'Moose::Exception::Role::Class';
 
 has 'attribute_name' => (
