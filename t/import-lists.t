@@ -3,8 +3,8 @@
 use lib 't/lib';
 use MooseX::Extended::Tests
   name    => 'method',
-  version => v5.26.0,
-  module  => ['Function::Parameters'];
+  version => v5.24.0,
+  requires => { 'Function::Parameters' => '2.001003', 'Syntax::Keyword::Try' => '0.027' };
 
 package My::Import::List {
     use MooseX::Extended types => 'is_PositiveOrZeroInt',
