@@ -492,7 +492,7 @@ sub _should_debug () {
 
 sub _debug ( $message, @data ) {
     return unless _should_debug();
-    if (@data) {                                                 # yup, still want multidispatch
+    if (@data) {                                                       # yup, still want multidispatch
         require Data::Printer;
         my $data = Data::Printer::np(@data);
         $message = "$message: $data";
