@@ -233,7 +233,7 @@ sub _default_import_list () {
     );
 }
 
-sub _with_imports ($requested, $defaults) {
+sub _with_imports ( $requested, $defaults ) {
     if ($requested) {
         return $requested->@*;
     }
@@ -242,7 +242,6 @@ sub _with_imports ($requested, $defaults) {
     }
     return;
 }
-
 
 sub _apply_optional_features ( $config, $for_class ) {
     my $includes = $config->{includes} or return;
