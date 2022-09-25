@@ -1,21 +1,10 @@
 #!/usr/bin/env perl
 
 use lib 't/lib';
-use Module::Load 'load';
 use MooseX::Extended::Tests
-  name    => 'async',
-  version => v5.26.0,
-  module  => [ 'Future::AsyncAwait', '0.56' ];
-
-BEGIN {
-    eval {
-        load IO::Async::Loop;
-        1;
-    } or do {
-        my $error = $@ || '<unknown error>';
-        plan skip_all => "Could not load IO::Async::Loop: $error";
-    };
-}
+  name     => 'async',
+  version  => '5.26.0',
+  requires => { 'Future::AsyncAwait' => '0.56', 'IO::Async::Loop' => 0 };
 
 package My::Thing {
     use MooseX::Extended

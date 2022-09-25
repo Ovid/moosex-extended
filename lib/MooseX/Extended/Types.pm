@@ -6,20 +6,7 @@ use strict;
 use warnings;
 use Type::Library -base;
 use Type::Utils -all;
-
-# there is no :all, so we need to hardcode the list
-use Type::Params qw(
-  compile
-  compile_named
-  multisig
-  validate
-  validate_named
-  compile_named_oo
-  Invocant
-  wrap_subs
-  wrap_methods
-  ArgsObject
-);
+use Type::Params ':all';
 
 # EXPORT_OK, but not :all
 use Types::Standard qw(

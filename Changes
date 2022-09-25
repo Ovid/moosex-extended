@@ -1,6 +1,13 @@
 Revision history for MooseX-Extended
 
 {{$NEXT}}
+          - You can now specify custom imports for each included feature. See
+            MooseX::Extended::Manual::Includes for more information.
+          - If you have Perl v5.35.8 or above, including `try` will use Perl's
+            native `try` and not `Syntax::Keyword::Try`.
+            https://github.com/Ovid/moosex-extended/issues/55
+          - Internal changes to make tests a touch easier to write and to make
+            test output a bit clearer when optional modules are not loaded.
 
 0.32      2022-09-24 17:06:38 CEST
 

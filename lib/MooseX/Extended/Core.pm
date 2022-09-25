@@ -10,12 +10,15 @@ use Moose::Util qw(
   throw_exception
 );
 use MooseX::Extended::Types qw(
-  compile_named
   ArrayRef
   Bool
+  Dict
   Enum
   NonEmptyStr
   Optional
+  Str
+  Undef
+  compile_named
 );
 use Module::Load 'load';
 use feature qw(signatures postderef);
@@ -27,6 +30,7 @@ use Ref::Util qw(
   is_coderef
 );
 use Carp 'croak';
+#
 
 our $VERSION = '0.33';
 
@@ -40,6 +44,9 @@ our @EXPORT_OK = qw(
   field
   param
 );
+
+# Core's use feature 'try' only supports 'finally' since 5.35.8
+use constant HAVE_FEATURE_TRY => $] >= 5.035008;
 
 sub _enabled_features  {qw/signatures postderef postderef_qq :5.20/}             # internal use only
 sub _disabled_warnings {qw/experimental::signatures experimental::postderef/}    # internal use only
@@ -75,9 +82,20 @@ sub _our_import {
 sub _assert_import_list_is_valid {
     my ( $class, $args ) = @_;
 
-    foreach my $features (qw/types includes excludes/) {
+    foreach my $features (qw/types excludes/) {
         if ( exists $args->{$features} && !ref $args->{$features} ) {
             $args->{$features} = [ $args->{$features} ];
+        }
+    }
+    if ( my $includes = $args->{includes} ) {
+        if ( !ref $includes ) {
+            $args->{includes} = { $includes => undef };
+        }
+        elsif ( is_plain_arrayref($includes) ) {
+            $args->{includes} = { map { $_ => undef } $includes->@* };
+        }
+        else {
+            # let anything else just fail in type checking
         }
     }
 
@@ -118,8 +136,8 @@ END
         );
     };
 
-    # remap the arrays to hashes for easy lookup
-    foreach my $features (qw/includes excludes/) {
+    # remap the array to a hash for easy lookup
+    foreach my $features (qw/excludes/) {
         $args->{$features} = { map { $_ => 1 } $args->{$features}->@* };
     }
 
@@ -135,10 +153,12 @@ sub _our_init_meta ( $class, $apply_default_features, %params ) {
         $MooseX::Extended::Debug = $config->{debug};
     }
 
-    foreach my $feature (qw/includes excludes/) {
-        if ( exists $config->{$feature} ) {
-            foreach my $category ( sort keys $config->{$feature}->%* ) {
-                _debug("$for_class $feature '$category'");
+    if ( _should_debug() ) {
+        foreach my $feature (qw/includes excludes/) {
+            if ( exists $config->{$feature} ) {
+                foreach my $category ( sort keys $config->{$feature}->%* ) {
+                    _debug("$for_class $feature '$category'");
+                }
             }
         }
     }
@@ -209,52 +229,65 @@ sub _default_import_list () {
         types        => Optional [ ArrayRef [NonEmptyStr] ],
         _import_type => Enum [qw/class role/],
         _caller_eval => Bool,                                  # https://github.com/Ovid/moosex-extended/pull/34
-        includes     => Optional [
-            ArrayRef [
-                Enum [
-                    qw/
-                      multi
-                      async
-                      try
-                      method
-                      /
-                ]
-            ]
-        ]
+        includes     => Optional [ Dict [ map { $_ => Optional [ Undef | ArrayRef ] } qw/ multi async try method / ] ],
     );
 }
 
+sub _with_imports ( $requested, $defaults ) {
+    if ($requested) {
+        return $requested->@*;
+    }
+    elsif ($defaults) {
+        return $defaults->@*;
+    }
+    return;
+}
+
 sub _apply_optional_features ( $config, $for_class ) {
-    if ( $config->{includes}{multi} ) {
-        if ( $^V && $^V lt v5.26.0 ) {
-            croak("multi subs not supported in Perl version less than v5.26.0. You have $^V");
+    my $includes = $config->{includes} or return;
+
+    state $requirements_for = {
+        multi => {
+            version => v5.26.0,
+            import  => undef,
+            module  => 'Syntax::Keyword::MultiSub',
+        },
+        async => {
+            version => v5.26.0,
+            import  => undef,
+            module  => 'Future::AsyncAwait',
+        },
+        method => {
+            version => v5.0.0,
+            import  => ['method'],
+            module  => 'Function::Parameters',
+        },
+        try => {
+            version => v5.24.0,
+            import  => undef,
+            module  => 'Syntax::Keyword::Try',
+            skip    => sub ($for_class) {
+                if (HAVE_FEATURE_TRY) {
+                    feature->import::into($for_class);
+                    warnings->unimport('experimental::try');
+                    return 1;
+                }
+                return;
+            },
+        }
+    };
+    FEATURE: foreach my $feature ( keys $includes->%* ) {
+        my $required = $requirements_for->{$feature} or croak("PANIC: we have requested a non-existent feature: $feature");
+        if ( $^V && $^V lt $required->{version} ) {
+            croak("Feature '$feature' not supported in Perl version less than $required->{version}. You have $^V");
         }
 
         # don't trap the error. Let it bubble up.
-        load Syntax::Keyword::MultiSub;
-        Syntax::Keyword::MultiSub->import::into($for_class);
-    }
-    if ( $config->{includes}{async} ) {
-        if ( $^V && $^V lt v5.26.0 ) {
-            croak("async subs not supported in Perl version less than v5.26.0. You have $^V");
+        if ( my $skip = $required->{skip} ) {
+            next FEATURE if $skip->($for_class);
         }
-
-        # don't trap the error. Let it bubble up.
-        load Future::AsyncAwait;
-        Future::AsyncAwait->import::into($for_class);
-    }
-    if ( $config->{includes}{method} ) {
-        load Function::Parameters;
-        Function::Parameters->import::into( $for_class, 'method' );
-    }
-    if ( $config->{includes}{try} ) {
-        if ( $^V && $^V lt v5.24.0 ) {
-            croak("try/catch not supported in Perl version less than v5.24.0. You have $^V");
-        }
-
-        # don't trap the error. Let it bubble up.
-        load Syntax::Keyword::Try;
-        Syntax::Keyword::Try->import::into($for_class);
+        load $required->{module};
+        $required->{module}->import::into( $for_class, _with_imports( $includes->{$feature}, $required->{import} ) );
     }
 }
 
@@ -371,7 +404,7 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
     {
 
         my $call_level = 1 + $opt_for{_call_level};
-        my ( $package, $filename, $line ) = caller($call_level);
+        my ( undef, $filename, $line ) = caller($call_level);
         Carp::carp("$attr_type '$name' is read-only and has no init_arg or default, defined at $filename line $line\n")
           if $] ge '5.028'
           and warnings::enabled_at_level( 'MooseX::Extended::naked_fields', $call_level );
@@ -484,10 +517,13 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
     return %opt_for;
 }
 
+sub _should_debug () {
+    return $MooseX::Extended::Debug // $ENV{MOOSEX_EXTENDED_DEBUG};    # suppress "once" warnings
+}
+
 sub _debug ( $message, @data ) {
-    $MooseX::Extended::Debug //= $ENV{MOOSEX_EXTENDED_DEBUG};    # suppress "once" warnings
-    return unless $MooseX::Extended::Debug;
-    if (@data) {                                                 # yup, still want multidispatch
+    return unless _should_debug();
+    if (@data) {                                                       # yup, still want multidispatch
         require Data::Printer;
         my $data = Data::Printer::np(@data);
         $message = "$message: $data";
