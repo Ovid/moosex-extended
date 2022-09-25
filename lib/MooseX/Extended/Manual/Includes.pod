@@ -131,3 +131,6 @@ Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
 Allows you to use try/catch blocks, via L<Syntax::Keyword::Try>.
 
 Only available on Perl v5.24.0 or higher. Requires L<Syntax::Keyword::Try>.
+
+If you have Perl v5.35.8 or above, L<Syntax::Keyword::Try> is I<not> loaded
+and instead we use the native C<try> syntax available in Perl.

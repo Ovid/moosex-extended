@@ -27,6 +27,9 @@ use Ref::Util qw(
   is_coderef
 );
 use Carp 'croak';
+#
+# Core's use feature 'try' only supports 'finally' since 5.35.8
+use constant HAVE_FEATURE_TRY => $] >= 5.035008;
 
 our $VERSION = '0.33';
 
@@ -255,8 +258,14 @@ sub _apply_optional_features ( $config, $for_class ) {
         }
 
         # don't trap the error. Let it bubble up.
-        load Syntax::Keyword::Try;
-        Syntax::Keyword::Try->import::into($for_class);
+        if (HAVE_FEATURE_TRY) {
+            feature->import::into( $for_class, 'try' );
+            warnings->unimport('experimental::try');
+        }
+        else {
+            load Syntax::Keyword::Try;
+            Syntax::Keyword::Try->import::into($for_class);
+        }
     }
 }
 
