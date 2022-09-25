@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use lib 't/lib';
-use MooseX::Extended::Tests module => 'Test::Compile';
+use MooseX::Extended::Tests requires => { 'Test::Compile' => v3.1.0 };
 use Test::Compile v3.1.0;    # not needed directly, but make sure various cpan clients pick it up
 use Test::Compile::Internal;
 
