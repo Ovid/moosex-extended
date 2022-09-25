@@ -227,11 +227,6 @@ sub _default_import_list () {
 }
 
 sub _apply_optional_features ( $config, $for_class ) {
-
-use Data::Dumper::Simple;
-local $Data::Dumper::Indent   = 1;
-local $Data::Dumper::Sortkeys = 1;
-print STDERR Dumper($config, $for_class);
     if ( $config->{includes}{multi} ) {
         if ( $^V && $^V lt v5.26.0 ) {
             croak("multi subs not supported in Perl version less than v5.26.0. You have $^V");
