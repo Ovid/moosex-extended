@@ -28,8 +28,6 @@ use Ref::Util qw(
 );
 use Carp 'croak';
 #
-# Core's use feature 'try' only supports 'finally' since 5.35.8
-use constant HAVE_FEATURE_TRY => $] >= 5.035008;
 
 our $VERSION = '0.33';
 
@@ -43,6 +41,9 @@ our @EXPORT_OK = qw(
   field
   param
 );
+
+# Core's use feature 'try' only supports 'finally' since 5.35.8
+use constant HAVE_FEATURE_TRY => $] >= 5.035008;
 
 sub _enabled_features  {qw/signatures postderef postderef_qq :5.20/}             # internal use only
 sub _disabled_warnings {qw/experimental::signatures experimental::postderef/}    # internal use only

@@ -24,6 +24,7 @@ requires "Type::Utils" => "0";
 requires "Types::Common::Numeric" => "0";
 requires "Types::Common::String" => "0";
 requires "Types::Standard" => "0";
+requires "constant" => "0";
 requires "feature" => "0";
 requires "mro" => "0";
 requires "namespace::autoclean" => "0";
