@@ -135,10 +135,12 @@ sub _our_init_meta ( $class, $apply_default_features, %params ) {
         $MooseX::Extended::Debug = $config->{debug};
     }
 
-    foreach my $feature (qw/includes excludes/) {
-        if ( exists $config->{$feature} ) {
-            foreach my $category ( sort keys $config->{$feature}->%* ) {
-                _debug("$for_class $feature '$category'");
+    if ( _should_debug() ) {
+        foreach my $feature (qw/includes excludes/) {
+            if ( exists $config->{$feature} ) {
+                foreach my $category ( sort keys $config->{$feature}->%* ) {
+                    _debug("$for_class $feature '$category'");
+                }
             }
         }
     }
@@ -484,9 +486,12 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
     return %opt_for;
 }
 
+sub _should_debug () {
+    return $MooseX::Extended::Debug // $ENV{MOOSEX_EXTENDED_DEBUG};    # suppress "once" warnings
+}
+
 sub _debug ( $message, @data ) {
-    $MooseX::Extended::Debug //= $ENV{MOOSEX_EXTENDED_DEBUG};    # suppress "once" warnings
-    return unless $MooseX::Extended::Debug;
+    return unless _should_debug();
     if (@data) {                                                 # yup, still want multidispatch
         require Data::Printer;
         my $data = Data::Printer::np(@data);
