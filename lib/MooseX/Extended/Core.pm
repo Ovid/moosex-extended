@@ -59,7 +59,7 @@ sub _config_for ($package) {
 sub _our_import {
 
     # don't use signatures for this import because we need @_ later. @_ is
-    # intended to be removed for subs with signature
+    # intended to be removed for subs with signatures
     my ( $class, $import, $target_class ) = @_;
 
     # Moose::Exporter uses Sub::Exporter to handle exporting, so it accepts an
@@ -227,6 +227,11 @@ sub _default_import_list () {
 }
 
 sub _apply_optional_features ( $config, $for_class ) {
+
+use Data::Dumper::Simple;
+local $Data::Dumper::Indent   = 1;
+local $Data::Dumper::Sortkeys = 1;
+print STDERR Dumper($config, $for_class);
     if ( $config->{includes}{multi} ) {
         if ( $^V && $^V lt v5.26.0 ) {
             croak("multi subs not supported in Perl version less than v5.26.0. You have $^V");
