@@ -1,13 +1,20 @@
 #!/usr/bin/env perl
 
 use lib 't/lib';
+my %requires;
+
+BEGIN {
+    if ( $] < 5.035008 ) {
+        %requires = ( 'Syntax::Keyword::Try' => '0.27' );
+    }
+}
 use MooseX::Extended::Tests
   name     => 'try/catch',
-  requires => { 'Syntax::Keyword::Try' => '0.27' },
+  requires => \%requires,
   version  => v5.24.0;
 
 package My::Try {
-    use MooseX::Extended includes => [qw/try/];
+    use MooseX::Extended includes => 'try';
 
     sub reciprocal ( $self, $num ) {
         try {
@@ -20,7 +27,7 @@ package My::Try {
 }
 
 package My::Try::Role {
-    use MooseX::Extended::Role includes => [qw/try/];
+    use MooseX::Extended::Role includes => 'try';
 
     sub reciprocal ( $self, $num ) {
         try {
