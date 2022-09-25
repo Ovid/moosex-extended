@@ -34,7 +34,8 @@ Note: this is equivalent to writing:
 
     use Function::Parameters 'method';
 
-The other features of L<Function::Parameters> are not available.
+The other features of L<Function::Parameters> are not available by default,
+but see "Fine-Tuning Your Includes" below.
 
 This feature does not work with the optional C<multi> keyword. Thus,  if you
 do this:
@@ -49,6 +50,10 @@ You cannot do C<multi method>. You'll have to fall back to C<multi sub>.
 
     multi sub foo ($self, $x)      { ... }
     multi sub foo ($self, $x, $y ) { ... }
+
+Note: this is equivalent to writing:
+
+    use Syntax::Keyword::MultiSub;
 
 Allows you to redeclare a method (or subroutine) and the dispatch will use the number
 of arguments to determine which subroutine to use. Note that "slurpy" arguments such as
@@ -93,8 +98,8 @@ You cannot do C<multi method>. You'll have to fall back to C<multi sub>.
 
     package My::Thing {
         use MooseX::Extended
-        types    => 'Str',
-        includes => 'async';
+            types    => 'Str',
+            includes => 'async';
         use IO::Async::Loop;
 
         field output => ( is => 'rw', isa => Str, default => '' );
@@ -108,6 +113,10 @@ You cannot do C<multi method>. You'll have to fall back to C<multi sub>.
             }
         }
     }
+
+Note: this is equivalent to writing:
+
+    use Future::AsyncAwait;
 
 Allows you to write asynchronous code with C<async> and C<await>.
 
@@ -128,9 +137,46 @@ Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
         }
     }
 
+Note: this is equivalent to writing:
+
+    use Syntax::Keyword::Try;
+
 Allows you to use try/catch blocks, via L<Syntax::Keyword::Try>.
 
 Only available on Perl v5.24.0 or higher. Requires L<Syntax::Keyword::Try>.
 
 If you have Perl v5.35.8 or above, L<Syntax::Keyword::Try> is I<not> loaded
 and instead we use the native C<try> syntax available in Perl.
+
+=head1 Fine-Tuning Your Includes
+
+Some of the features rely on modules that are customizable via import lists
+when you C<use> them. Instead of accepting our defaults, you can pass your own
+by passing a hashref to C<includes>. Each key must be the name of a feature
+you can include and each value must be C<undef> or an array reference that
+will be expaned to an import list for the module:
+
+    package My::Import::List {
+        use MooseX::Extended types => 'is_PositiveOrZeroInt',
+          includes                 => {
+              method => [qw/method fun/],
+              try    => undef,
+          };
+        use List::Util 'sum';
+
+        method fac($n) { return _fac($n) }
+
+        fun _fac($n) {
+            is_PositiveOrZeroInt($n) or die "Don't do that!";
+            return 1 if $n < 2;
+            return $n * _fac $n - 1;
+        }
+    }
+
+The above would be equivalentt to writing:
+
+    use Function::Parameters qw(method fun);
+    use Syntax::Keyword::Try;
+
+See the underlying module providing each feature to understand what arguments
+you can pass to the import lists.

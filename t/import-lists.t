@@ -8,8 +8,10 @@ use MooseX::Extended::Tests
 
 package My::Import::List {
     use MooseX::Extended types => 'is_PositiveOrZeroInt',
-      includes                 => { 'method' => [qw/method fun/] };
-    use List::Util 'sum';
+      includes                 => {
+        method => [qw/method fun/],
+        try    => undef,
+      };
 
     method fac($n) { return _fac($n) }
 
@@ -17,6 +19,15 @@ package My::Import::List {
         is_PositiveOrZeroInt($n) or die "Don't do that!";
         return 1 if $n < 2;
         return $n * _fac $n - 1;
+    }
+
+    method reciprocal($n) {
+        try {
+            return 1 / $n;
+        }
+        catch ($error) {
+            croak "My error: $error";
+        }
     }
 }
 
@@ -26,6 +37,10 @@ subtest 'custom import lists' => sub {
 
     throws_ok { $thing->fac(3.14) } qr/Don't do that!/,
       '... and our type constraint works inside of the fun';
+
+    is $thing->reciprocal(.5), 2, 'We are in the try';
+    throws_ok { $thing->reciprocal(0) } qr/My error/,
+      '... and now we are in the catch';
 };
 
 done_testing;
