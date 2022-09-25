@@ -59,7 +59,7 @@ sub _config_for ($package) {
 sub _our_import {
 
     # don't use signatures for this import because we need @_ later. @_ is
-    # intended to be removed for subs with signatures
+    # intended to be removed for subs with signature
     my ( $class, $import, $target_class ) = @_;
 
     # Moose::Exporter uses Sub::Exporter to handle exporting, so it accepts an
