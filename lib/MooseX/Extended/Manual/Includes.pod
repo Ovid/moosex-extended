@@ -131,8 +131,8 @@ Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
             try {
                 return 1 / $num;
             }
-            catch {
-                croak "Could not calculate reciprocal of $num: $@";
+            catch ($e) {
+                croak "Could not calculate reciprocal of $num: $e";
             }
         }
     }

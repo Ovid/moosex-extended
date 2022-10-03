@@ -268,7 +268,7 @@ sub _apply_optional_features ( $config, $for_class ) {
             module  => 'Syntax::Keyword::Try',
             skip    => sub ($for_class) {
                 if (HAVE_FEATURE_TRY) {
-                    feature->import::into($for_class);
+                    feature->import::into($for_class, 'try');
                     warnings->unimport('experimental::try');
                     return 1;
                 }
