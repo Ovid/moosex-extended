@@ -1,6 +1,8 @@
 Revision history for MooseX-Extended
 
 {{$NEXT}}
+          - Make Syntax::Keyword::Try work on newer versions of Perl. (gmbow)
+          - Update some docs to show proper usage of try/catch (gmbow)
 
 0.33      2022-09-25 14:33:53 CEST
           - You can now specify custom imports for each included feature. See
