@@ -388,28 +388,7 @@ useful to be able to define an `init_arg` for unit testing.)
 
 # BUGS AND LIMITATIONS
 
-You cannot (at this time) use `multi` subs with the debugger. This is due to
-a bug in [Syntax::Keyword::MultiSub](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3AMultiSub) that should be fixed in the next release
-of that module.
-
-If you must have multisubs and the debugger, the follow patch to
-[Syntax::Keyword::MultiSub](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3AMultiSub) fixes the issue:
-
-```
---- old/lib/Syntax/Keyword/MultiSub.xs  2021-12-16 10:59:30 +0000
-+++ new/lib/Syntax/Keyword/MultiSub.xs  2022-08-12 10:23:06 +0000
-@@ -129,6 +129,7 @@
- redo:
-     switch(o->op_type) {
-       case OP_NEXTSTATE:
-+      case OP_DBSTATE:
-         o = o->op_next;
-         goto redo;
-```
-
-See also:
-
-- [The github issue](https://github.com/Ovid/moosex-extended/issues/45)
+None known at this time.
 
 # MANUAL
 
