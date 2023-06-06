@@ -32,7 +32,7 @@ use Ref::Util qw(
 use Carp 'croak';
 #
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 our @EXPORT_OK = qw(
   _assert_import_list_is_valid
